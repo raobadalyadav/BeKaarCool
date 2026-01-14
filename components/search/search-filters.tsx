@@ -6,9 +6,8 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Separator } from "@/components/ui/separator"
-import { Card } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, X, Filter, Star } from "lucide-react"
+import { ChevronDown, Filter, Star } from "lucide-react"
 
 interface SearchFiltersProps {
   selectedCategories: string[]
@@ -41,23 +40,22 @@ export function SearchFilters({
     categories: true,
     price: true,
     sizes: true,
-    brands: false,
+    brands: true,
     rating: false
   })
 
+  // Dummy data - ideally from API
   const categories = [
     { name: "T-Shirts", count: 245 },
     { name: "Hoodies", count: 128 },
     { name: "Accessories", count: 89 },
     { name: "Mugs", count: 156 },
-    { name: "Posters", count: 203 },
     { name: "Phone Cases", count: 67 },
-    { name: "Stickers", count: 134 }
   ]
 
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL", "One Size"]
-  const brands = ["Nike", "Adidas", "Custom Co.", "Print Pro", "Design Hub", "Creative Wear"]
-  const ratings = [5, 4, 3, 2, 1]
+  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"]
+  const brands = ["Nike", "Adidas", "Puma", "BeKaarCool", "Zara", "H&M"]
+  const ratings = [4, 3, 2, 1]
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }))
@@ -71,209 +69,172 @@ export function SearchFilters({
     if (setSelectedRating) setSelectedRating(0)
   }
 
-  const hasActiveFilters = selectedCategories.length > 0 || 
-    selectedSizes.length > 0 || 
-    priceRange[0] > 0 || 
+  const hasActiveFilters = selectedCategories.length > 0 ||
+    selectedSizes.length > 0 ||
+    priceRange[0] > 0 ||
     priceRange[1] < 5000 ||
     selectedBrands.length > 0 ||
     (selectedRating && selectedRating > 0)
 
   return (
-    <Card className={`p-6 sticky top-24 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Filter className="h-5 w-5" />
+    <div className={`space-y-6 ${className}`}>
+      <div className="flex items-center justify-between pb-4 border-b">
+        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider">
           Filters
         </h2>
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={clearAllFilters}
-            className="text-xs text-muted-foreground hover:text-destructive"
+            className="text-xs font-bold text-teal-600 hover:text-teal-700 uppercase"
           >
-            Clear all
-          </Button>
+            Clear All
+          </button>
         )}
       </div>
 
-      <div className="space-y-6">
-        {/* Categories */}
+      {/* Categories */}
+      <div className="border-b pb-4">
         <Collapsible open={openSections.categories} onOpenChange={() => toggleSection('categories')}>
-          <CollapsibleTrigger className="flex items-center justify-between w-full">
-            <h3 className="font-semibold">Categories</h3>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.categories ? 'rotate-180' : ''}`} />
+          <CollapsibleTrigger className="flex items-center justify-between w-full group">
+            <h3 className="font-semibold text-gray-800 text-sm">Category</h3>
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openSections.categories ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 mt-3">
-            {categories.map((category) => (
-              <div key={category.name} className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id={category.name}
-                    checked={selectedCategories.includes(category.name)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedCategories([...selectedCategories, category.name])
-                      } else {
-                        setSelectedCategories(selectedCategories.filter((c) => c !== category.name))
-                      }
-                    }}
-                  />
-                  <label htmlFor={category.name} className="text-sm font-medium cursor-pointer">
-                    {category.name}
-                  </label>
-                </div>
-                <span className="text-xs text-muted-foreground">({category.count})</span>
+          <CollapsibleContent className="mt-4 space-y-2">
+            {categories.map((cat) => (
+              <div key={cat.name} className="flex items-center gap-3">
+                <Checkbox
+                  id={`cat-${cat.name}`}
+                  checked={selectedCategories.includes(cat.name)}
+                  onCheckedChange={(checked) => {
+                    if (checked) setSelectedCategories([...selectedCategories, cat.name])
+                    else setSelectedCategories(selectedCategories.filter(c => c !== cat.name))
+                  }}
+                  className="border-gray-300 rounded-[2px] data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 data-[state=checked]:text-black"
+                />
+                <label htmlFor={`cat-${cat.name}`} className="text-sm text-gray-600 cursor-pointer flex-1 flex justify-between">
+                  <span>{cat.name}</span>
+                  <span className="text-gray-400 text-xs">({cat.count})</span>
+                </label>
               </div>
             ))}
           </CollapsibleContent>
         </Collapsible>
+      </div>
 
-        <Separator />
-
-        {/* Price Range */}
+      {/* Price */}
+      <div className="border-b pb-4">
         <Collapsible open={openSections.price} onOpenChange={() => toggleSection('price')}>
           <CollapsibleTrigger className="flex items-center justify-between w-full">
-            <h3 className="font-semibold">Price Range</h3>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? 'rotate-180' : ''}`} />
+            <h3 className="font-semibold text-gray-800 text-sm">Price</h3>
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openSections.price ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 mt-3">
-            <Slider 
-              value={priceRange} 
-              onValueChange={setPriceRange} 
-              max={5000} 
-              min={0} 
-              step={100} 
-              className="w-full" 
+          <CollapsibleContent className="mt-4 space-y-4">
+            <Slider
+              value={priceRange}
+              onValueChange={setPriceRange}
+              max={5000}
+              min={0}
+              step={100}
+              className="w-full"
             />
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>₹{priceRange[0]}</span>
-              <span>₹{priceRange[1]}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { label: "Under ₹500", range: [0, 500] },
-                { label: "₹500-₹1000", range: [500, 1000] },
-                { label: "₹1000-₹2000", range: [1000, 2000] },
-                { label: "Above ₹2000", range: [2000, 5000] }
-              ].map((preset) => (
-                <Button
-                  key={preset.label}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPriceRange(preset.range)}
-                  className="text-xs"
-                >
-                  {preset.label}
-                </Button>
-              ))}
+            <div className="flex justify-between items-center text-xs text-gray-500 font-medium">
+              <span className="bg-gray-100 px-2 py-1 rounded">₹{priceRange[0]}</span>
+              <span className="text-gray-300">to</span>
+              <span className="bg-gray-100 px-2 py-1 rounded">₹{priceRange[1]}</span>
             </div>
           </CollapsibleContent>
         </Collapsible>
+      </div>
 
-        <Separator />
-
-        {/* Sizes */}
+      {/* Sizes */}
+      <div className="border-b pb-4">
         <Collapsible open={openSections.sizes} onOpenChange={() => toggleSection('sizes')}>
           <CollapsibleTrigger className="flex items-center justify-between w-full">
-            <h3 className="font-semibold">Sizes</h3>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.sizes ? 'rotate-180' : ''}`} />
+            <h3 className="font-semibold text-gray-800 text-sm">Sizes</h3>
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openSections.sizes ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3">
-            <div className="grid grid-cols-3 gap-2">
+          <CollapsibleContent className="mt-4">
+            <div className="flex flex-wrap gap-2">
               {sizes.map((size) => (
-                <Button
+                <button
                   key={size}
-                  variant={selectedSizes.includes(size) ? "default" : "outline"}
-                  size="sm"
                   onClick={() => {
-                    if (selectedSizes.includes(size)) {
-                      setSelectedSizes(selectedSizes.filter((s) => s !== size))
-                    } else {
-                      setSelectedSizes([...selectedSizes, size])
-                    }
+                    if (selectedSizes.includes(size)) setSelectedSizes(selectedSizes.filter(s => s !== size))
+                    else setSelectedSizes([...selectedSizes, size])
                   }}
-                  className="text-xs"
+                  className={`w-10 h-10 flex items-center justify-center text-xs border rounded-sm transition-colors ${selectedSizes.includes(size) ? 'border-black bg-white font-bold' : 'border-gray-200 text-gray-500 hover:border-gray-400'
+                    }`}
                 >
                   {size}
-                </Button>
+                </button>
               ))}
             </div>
           </CollapsibleContent>
         </Collapsible>
+      </div>
 
-        {/* Brands */}
-        {setSelectedBrands && (
-          <>
-            <Separator />
-            <Collapsible open={openSections.brands} onOpenChange={() => toggleSection('brands')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full">
-                <h3 className="font-semibold">Brands</h3>
-                <ChevronDown className={`h-4 w-4 transition-transform ${openSections.brands ? 'rotate-180' : ''}`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 mt-3">
-                {brands.map((brand) => (
-                  <div key={brand} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={brand}
-                      checked={selectedBrands.includes(brand)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setSelectedBrands([...selectedBrands, brand])
-                        } else {
-                          setSelectedBrands(selectedBrands.filter((b) => b !== brand))
-                        }
-                      }}
-                    />
-                    <label htmlFor={brand} className="text-sm font-medium cursor-pointer">
-                      {brand}
-                    </label>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          </>
-        )}
+      {/* Brands */}
+      {setSelectedBrands && (
+        <div className="border-b pb-4">
+          <Collapsible open={openSections.brands} onOpenChange={() => toggleSection('brands')}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full">
+              <h3 className="font-semibold text-gray-800 text-sm">Brand</h3>
+              <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openSections.brands ? 'rotate-180' : ''}`} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+              {brands.map((brand) => (
+                <div key={brand} className="flex items-center gap-3">
+                  <Checkbox
+                    id={`brand-${brand}`}
+                    checked={selectedBrands.includes(brand)}
+                    onCheckedChange={(checked) => {
+                      if (checked) setSelectedBrands([...selectedBrands, brand])
+                      else setSelectedBrands(selectedBrands.filter(b => b !== brand))
+                    }}
+                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 data-[state=checked]:text-black"
+                  />
+                  <label htmlFor={`brand-${brand}`} className="text-sm text-gray-600 cursor-pointer">
+                    {brand}
+                  </label>
+                </div>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      )}
 
-        {/* Rating */}
-        {setSelectedRating && (
-          <>
-            <Separator />
-            <Collapsible open={openSections.rating} onOpenChange={() => toggleSection('rating')}>
-              <CollapsibleTrigger className="flex items-center justify-between w-full">
-                <h3 className="font-semibold">Rating</h3>
-                <ChevronDown className={`h-4 w-4 transition-transform ${openSections.rating ? 'rotate-180' : ''}`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 mt-3">
-                {ratings.map((rating) => (
-                  <div
-                    key={rating}
-                    onClick={() => setSelectedRating(selectedRating === rating ? 0 : rating)}
-                    className="flex items-center space-x-2 cursor-pointer hover:bg-muted p-2 rounded"
-                  >
-                    <div className="flex items-center">
+      {/* Rating */}
+      {setSelectedRating && (
+        <div className="pb-4">
+          <Collapsible open={openSections.rating} onOpenChange={() => toggleSection('rating')}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full">
+              <h3 className="font-semibold text-gray-800 text-sm">Ratings</h3>
+              <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${openSections.rating ? 'rotate-180' : ''}`} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-2">
+              {ratings.map((rating) => (
+                <div key={rating} className="flex items-center gap-3 cursor-pointer" onClick={() => setSelectedRating(selectedRating === rating ? 0 : rating)}>
+                  <Checkbox
+                    id={`rating-${rating}`}
+                    checked={selectedRating === rating}
+                    onCheckedChange={() => setSelectedRating(selectedRating === rating ? 0 : rating)}
+                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-yellow-400 data-[state=checked]:border-yellow-400 data-[state=checked]:text-black"
+                  />
+                  <label htmlFor={`rating-${rating}`} className="text-sm text-gray-600 cursor-pointer flex items-center gap-1">
+                    <div className="flex">
                       {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                          }`}
-                        />
+                        <Star key={i} className={`h-3 w-3 ${i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200 fill-gray-200"}`} />
                       ))}
                     </div>
-                    <span className="text-sm">& up</span>
-                    {selectedRating === rating && (
-                      <Badge variant="default" className="ml-auto">
-                        Selected
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          </>
-        )}
-      </div>
-    </Card>
+                    <span className="text-xs text-gray-400">& Above</span>
+                  </label>
+                </div>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      )}
+
+    </div>
   )
 }

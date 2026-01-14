@@ -17,13 +17,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { CartSheet } from "@/components/cart/cart-sheet"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 import { Search, ShoppingCart, User, Menu, Globe, DollarSign, Sun, Moon, Palette, Store } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useToast } from "@/hooks/use-toast"
 import { useAppSelector, useAppDispatch } from "@/store"
-import { fetchCart } from "@/store/slices/cart-slice"
+import { fetchCart, loadFromStorage } from "@/store/slices/cart-slice"
 import { EnhancedSearch } from "@/components/search/enhanced-search"
 import { CommandSearch } from "@/components/search/command-search"
 
@@ -37,7 +38,7 @@ export function Header() {
   const { theme, setTheme } = useTheme()
   const [commandOpen, setCommandOpen] = useState(false)
 
-  
+
   const { items } = useAppSelector((state) => state.cart)
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
@@ -51,6 +52,8 @@ export function Header() {
   useEffect(() => {
     if (session) {
       dispatch(fetchCart())
+    } else {
+      dispatch(loadFromStorage())
     }
   }, [session, dispatch])
 
@@ -86,200 +89,217 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        {/* Top Section - Logo, Search, Actions */}
-        <div className="border-b border-border/40">
-          <div className="container flex h-14 md:h-16 items-center justify-between px-4">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <div className="h-7 w-7 md:h-8 md:w-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-xs md:text-sm">B</span>
-              </div>
-              <span className="font-bold text-lg md:text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                BeKaarCool
-              </span>
-            </Link>
-
-            {/* Enhanced Search Bar - Desktop */}
-            <div className="hidden md:flex flex-1 max-w-xl mx-6 lg:mx-8">
-              <div className="relative w-full">
-                <EnhancedSearch className="w-full" />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden lg:flex items-center gap-1 text-xs text-muted-foreground">
-                  <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                    <span className="text-xs">⌘</span>K
-                  </kbd>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side Actions */}
-            <div className="flex items-center space-x-1 md:space-x-2">
-              {/* Mobile Search */}
-              <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setCommandOpen(true)}>
-                <Search className="h-4 w-4" />
-              </Button>
-
-              {/* Cart */}
-              <Link href="/cart">
-                <Button variant="ghost" size="sm" className="relative">
-                  <ShoppingCart className="h-4 w-4" />
-                  {cartCount > 0 && (
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-blue-600">
-                      {cartCount > 99 ? "99+" : cartCount}
-                    </Badge>
-                  )}
-                </Button>
+      <div className="flex flex-col w-full">
+        {/* Top Bar Utilities */}
+        <div className="bg-muted/30 py-1 border-b text-[10px] md:text-xs">
+          <div className="container mx-auto px-4 flex justify-between items-center text-muted-foreground font-medium">
+            <div className="flex items-center space-x-4 md:space-x-6">
+              <Link href="/offers" className="hover:text-primary transition-colors">Offers</Link>
+              <Link href="/fanbook" className="hidden md:inline hover:text-primary transition-colors">Fanbook</Link>
+              <Link href="/apps" className="flex items-center hover:text-primary transition-colors">
+                <span className="hidden md:inline mr-1">Download App</span>
+                <span className="md:hidden">App</span>
               </Link>
+              <Link href="/stores" className="hidden md:inline hover:text-primary transition-colors">Find a store near me</Link>
+            </div>
+            <div className="flex items-center space-x-4 md:space-x-6">
+              <Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
+              <Link href="/track-order" className="hover:text-primary transition-colors">Track Order</Link>
+            </div>
+          </div>
+        </div>
 
-              {/* User Menu */}
-              {session ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span className="hidden lg:inline max-w-20 truncate text-sm">{session.user?.name}</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile" className="flex items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/orders" className="flex items-center">
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        My Orders
-                      </Link>
-                    </DropdownMenuItem>
-                    {session.user?.role === "seller" && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/seller/dashboard" className="flex items-center">
-                          <Store className="mr-2 h-4 w-4" />
-                          Seller Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    {session.user?.role === "admin" && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/admin" className="flex items-center">
-                          <Store className="mr-2 h-4 w-4" />
-                          Admin Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="flex items-center space-x-1 md:space-x-2">
-                  <Button variant="ghost" size="sm" asChild className="text-sm">
-                    <Link href="/auth/login">Login</Link>
-                  </Button>
-                  <Button size="sm" asChild className="text-sm">
-                    <Link href="/auth/register">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
-
-              {/* Mobile Menu */}
+        {/* Main Header */}
+        <header className="sticky top-0 z-50 w-full bg-background border-b shadow-sm">
+          <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
+            {/* Left: Logo & Menu */}
+            <div className="flex items-center gap-6 lg:gap-8">
+              {/* Mobile Menu Trigger */}
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="md:hidden">
-                    <Menu className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="lg:hidden -ml-2">
+                    <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-80">
-                  <div className="flex flex-col space-y-4 mt-8">
-                    {/* Mobile Navigation */}
-                    <Link href="/products" className="text-lg font-medium py-2 hover:text-primary transition-colors">
-                      Products
-                    </Link>
-                    <Link href="/categories" className="text-lg font-medium py-2 hover:text-primary transition-colors">
-                      Categories
-                    </Link>
-                    <Link href="/about" className="text-lg font-medium py-2 hover:text-primary transition-colors">
-                      About
-                    </Link>
-                    <Link href="/contact" className="text-lg font-medium py-2 hover:text-primary transition-colors">
-                      Contact
-                    </Link>
-
-                    {/* Mobile User Actions */}
-                    {session ? (
-                      <div className="space-y-2 pt-4 border-t">
-                        <Link href="/profile" className="text-lg font-medium py-2 flex items-center hover:text-primary transition-colors">
-                          <User className="h-5 w-5 mr-2" />
-                          Profile
-                        </Link>
-                        <Link href="/orders" className="text-lg font-medium py-2 flex items-center hover:text-primary transition-colors">
-                          <ShoppingCart className="h-5 w-5 mr-2" />
-                          My Orders
-                        </Link>
-                        {session.user?.role === "seller" && (
-                          <Link href="/seller/dashboard" className="text-lg font-medium py-2 flex items-center hover:text-primary transition-colors">
-                            <Store className="h-5 w-5 mr-2" />
-                            Seller Dashboard
-                          </Link>
-                        )}
-                        {session.user?.role === "admin" && (
-                          <Link href="/admin" className="text-lg font-medium py-2 flex items-center hover:text-primary transition-colors">
-                            <Store className="h-5 w-5 mr-2" />
-                            Admin Dashboard
-                          </Link>
-                        )}
-                        <Button onClick={handleSignOut} variant="outline" className="w-full mt-4">
-                          Sign Out
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 pt-4 border-t">
-                        <Button variant="outline" asChild className="w-full">
-                          <Link href="/auth/login">Login</Link>
-                        </Button>
-                        <Button asChild className="w-full">
-                          <Link href="/auth/register">Sign Up</Link>
-                        </Button>
-                      </div>
-                    )}
+                <SheetContent side="left" className="w-[300px]">
+                  <div className="flex flex-col space-y-6 mt-8">
+                    <div className="font-bold text-xl px-2">Menu</div>
+                    <nav className="flex flex-col space-y-2">
+                      <Link href="/products?category=Men" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Men</Link>
+                      <Link href="/products?category=Women" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Women</Link>
+                      <Link href="/products?category=Mobile%20Covers" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Mobile Covers</Link>
+                      <hr className="my-2" />
+                      <Link href="/orders" className="px-4 py-3 hover:bg-muted rounded-md font-medium">My Orders</Link>
+                      <Link href="/contact" className="px-4 py-3 hover:bg-muted rounded-md font-medium">Contact Us</Link>
+                      {session ? (
+                        <div onClick={handleSignOut} className="px-4 py-3 hover:bg-muted rounded-md font-medium cursor-pointer text-red-500">Sign Out</div>
+                      ) : (
+                        <Link href="/auth/login" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-primary">Login</Link>
+                      )}
+                    </nav>
                   </div>
                 </SheetContent>
               </Sheet>
+
+              {/* Logo */}
+              <Link href="/" className="flex-shrink-0">
+                <span className="font-bold text-2xl tracking-tight text-yellow-500">
+                  BeKaarCool
+                </span>
+              </Link>
+
+              {/* Desktop Navigation */}
+              <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold tracking-wide uppercase">
+                <Link href="/products?category=Men" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                  Men
+                </Link>
+                <Link href="/products?category=Women" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                  Women
+                </Link>
+                <Link href="/products?category=Mobile%20Covers" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                  Mobile Covers
+                </Link>
+              </nav>
+            </div>
+
+            {/* Right: Search & Actions */}
+            <div className="flex items-center flex-1 justify-end gap-2 md:gap-4">
+
+              {/* Search Bar (Desktop) */}
+              <div className="hidden md:block flex-1 max-w-sm mx-4">
+                <div className="relative group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
+                  <Input
+                    placeholder="Search by product, category or collection"
+                    className="bg-muted/40 border-transparent focus:border-border focus:bg-background h-10 w-full pl-10 text-xs font-medium"
+                    onClick={() => setCommandOpen(true)}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 md:gap-3 text-muted-foreground">
+                {/* Mobile Search Icon */}
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setCommandOpen(true)}>
+                  <Search className="h-5 w-5" />
+                </Button>
+
+                <div className="hidden md:flex items-center h-8 w-[1px] bg-border mx-1"></div>
+
+                {/* Login / User */}
+                {session ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="hidden md:flex flex-col gap-0.5 h-auto px-2 py-1 items-center hover:bg-transparent hover:text-foreground">
+                        <User className="h-5 w-5" />
+                        {/* <span className="text-[10px] font-medium">Profile</span> */}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 mt-2">
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile">Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/orders">Orders</Link>
+                      </DropdownMenuItem>
+                      {session.user?.role === "seller" && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/seller/dashboard">Seller Dashboard</Link>
+                        </DropdownMenuItem>
+                      )}
+                      {session.user?.role === "admin" && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin">Admin Dashboard</Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Link href="/auth/login" className="hidden md:block text-xs font-bold hover:underline px-2">
+                    Login
+                  </Link>
+                )}
+
+                {/* Heart / Wishlist */}
+                <Link href="/wishlist">
+                  <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9 text-muted-foreground hover:text-foreground">
+                    <span className="sr-only">Wishlist</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
+                  </Button>
+                </Link>
+
+                {/* Cart */}
+                <CartSheet>
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
+                    <ShoppingBagIcon className="h-5 w-5" />
+                    {cartCount > 0 && (
+                      <span className="absolute top-0 right-0 h-4 w-4 bg-yellow-400 text-black text-[10px] font-bold flex items-center justify-center rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Button>
+                </CartSheet>
+
+                {/* Flag / Region (Optional - mimicking Bewakoof's possible region selector or just placeholder) */}
+                <div className="hidden lg:flex items-center justify-center h-8 w-8">
+                  <span className="text-lg">🇮🇳</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Bottom Section - Navigation */}
-        <div className="hidden md:block">
-          <div className="container px-4">
-            <nav className="flex items-center justify-center space-x-8 h-12">
-              <Link href="/products" className="text-sm font-medium hover:text-primary transition-colors flex items-center">
-                <ShoppingCart className="h-4 w-4 mr-1" />
-                Shop All
-              </Link>
-              <Link href="/products?category=Fashion" className="text-sm font-medium hover:text-primary transition-colors">
-                Fashion
-              </Link>
-              <Link href="/products?category=Electronics" className="text-sm font-medium hover:text-primary transition-colors">
-                Electronics
-              </Link>
-              <Link href="/products?sale=true" className="text-sm font-medium hover:text-primary transition-colors text-red-600">
-                Sale
-              </Link>
-              <Link href="/products?sort=trending" className="text-sm font-medium hover:text-primary transition-colors">
-                Trending
-              </Link>
-              <Link href="/products?sort=newest" className="text-sm font-medium hover:text-primary transition-colors">
-                New Arrivals
-              </Link>
-            </nav>
+          {/* Sub-Header / Mega Menu Categories Mockup (Optional) */}
+          <div className="w-full border-t hidden md:block">
+            <div className="container mx-auto px-4">
+              <div className="flex items-center space-x-6 h-10 text-xs font-medium text-muted-foreground overflow-x-auto no-scrollbar">
+                <Link href="/products?sort=trending" className="whitespace-nowrap hover:text-foreground">LIVE NOW</Link>
+                <Link href="/products?category=Men" className="whitespace-nowrap hover:text-foreground">MEN</Link>
+                <Link href="/products?category=Women" className="whitespace-nowrap hover:text-foreground">WOMEN</Link>
+                <Link href="/products?category=Accessories" className="whitespace-nowrap hover:text-foreground">ACCESSORIES</Link>
+                <Link href="/products?sale=true" className="whitespace-nowrap hover:text-foreground">WINTERWEAR</Link>
+                <Link href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-foreground">PLUS SIZE</Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </header>
-      
+        </header>
+      </div>
+
       <CommandSearch open={commandOpen} onOpenChange={setCommandOpen} />
     </>
+  )
+}
+
+function ShoppingBagIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
   )
 }

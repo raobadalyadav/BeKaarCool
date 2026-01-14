@@ -36,6 +36,50 @@ export default function RootLayout({
             src="https://checkout.razorpay.com/v1/checkout.js"
             defer
           />
+          <Script
+            id="organization-schema"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "BeKaarCool",
+                "url": process.env.NEXTAUTH_URL || "https://bekaarcool.com",
+                "logo": `${process.env.NEXTAUTH_URL || "https://bekaarcool.com"}/logo.png`,
+                "description": "Premium custom print-on-demand marketplace in India",
+                "sameAs": [
+                  "https://instagram.com/bekaarcool",
+                  "https://twitter.com/bekaarcool"
+                ],
+                "contactPoint": {
+                  "@type": "ContactPoint",
+                  "telephone": "+91-XXXXXXXXXX",
+                  "contactType": "customer service",
+                  "availableLanguage": ["English", "Hindi"]
+                }
+              })
+            }}
+          />
+          <Script
+            id="website-schema"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "BeKaarCool",
+                "url": process.env.NEXTAUTH_URL || "https://bekaarcool.com",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": {
+                    "@type": "EntryPoint",
+                    "urlTemplate": `${process.env.NEXTAUTH_URL || "https://bekaarcool.com"}/products?search={search_term_string}`
+                  },
+                  "query-input": "required name=search_term_string"
+                }
+              })
+            }}
+          />
           <Toaster />
           <SonnerToaster />
         </Providers>

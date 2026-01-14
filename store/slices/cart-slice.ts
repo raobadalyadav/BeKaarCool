@@ -75,7 +75,7 @@ export const fetchCart = createAsyncThunk("cart/fetchCart", async () => {
   const response = await fetch("/api/cart")
   if (!response.ok) throw new Error("Failed to fetch cart")
   const data = await response.json()
-  
+
   return {
     ...data,
     items: data.items.map(transformCartItem),
@@ -104,7 +104,7 @@ export const addToCart = createAsyncThunk(
       throw new Error(error.message || "Failed to add to cart")
     }
     const data = await response.json()
-    
+
     return {
       ...data,
       items: data.items.map(transformCartItem),
@@ -122,7 +122,7 @@ export const updateCartItem = createAsyncThunk(
     })
     if (!response.ok) throw new Error("Failed to update cart item")
     const data = await response.json()
-    
+
     return {
       ...data,
       items: data.items.map(transformCartItem),
@@ -136,7 +136,7 @@ export const removeFromCart = createAsyncThunk("cart/removeFromCart", async (ite
   })
   if (!response.ok) throw new Error("Failed to remove from cart")
   const data = await response.json()
-  
+
   return {
     ...data,
     items: data.items.map(transformCartItem),
@@ -182,7 +182,7 @@ const cartSlice = createSlice({
     loadFromStorage: (state) => {
       const storedCart = getStoredCart()
       const storedCoupon = getStoredCoupon()
-      
+
       if (storedCart) {
         state.items = storedCart.items
         state.total = storedCart.total
@@ -192,11 +192,38 @@ const cartSlice = createSlice({
         state.discount = storedCart.discount
         state.couponCode = storedCart.couponCode
       }
-      
+
       if (storedCoupon) {
         state.couponCode = storedCoupon.code
         state.discount = storedCoupon.discount
       }
+    },
+    addToCartLocal: (state, action) => {
+      const newItem = action.payload
+      const existingItemIndex = state.items.findIndex(
+        (item) => item.productId === newItem.productId && item.size === newItem.size && item.color === newItem.color
+      )
+
+      if (existingItemIndex >= 0) {
+        state.items[existingItemIndex].quantity += newItem.quantity
+      } else {
+        const cartItem: CartItem = {
+          id: `local-${Date.now()}`,
+          productId: newItem.productId,
+          name: newItem.name || 'Product',
+          price: newItem.price || 0,
+          originalPrice: newItem.originalPrice,
+          image: newItem.image || "/placeholder.svg",
+          quantity: newItem.quantity,
+          size: newItem.size,
+          color: newItem.color,
+          stock: 100,
+          seller: { id: 'demo', name: 'Demo Seller' }
+        }
+        state.items.push(cartItem)
+      }
+      cartSlice.caseReducers.calculateTotals(state)
+      setStoredCart({ ...state, updatedAt: Date.now() })
     },
     calculateTotals: (state) => {
       state.subtotal = state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -219,7 +246,7 @@ const cartSlice = createSlice({
         state.tax = action.payload.tax
         state.couponCode = action.payload.couponCode
         state.discount = action.payload.discount
-        
+
         // Store in localStorage
         setStoredCart({
           items: action.payload.items,
@@ -263,7 +290,7 @@ const cartSlice = createSlice({
       .addCase(applyCoupon.fulfilled, (state, action) => {
         state.discount = action.payload.discount
         state.couponCode = action.payload.couponCode
-        
+
         // Store coupon in localStorage
         setStoredCoupon({
           code: action.payload.couponCode,
@@ -280,5 +307,5 @@ const cartSlice = createSlice({
   },
 })
 
-export const { clearCart, calculateTotals, loadFromStorage } = cartSlice.actions
+export const { clearCart, calculateTotals, loadFromStorage, addToCartLocal } = cartSlice.actions
 export default cartSlice.reducer
