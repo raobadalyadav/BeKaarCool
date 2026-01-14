@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       if (status === "inactive") query.isActive = false
       if (status === "verified") query.isVerified = true
       if (status === "unverified") query.isVerified = false
+      if (status === "banned") query.isBanned = true
     }
 
     if (search) {
@@ -41,6 +42,21 @@ export async function GET(request: NextRequest) {
     const total = await User.countDocuments(query)
     const users = await User.find(query).select("-password").sort({ createdAt: -1 }).skip(skip).limit(limit)
 
+    // Get stats
+    const stats = await User.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          active: { $sum: { $cond: ["$isActive", 1, 0] } },
+          verified: { $sum: { $cond: ["$isVerified", 1, 0] } },
+          banned: { $sum: { $cond: ["$isBanned", 1, 0] } },
+          sellers: { $sum: { $cond: [{ $eq: ["$role", "seller"] }, 1, 0] } },
+          admins: { $sum: { $cond: [{ $eq: ["$role", "admin"] }, 1, 0] } },
+        }
+      }
+    ])
+
     return NextResponse.json({
       users,
       pagination: {
@@ -49,6 +65,7 @@ export async function GET(request: NextRequest) {
         total,
         pages: Math.ceil(total / limit),
       },
+      stats: stats[0] || { total: 0, active: 0, verified: 0, banned: 0, sellers: 0, admins: 0 }
     })
   } catch (error) {
     console.error("Error fetching users:", error)

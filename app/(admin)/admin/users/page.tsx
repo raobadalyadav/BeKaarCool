@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Users,
   Search,
@@ -25,27 +28,73 @@ import {
   Phone,
   Calendar,
   MapPin,
+  ShieldCheck,
+  ShieldX,
+  UserCog,
+  Ban,
+  CheckCircle,
+  Package,
+  Home,
+  Briefcase,
+  Crown,
+  Coins,
+  ShoppingBag,
 } from "lucide-react"
 import { formatDate, getStatusColor } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+
+interface UserAddress {
+  _id: string
+  type: "home" | "work" | "other"
+  name: string
+  phone: string
+  address: string
+  landmark?: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+  isDefault: boolean
+}
+
+interface UserOrder {
+  _id: string
+  orderNumber: string
+  status: string
+  paymentStatus: string
+  totalAmount: number
+  createdAt: string
+  items: Array<{ name: string; quantity: number }>
+}
 
 interface User {
   _id: string
   name: string
   email: string
-  phone: string
+  phone?: string
   role: string
   avatar?: string
   isVerified: boolean
   isActive: boolean
+  isBanned: boolean
+  banReason?: string
+  bannedAt?: string
   lastLogin?: string
   createdAt: string
-  address?: {
-    city: string
-    state: string
-    country: string
-  }
-  affiliateEarnings?: number
+  loyaltyPoints?: number
+  loyaltyTier?: string
+  totalSpent?: number
+  totalOrders?: number
+  walletBalance?: number
+}
+
+interface UserStats {
+  total: number
+  active: number
+  verified: number
+  banned: number
+  sellers: number
+  admins: number
 }
 
 export default function AdminUsersPage() {
@@ -55,7 +104,15 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [userOrders, setUserOrders] = useState<UserOrder[]>([])
+  const [userAddresses, setUserAddresses] = useState<UserAddress[]>([])
   const [showUserDialog, setShowUserDialog] = useState(false)
+  const [showRoleDialog, setShowRoleDialog] = useState(false)
+  const [showBanDialog, setShowBanDialog] = useState(false)
+  const [newRole, setNewRole] = useState("")
+  const [banReason, setBanReason] = useState("")
+  const [userDetailsLoading, setUserDetailsLoading] = useState(false)
+  const [stats, setStats] = useState<UserStats>({ total: 0, active: 0, verified: 0, banned: 0, sellers: 0, admins: 0 })
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -86,6 +143,7 @@ export default function AdminUsersPage() {
       if (response.ok) {
         setUsers(data.users || [])
         setPagination(data.pagination || pagination)
+        if (data.stats) setStats(data.stats)
       } else {
         throw new Error(data.message || "Failed to fetch users")
       }
@@ -100,13 +158,124 @@ export default function AdminUsersPage() {
     }
   }
 
+  const fetchUserDetails = async (userId: string) => {
+    setUserDetailsLoading(true)
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setSelectedUser(data.user)
+        setUserOrders(data.orders || [])
+        setUserAddresses(data.addresses || [])
+      } else {
+        throw new Error(data.message || "Failed to fetch user details")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch user details",
+        variant: "destructive",
+      })
+    } finally {
+      setUserDetailsLoading(false)
+    }
+  }
+
+  const updateUserRole = async () => {
+    if (!selectedUser || !newRole) return
+
+    try {
+      const response = await fetch(`/api/admin/users/${selectedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
+      })
+
+      if (response.ok) {
+        await fetchUsers()
+        setShowRoleDialog(false)
+        setNewRole("")
+        toast({
+          title: "Success",
+          description: `User role updated to ${newRole}`,
+        })
+      } else {
+        throw new Error("Failed to update user role")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user role",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleBanUser = async () => {
+    if (!selectedUser) return
+
+    try {
+      const response = await fetch(`/api/admin/users/${selectedUser._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isBanned: true,
+          banReason: banReason || "No reason provided"
+        }),
+      })
+
+      if (response.ok) {
+        await fetchUsers()
+        setShowBanDialog(false)
+        setBanReason("")
+        toast({
+          title: "User Banned",
+          description: `${selectedUser.name} has been banned`,
+        })
+      } else {
+        throw new Error("Failed to ban user")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to ban user",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleUnbanUser = async (user: User) => {
+    try {
+      const response = await fetch(`/api/admin/users/${user._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isBanned: false }),
+      })
+
+      if (response.ok) {
+        await fetchUsers()
+        toast({
+          title: "User Unbanned",
+          description: `${user.name} has been unbanned`,
+        })
+      } else {
+        throw new Error("Failed to unban user")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unban user",
+        variant: "destructive",
+      })
+    }
+  }
+
   const updateUserStatus = async (userId: string, isActive: boolean) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
       })
 
@@ -175,6 +344,47 @@ export default function AdminUsersPage() {
     }
   }
 
+  const openUserDetailsDialog = async (user: User) => {
+    setSelectedUser(user)
+    setShowUserDialog(true)
+    await fetchUserDetails(user._id)
+  }
+
+  const openRoleDialog = (user: User) => {
+    setSelectedUser(user)
+    setNewRole(user.role)
+    setShowRoleDialog(true)
+  }
+
+  const openBanDialog = (user: User) => {
+    setSelectedUser(user)
+    setBanReason("")
+    setShowBanDialog(true)
+  }
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin":
+      case "super_admin":
+        return "bg-purple-100 text-purple-800"
+      case "seller":
+        return "bg-blue-100 text-blue-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const getAddressIcon = (type: string) => {
+    switch (type) {
+      case "work":
+        return <Briefcase className="h-4 w-4" />
+      case "other":
+        return <MapPin className="h-4 w-4" />
+      default:
+        return <Home className="h-4 w-4" />
+    }
+  }
+
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -201,48 +411,59 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold">{pagination.total}</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
               </div>
               <Users className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.isActive).length}</p>
+                <p className="text-sm font-medium text-gray-600">Active</p>
+                <p className="text-2xl font-bold">{stats.active}</p>
               </div>
-              <Users className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Sellers</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.role === "seller").length}</p>
+                <p className="text-2xl font-bold">{stats.sellers}</p>
               </div>
-              <Users className="h-8 w-8 text-purple-600" />
+              <ShoppingBag className="h-8 w-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Verified Users</p>
-                <p className="text-2xl font-bold">{users.filter((u) => u.isVerified).length}</p>
+                <p className="text-sm font-medium text-gray-600">Verified</p>
+                <p className="text-2xl font-bold">{stats.verified}</p>
               </div>
-              <Users className="h-8 w-8 text-orange-600" />
+              <ShieldCheck className="h-8 w-8 text-emerald-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-red-600">Banned</p>
+                <p className="text-2xl font-bold text-red-700">{stats.banned}</p>
+              </div>
+              <Ban className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
@@ -260,6 +481,7 @@ export default function AdminUsersPage() {
                   className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && fetchUsers()}
                 />
               </div>
             </div>
@@ -284,11 +506,12 @@ export default function AdminUsersPage() {
                 <SelectItem value="inactive">Inactive</SelectItem>
                 <SelectItem value="verified">Verified</SelectItem>
                 <SelectItem value="unverified">Unverified</SelectItem>
+                <SelectItem value="banned">Banned</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
+            <Button variant="outline" onClick={fetchUsers}>
               <Filter className="mr-2 h-4 w-4" />
-              Filter
+              Apply
             </Button>
           </div>
         </CardContent>
@@ -347,7 +570,7 @@ export default function AdminUsersPage() {
                 </TableRow>
               ) : (
                 filteredUsers.map((user) => (
-                  <TableRow key={user._id}>
+                  <TableRow key={user._id} className={user.isBanned ? "bg-red-50" : ""}>
                     <TableCell>
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
@@ -361,15 +584,22 @@ export default function AdminUsersPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {user.role}
+                      <Badge className={getRoleColor(user.role)}>
+                        {user.role === "super_admin" ? "Super Admin" : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <Badge className={getStatusColor(user.isActive ? "active" : "inactive")}>
-                          {user.isActive ? "Active" : "Inactive"}
-                        </Badge>
+                        {user.isBanned ? (
+                          <Badge className="bg-red-100 text-red-800">
+                            <Ban className="h-3 w-3 mr-1" />
+                            Banned
+                          </Badge>
+                        ) : (
+                          <Badge className={getStatusColor(user.isActive ? "active" : "inactive")}>
+                            {user.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        )}
                         {user.isVerified && <Badge variant="secondary">Verified</Badge>}
                       </div>
                     </TableCell>
@@ -383,22 +613,40 @@ export default function AdminUsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedUser(user)
-                              setShowUserDialog(true)
-                            }}
-                          >
+                          <DropdownMenuItem onClick={() => openUserDetailsDialog(user)}>
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit User
+                          <DropdownMenuItem onClick={() => openRoleDialog(user)}>
+                            <UserCog className="mr-2 h-4 w-4" />
+                            Change Role
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => updateUserStatus(user._id, !user.isActive)}>
-                            {user.isActive ? "Deactivate" : "Activate"}
+                            {user.isActive ? (
+                              <>
+                                <ShieldX className="mr-2 h-4 w-4" />
+                                Deactivate
+                              </>
+                            ) : (
+                              <>
+                                <ShieldCheck className="mr-2 h-4 w-4" />
+                                Activate
+                              </>
+                            )}
                           </DropdownMenuItem>
+                          {user.isBanned ? (
+                            <DropdownMenuItem onClick={() => handleUnbanUser(user)}>
+                              <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
+                              <span className="text-green-600">Unban User</span>
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => openBanDialog(user)}>
+                              <Ban className="mr-2 h-4 w-4 text-red-600" />
+                              <span className="text-red-600">Ban User</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => deleteUser(user._id)} className="text-red-600">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -425,15 +673,20 @@ export default function AdminUsersPage() {
             Previous
           </Button>
 
-          {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              variant={pagination.page === page ? "default" : "outline"}
-              onClick={() => setPagination((prev) => ({ ...prev, page }))}
-            >
-              {page}
-            </Button>
-          ))}
+          {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+            const startPage = Math.max(1, pagination.page - 2)
+            const page = startPage + i
+            if (page > pagination.pages) return null
+            return (
+              <Button
+                key={page}
+                variant={pagination.page === page ? "default" : "outline"}
+                onClick={() => setPagination((prev) => ({ ...prev, page }))}
+              >
+                {page}
+              </Button>
+            )
+          })}
 
           <Button
             variant="outline"
@@ -445,84 +698,254 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      {/* User Details Dialog */}
+      {/* User Details Dialog with Tabs */}
       <Dialog open={showUserDialog} onOpenChange={setShowUserDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={selectedUser.avatar || "/placeholder.svg"} />
-                  <AvatarFallback className="text-lg">{selectedUser.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-xl font-semibold">{selectedUser.name}</h3>
-                  <p className="text-gray-600">{selectedUser.email}</p>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Badge variant="outline" className="capitalize">
-                      {selectedUser.role}
-                    </Badge>
-                    <Badge className={getStatusColor(selectedUser.isActive ? "active" : "inactive")}>
-                      {selectedUser.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                    {selectedUser.isVerified && <Badge variant="secondary">Verified</Badge>}
-                  </div>
-                </div>
-              </div>
+            <Tabs defaultValue="profile" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="orders">Orders</TabsTrigger>
+                <TabsTrigger value="addresses">Addresses</TabsTrigger>
+              </TabsList>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Mail className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm">{selectedUser.email}</span>
-                  </div>
-                  {selectedUser.phone && (
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{selectedUser.phone}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm">Joined {formatDate(selectedUser.createdAt)}</span>
-                  </div>
-                  {selectedUser.address && (
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">
-                        {selectedUser.address.city}, {selectedUser.address.state}, {selectedUser.address.country}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
+              {/* Profile Tab */}
+              <TabsContent value="profile" className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={selectedUser.avatar || "/placeholder.svg"} />
+                    <AvatarFallback className="text-2xl">{selectedUser.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
                   <div>
-                    <Label className="text-sm font-medium">Last Login</Label>
-                    <p className="text-sm text-gray-600">
-                      {selectedUser.lastLogin ? formatDate(selectedUser.lastLogin) : "Never"}
-                    </p>
+                    <h3 className="text-xl font-semibold">{selectedUser.name}</h3>
+                    <p className="text-gray-600">{selectedUser.email}</p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Badge className={getRoleColor(selectedUser.role)}>
+                        {selectedUser.role.charAt(0).toUpperCase() + selectedUser.role.slice(1)}
+                      </Badge>
+                      {selectedUser.isBanned ? (
+                        <Badge className="bg-red-100 text-red-800">
+                          <Ban className="h-3 w-3 mr-1" />
+                          Banned
+                        </Badge>
+                      ) : (
+                        <Badge className={getStatusColor(selectedUser.isActive ? "active" : "inactive")}>
+                          {selectedUser.isActive ? "Active" : "Inactive"}
+                        </Badge>
+                      )}
+                      {selectedUser.isVerified && <Badge variant="secondary">Verified</Badge>}
+                    </div>
                   </div>
-                  {selectedUser.role === "seller" && selectedUser.affiliateEarnings && (
-                    <div>
-                      <Label className="text-sm font-medium">Affiliate Earnings</Label>
-                      <p className="text-sm text-gray-600">₹{selectedUser.affiliateEarnings}</p>
+                </div>
+
+                {selectedUser.isBanned && selectedUser.banReason && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm font-medium text-red-800">Ban Reason:</p>
+                    <p className="text-sm text-red-700">{selectedUser.banReason}</p>
+                    {selectedUser.bannedAt && (
+                      <p className="text-xs text-red-500 mt-1">Banned on {formatDate(selectedUser.bannedAt)}</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">{selectedUser.email}</span>
+                    </div>
+                    {selectedUser.phone && (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <span className="text-sm">{selectedUser.phone}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm">Joined {formatDate(selectedUser.createdAt)}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Crown className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm capitalize">{selectedUser.loyaltyTier || "Bronze"} Tier</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Coins className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm">{selectedUser.loyaltyPoints || 0} Points</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Package className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm">{selectedUser.totalOrders || 0} Orders (₹{(selectedUser.totalSpent || 0).toLocaleString()})</span>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Orders Tab */}
+              <TabsContent value="orders">
+                <ScrollArea className="h-[400px]">
+                  {userDetailsLoading ? (
+                    <div className="space-y-2">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="p-4 border rounded animate-pulse">
+                          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : userOrders.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No orders found</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {userOrders.map((order) => (
+                        <div key={order._id} className="p-4 border rounded-lg hover:bg-gray-50">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium">{order.orderNumber}</p>
+                              <p className="text-sm text-gray-500">{order.items.length} items</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">₹{order.totalAmount?.toLocaleString()}</p>
+                              <p className="text-sm text-gray-500">{formatDate(order.createdAt)}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
+                            <Badge className={getStatusColor(order.paymentStatus)}>{order.paymentStatus}</Badge>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
-                </div>
-              </div>
+                </ScrollArea>
+              </TabsContent>
 
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setShowUserDialog(false)}>
-                  Close
-                </Button>
-                <Button>Edit User</Button>
-              </div>
-            </div>
+              {/* Addresses Tab */}
+              <TabsContent value="addresses">
+                <ScrollArea className="h-[400px]">
+                  {userDetailsLoading ? (
+                    <div className="space-y-2">
+                      {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="p-4 border rounded animate-pulse">
+                          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : userAddresses.length === 0 ? (
+                    <div className="text-center py-8">
+                      <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">No addresses found</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {userAddresses.map((address) => (
+                        <div key={address._id} className="p-4 border rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 bg-gray-100 rounded">
+                              {getAddressIcon(address.type)}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{address.name}</p>
+                                <Badge variant="outline" className="capitalize">{address.type}</Badge>
+                                {address.isDefault && (
+                                  <Badge className="bg-green-100 text-green-800">Default</Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1">{address.phone}</p>
+                              <p className="text-sm text-gray-600">
+                                {address.address}
+                                {address.landmark && `, ${address.landmark}`}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                {address.city}, {address.state} - {address.pincode}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+            </Tabs>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Change Dialog */}
+      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Change the role for {selectedUser?.name}. This will affect their permissions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Select Role</Label>
+              <Select value={newRole} onValueChange={setNewRole}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="seller">Seller</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRoleDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={updateUserRole} disabled={!newRole || newRole === selectedUser?.role}>
+              Update Role
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ban User Dialog */}
+      <Dialog open={showBanDialog} onOpenChange={setShowBanDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ban User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to ban {selectedUser?.name}? They will not be able to access their account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Ban Reason</Label>
+              <Textarea
+                placeholder="Enter the reason for banning this user..."
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBanDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleBanUser}>
+              <Ban className="mr-2 h-4 w-4" />
+              Ban User
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -5,6 +5,15 @@
 
 import mongoose, { Document, Model } from "mongoose"
 
+export interface ISeo {
+    metaTitle?: string
+    metaDescription?: string
+    focusKeyword?: string
+    canonicalUrl?: string
+    ogImage?: string
+    noIndex?: boolean
+}
+
 export interface IBlogPost extends Document {
     title: string
     slug: string
@@ -20,6 +29,8 @@ export interface IBlogPost extends Document {
     isPublished: boolean
     views: number
     likes: number
+    seo?: ISeo
+    featured?: boolean
     publishedAt?: Date
     createdAt: Date
     updatedAt: Date
@@ -103,6 +114,18 @@ const blogPostSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    featured: {
+        type: Boolean,
+        default: false
+    },
+    seo: {
+        metaTitle: String,
+        metaDescription: String,
+        focusKeyword: String,
+        canonicalUrl: String,
+        ogImage: String,
+        noIndex: { type: Boolean, default: false }
+    },
     publishedAt: Date
 }, {
     timestamps: true,
@@ -138,7 +161,6 @@ blogPostSchema.pre("save", function (next) {
         this.isPublished = true
     }
 
-    next()
 })
 
 // Static methods

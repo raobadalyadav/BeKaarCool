@@ -4,18 +4,40 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart3, TrendingUp, Users, Package, DollarSign, Eye } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 
 export default function SellerAnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d")
-  const [analytics, setAnalytics] = useState({
-    revenue: { current: 45230, previous: 38950, change: 16.1 },
-    orders: { current: 156, previous: 142, change: 9.9 },
-    products: { current: 24, previous: 22, change: 9.1 },
-    views: { current: 8420, previous: 7650, change: 10.1 }
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<any>({
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+    totalViews: 0,
+    topProducts: []
   })
 
+  useEffect(() => {
+    fetchAnalytics()
+  }, [timeRange])
+
+  const fetchAnalytics = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/seller/analytics?range=${timeRange}`)
+      if (res.ok) {
+        const result = await res.json()
+        setData(result)
+      }
+    } catch (error) {
+      console.error("Failed to fetch analytics")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
@@ -39,9 +61,9 @@ export default function SellerAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Revenue</p>
-                <p className="text-2xl font-bold">₹{analytics.revenue.current.toLocaleString()}</p>
-                <p className="text-sm text-green-600">+{analytics.revenue.change}%</p>
+                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-green-700">{formatCurrency(data.totalRevenue)}</p>
+                <p className="text-xs text-gray-500 mt-1">Lifetime earnings</p>
               </div>
               <DollarSign className="h-8 w-8 text-green-600" />
             </div>
@@ -52,9 +74,9 @@ export default function SellerAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Orders</p>
-                <p className="text-2xl font-bold">{analytics.orders.current}</p>
-                <p className="text-sm text-green-600">+{analytics.orders.change}%</p>
+                <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                <p className="text-2xl font-bold text-blue-700">{data.totalOrders}</p>
+                <p className="text-xs text-gray-500 mt-1">All time orders</p>
               </div>
               <Package className="h-8 w-8 text-blue-600" />
             </div>
@@ -65,9 +87,9 @@ export default function SellerAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Products</p>
-                <p className="text-2xl font-bold">{analytics.products.current}</p>
-                <p className="text-sm text-green-600">+{analytics.products.change}%</p>
+                <p className="text-sm font-medium text-gray-600">Active Products</p>
+                <p className="text-2xl font-bold text-purple-700">{data.totalProducts}</p>
+                <p className="text-xs text-gray-500 mt-1">Currently listed</p>
               </div>
               <BarChart3 className="h-8 w-8 text-purple-600" />
             </div>
@@ -78,9 +100,9 @@ export default function SellerAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Views</p>
-                <p className="text-2xl font-bold">{analytics.views.current.toLocaleString()}</p>
-                <p className="text-sm text-green-600">+{analytics.views.change}%</p>
+                <p className="text-sm font-medium text-gray-600">Total Views</p>
+                <p className="text-2xl font-bold text-orange-700">{data.totalViews.toLocaleString()}</p>
+                <p className="text-xs text-gray-500 mt-1">Product page views</p>
               </div>
               <Eye className="h-8 w-8 text-orange-600" />
             </div>
@@ -91,34 +113,40 @@ export default function SellerAnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Revenue Trend</CardTitle>
+            <CardTitle>Top Performing Products</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 flex items-center justify-center text-gray-500">
-              Chart placeholder - Revenue over time
-            </div>
+            {data.topProducts.length > 0 ? (
+              <div className="space-y-4">
+                {data.topProducts.map((product: any, i: number) => (
+                  <div key={i} className="flex justify-between items-center border-b pb-2 last:border-0 last:pb-0">
+                    <div>
+                      <p className="font-medium truncate max-w-[200px]">{product.name}</p>
+                      <p className="text-sm text-gray-600">{product.sales} sold</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-green-700">{formatCurrency(product.revenue)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="h-40 flex items-center justify-center text-gray-500">
+                No sales data available yet
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Top Products</CardTitle>
+            <CardTitle>Revenue Insights</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { name: "Custom T-Shirt", sales: 45, revenue: 26950 },
-                { name: "Premium Hoodie", sales: 32, revenue: 41568 },
-                { name: "Coffee Mug", sales: 28, revenue: 8372 }
-              ].map((product, i) => (
-                <div key={i} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{product.name}</p>
-                    <p className="text-sm text-gray-600">{product.sales} sold</p>
-                  </div>
-                  <p className="font-medium">₹{product.revenue.toLocaleString()}</p>
-                </div>
-              ))}
+            <div className="h-64 flex flex-col items-center justify-center text-gray-500 space-y-2">
+              <TrendingUp className="h-12 w-12 text-gray-300" />
+              <p>Detailed chart visualization coming soon</p>
+              <p className="text-sm text-gray-400">Requires additional historical data tracking</p>
             </div>
           </CardContent>
         </Card>

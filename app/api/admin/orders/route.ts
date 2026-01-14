@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
     const limit = Number.parseInt(searchParams.get("limit") || "20")
     const status = searchParams.get("status")
     const paymentStatus = searchParams.get("paymentStatus")
+    const paymentMethod = searchParams.get("paymentMethod")
+    const startDate = searchParams.get("startDate")
+    const endDate = searchParams.get("endDate")
     const search = searchParams.get("search")
 
     const skip = (page - 1) * limit
@@ -33,6 +36,24 @@ export async function GET(request: NextRequest) {
       filter.paymentStatus = paymentStatus
     }
 
+    if (paymentMethod && paymentMethod !== "all") {
+      filter.paymentMethod = paymentMethod
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      filter.createdAt = {}
+      if (startDate) {
+        filter.createdAt.$gte = new Date(startDate)
+      }
+      if (endDate) {
+        // Set end date to end of day
+        const end = new Date(endDate)
+        end.setHours(23, 59, 59, 999)
+        filter.createdAt.$lte = end
+      }
+    }
+
     if (search) {
       filter.$or = [
         { orderNumber: { $regex: search, $options: "i" } },
@@ -45,8 +66,9 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("customer", "name email")
+      .populate("customer", "name email phone")
       .populate("items.product", "name images")
+      .select("+internalNotes")
 
     const total = await Order.countDocuments(filter)
 
@@ -64,3 +86,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Failed to fetch orders" }, { status: 500 })
   }
 }
+

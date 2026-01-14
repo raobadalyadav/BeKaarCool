@@ -40,11 +40,11 @@ export default function SellerLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex">
       <SellerSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
-      <div className="lg:pl-64">
+      <div className="flex-1 flex flex-col min-w-0">
         <SellerHeader onMenuClick={() => setSidebarOpen(true)} />
-        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="">{children}</main>
       </div>
     </div>
   )

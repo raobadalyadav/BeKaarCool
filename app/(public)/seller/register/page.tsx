@@ -1,81 +1,128 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Store, Users, TrendingUp, Shield, CheckCircle, Upload } from "lucide-react"
+import { Store, Users, TrendingUp, Shield, CheckCircle, Upload, ChevronRight, ChevronLeft, Building, MapPin, CreditCard, FileText } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 export default function SellerRegisterPage() {
+  const router = useRouter()
+  const { data: session } = useSession()
+  const { toast } = useToast()
+
+  const [step, setStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
+    // Business Info
     businessName: "",
-    ownerName: "",
-    email: "",
-    phone: "",
-    businessType: "",
-    gstNumber: "",
-    panNumber: "",
+    businessType: "individual",
+    businessEmail: "",
+    businessPhone: "",
+    name: "", // Owner name (usually from session, but can be separate)
+    description: "",
+
+    // Address
     address: "",
     city: "",
     state: "",
     pincode: "",
+    country: "India",
+
+    // Bank Details
+    accountHolderName: "",
     bankAccount: "",
     ifscCode: "",
-    description: "",
-    agreeTerms: false
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
+    bankName: "",
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!formData.agreeTerms) {
-      toast({
-        title: "Error",
-        description: "Please agree to the terms and conditions",
-        variant: "destructive"
-      })
+    // Documents
+    gstNumber: "",
+    panNumber: "",
+    tourAccepted: false
+  })
+
+  // Pre-fill email/name from session if available
+  // useEffect(() => {
+  //   if (session?.user) {
+  //     setFormData(prev => ({ 
+  //       ...prev, 
+  //       businessEmail: prev.businessEmail || session.user.email || "",
+  //       name: prev.name || session.user.name || "" 
+  //     }))
+  //   }
+  // }, [session])
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const nextStep = () => {
+    // Validation logic per step
+    if (step === 1 && (!formData.businessName || !formData.businessPhone)) {
+      toast({ title: "Missing fields", description: "Please fill in all required business details", variant: "destructive" })
+      return
+    }
+    if (step === 2 && (!formData.address || !formData.city || !formData.state || !formData.pincode)) {
+      toast({ title: "Missing fields", description: "Please fill in all address details", variant: "destructive" })
+      return
+    }
+    if (step === 3 && (!formData.bankAccount || !formData.ifscCode)) {
+      toast({ title: "Missing fields", description: "Please fill in bank details", variant: "destructive" })
+      return
+    }
+
+    setStep(prev => prev + 1)
+    window.scrollTo(0, 0)
+  }
+
+  const prevStep = () => {
+    setStep(prev => prev - 1)
+    window.scrollTo(0, 0)
+  }
+
+  const handleSubmit = async () => {
+    if (!formData.gstNumber && !formData.panNumber) {
+      toast({ title: "Missing Documents", description: "Please provide at least PAN Number", variant: "destructive" })
+      return
+    }
+    if (!formData.tourAccepted) {
+      toast({ title: "Terms Check", description: "Please accept the terms and conditions", variant: "destructive" })
       return
     }
 
     setIsSubmitting(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      toast({
-        title: "Application Submitted!",
-        description: "We'll review your application within 2-3 business days."
+      const response = await fetch("/api/auth/register-seller", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
       })
-      
-      // Reset form
-      setFormData({
-        businessName: "",
-        ownerName: "",
-        email: "",
-        phone: "",
-        businessType: "",
-        gstNumber: "",
-        panNumber: "",
-        address: "",
-        city: "",
-        state: "",
-        pincode: "",
-        bankAccount: "",
-        ifscCode: "",
-        description: "",
-        agreeTerms: false
-      })
-    } catch (error) {
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Application Submitted!",
+          description: "Your seller account has been created successfully."
+        })
+        // Redirect to seller dashboard
+        setTimeout(() => router.push("/seller"), 2000)
+      } else {
+        throw new Error(data.message || "Registration failed")
+      }
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to submit application. Please try again.",
+        title: "Registration Failed",
+        description: error.message,
         variant: "destructive"
       })
     } finally {
@@ -83,269 +130,308 @@ export default function SellerRegisterPage() {
     }
   }
 
-  const benefits = [
-    { icon: Store, title: "Your Own Store", desc: "Create your branded storefront" },
-    { icon: Users, title: "Reach Millions", desc: "Access to our customer base" },
-    { icon: TrendingUp, title: "Analytics", desc: "Track sales and performance" },
-    { icon: Shield, title: "Secure Payments", desc: "Safe and timely payouts" }
+  const steps = [
+    { id: 1, title: "Business Info", icon: Building },
+    { id: 2, title: "Address", icon: MapPin },
+    { id: 3, title: "Bank Details", icon: CreditCard },
+    { id: 4, title: "Documents", icon: FileText }
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Become a Seller</h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Join thousands of sellers and start your online business with BeKaarCool
-          </p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-white border-b sticky top-0 z-10">
+        <div className="container py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Store className="h-6 w-6 text-blue-600" />
+            <span className="text-xl font-bold">BeKaarCool Seller</span>
+          </div>
+          <div className="text-sm text-gray-500">
+            Already a seller? <Link href="/auth/login" className="text-blue-600 hover:underline">Login</Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="container max-w-4xl py-12 flex-1">
+        <div className="mb-8 p-4">
+          <h1 className="text-3xl font-bold text-center mb-2">Become a Seller</h1>
+          <p className="text-center text-gray-600">Complete your profile to start selling on BeKaarCool</p>
+        </div>
+
+        {/* Steps Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between relative">
+            <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-10" />
+            {steps.map((s) => (
+              <div key={s.id} className={`flex flex-col items-center bg-white px-2 ${step >= s.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2 ${step >= s.id ? 'border-blue-600 bg-blue-50' : 'border-gray-200 bg-white'}`}>
+                  <s.icon className="h-5 w-5" />
+                </div>
+                <span className="text-sm font-medium">{s.title}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Benefits */}
-          <div className="space-y-6">
-            <Card>
+          {/* Sidebar / Help */}
+          <div className="hidden lg:block space-y-6">
+            <Card className="bg-blue-50 border-blue-100">
               <CardHeader>
-                <CardTitle>Why Sell With Us?</CardTitle>
+                <CardTitle className="text-blue-800">Why Sell With Us?</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <benefit.icon className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-sm">{benefit.title}</h4>
-                      <p className="text-xs text-gray-600">{benefit.desc}</p>
-                    </div>
+                <div className="flex gap-3">
+                  <Users className="h-5 w-5 text-blue-600 shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Reach Millions</h4>
+                    <p className="text-xs text-blue-700">Access to our growing customer base instantly.</p>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Requirements</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">Valid business registration</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">GST registration (if applicable)</span>
+                <div className="flex gap-3">
+                  <TrendingUp className="h-5 w-5 text-blue-600 shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Grow Faster</h4>
+                    <p className="text-xs text-blue-700">Powerful tools and analytics to boost sales.</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">Bank account details</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm">Quality product images</span>
+                <div className="flex gap-3">
+                  <Shield className="h-5 w-5 text-blue-600 shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-sm">Secure Payments</h4>
+                    <p className="text-xs text-blue-700">Timely payments directly to your bank account.</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Registration Form */}
+          {/* Main Form */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Seller Registration Form</CardTitle>
-                <p className="text-sm text-gray-600">Fill in your details to get started</p>
+                <CardTitle>{steps[step - 1].title}</CardTitle>
+                <CardDescription>Step {step} of 4</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Business Information */}
+                {step === 1 && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant="secondary">Business Information</Badge>
-                    </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="businessName">Business Name *</Label>
+                      <div className="space-y-2">
+                        <Label>Business Name *</Label>
                         <Input
-                          id="businessName"
                           value={formData.businessName}
-                          onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-                          required
+                          onChange={(e) => handleInputChange("businessName", e.target.value)}
+                          placeholder="Enter your store name"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="ownerName">Owner Name *</Label>
-                        <Input
-                          id="ownerName"
-                          value={formData.ownerName}
-                          onChange={(e) => setFormData({...formData, ownerName: e.target.value})}
-                          required
-                        />
+                      <div className="space-y-2">
+                        <Label>Business Type</Label>
+                        <Select
+                          value={formData.businessType}
+                          onValueChange={(val) => handleInputChange("businessType", val)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="individual">Individual</SelectItem>
+                            <SelectItem value="proprietorship">Proprietorship</SelectItem>
+                            <SelectItem value="partnership">Partnership</SelectItem>
+                            <SelectItem value="pvt_ltd">Private Ltd</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="email">Email *</Label>
+                      <div className="space-y-2">
+                        <Label>Business Email</Label>
                         <Input
-                          id="email"
                           type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          required
+                          value={formData.businessEmail}
+                          onChange={(e) => handleInputChange("businessEmail", e.target.value)}
+                          placeholder="contact@store.com"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="phone">Phone *</Label>
+                      <div className="space-y-2">
+                        <Label>Contact Phone *</Label>
                         <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          required
+                          value={formData.businessPhone}
+                          onChange={(e) => handleInputChange("businessPhone", e.target.value)}
+                          placeholder="+91 9876543210"
                         />
                       </div>
                     </div>
-
-                    <div>
-                      <Label htmlFor="businessType">Business Type *</Label>
-                      <Select value={formData.businessType} onValueChange={(value) => setFormData({...formData, businessType: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select business type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="individual">Individual</SelectItem>
-                          <SelectItem value="partnership">Partnership</SelectItem>
-                          <SelectItem value="company">Private Limited Company</SelectItem>
-                          <SelectItem value="llp">LLP</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="gstNumber">GST Number</Label>
-                        <Input
-                          id="gstNumber"
-                          value={formData.gstNumber}
-                          onChange={(e) => setFormData({...formData, gstNumber: e.target.value})}
-                          placeholder="Optional"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="panNumber">PAN Number *</Label>
-                        <Input
-                          id="panNumber"
-                          value={formData.panNumber}
-                          onChange={(e) => setFormData({...formData, panNumber: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Address Information */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant="secondary">Address Information</Badge>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="address">Address *</Label>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
                       <Textarea
-                        id="address"
-                        value={formData.address}
-                        onChange={(e) => setFormData({...formData, address: e.target.value})}
-                        required
+                        value={formData.description}
+                        onChange={(e) => handleInputChange("description", e.target.value)}
+                        placeholder="Tell us a bit about what you sell..."
+                        rows={4}
                       />
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="city">City *</Label>
-                        <Input
-                          id="city"
-                          value={formData.city}
-                          onChange={(e) => setFormData({...formData, city: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="state">State *</Label>
-                        <Input
-                          id="state"
-                          value={formData.state}
-                          onChange={(e) => setFormData({...formData, state: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="pincode">Pincode *</Label>
-                        <Input
-                          id="pincode"
-                          value={formData.pincode}
-                          onChange={(e) => setFormData({...formData, pincode: e.target.value})}
-                          required
-                        />
-                      </div>
-                    </div>
                   </div>
+                )}
 
-                  {/* Bank Details */}
+                {step === 2 && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant="secondary">Bank Details</Badge>
+                    <div className="space-y-2">
+                      <Label>Address Line *</Label>
+                      <Textarea
+                        value={formData.address}
+                        onChange={(e) => handleInputChange("address", e.target.value)}
+                        placeholder="Shop No, Street, Landmark"
+                      />
                     </div>
-                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>City *</Label>
+                        <Input
+                          value={formData.city}
+                          onChange={(e) => handleInputChange("city", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>State *</Label>
+                        <Input
+                          value={formData.state}
+                          onChange={(e) => handleInputChange("state", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Pincode *</Label>
+                        <Input
+                          value={formData.pincode}
+                          onChange={(e) => handleInputChange("pincode", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="bankAccount">Bank Account Number *</Label>
+                      <div className="space-y-2">
+                        <Label>Account Holder Name *</Label>
                         <Input
-                          id="bankAccount"
-                          value={formData.bankAccount}
-                          onChange={(e) => setFormData({...formData, bankAccount: e.target.value})}
-                          required
+                          value={formData.accountHolderName}
+                          onChange={(e) => handleInputChange("accountHolderName", e.target.value)}
+                          placeholder="Name as per bank records"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="ifscCode">IFSC Code *</Label>
+                      <div className="space-y-2">
+                        <Label>Bank Name</Label>
                         <Input
-                          id="ifscCode"
+                          value={formData.bankName}
+                          onChange={(e) => handleInputChange("bankName", e.target.value)}
+                          placeholder="e.g. HDFC Bank"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Account Number *</Label>
+                        <Input
+                          type="password"
+                          value={formData.bankAccount}
+                          onChange={(e) => handleInputChange("bankAccount", e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>IFSC Code *</Label>
+                        <Input
                           value={formData.ifscCode}
-                          onChange={(e) => setFormData({...formData, ifscCode: e.target.value})}
-                          required
+                          onChange={(e) => handleInputChange("ifscCode", e.target.value)}
+                          placeholder="HDFC0001234"
+                          className="uppercase"
                         />
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Business Description */}
-                  <div>
-                    <Label htmlFor="description">Business Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      placeholder="Tell us about your business and products"
-                    />
+                {step === 4 && (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>PAN Number *</Label>
+                        <Input
+                          value={formData.panNumber}
+                          onChange={(e) => handleInputChange("panNumber", e.target.value)}
+                          placeholder="ABCDE1234F"
+                          className="uppercase"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>GST Number (Optional)</Label>
+                        <Input
+                          value={formData.gstNumber}
+                          onChange={(e) => handleInputChange("gstNumber", e.target.value)}
+                          placeholder="22AAAAA0000A1Z5"
+                          className="uppercase"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <h4 className="font-semibold text-yellow-800 mb-2">Verification Notice</h4>
+                      <p className="text-sm text-yellow-700">
+                        Your account will be in "Pending" status until our team verifies your documents.
+                        You can start listing products immediately, but they will only go live once your account is approved.
+                      </p>
+                    </div>
+
+                    <div className="flex items-start space-x-2 pt-4">
+                      <Checkbox
+                        id="terms"
+                        checked={formData.tourAccepted}
+                        onCheckedChange={(c) => handleInputChange("tourAccepted", c)}
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor="terms"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Accept terms and conditions
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          I agree to the Seller Terms of Service and Privacy Policy.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Terms and Conditions */}
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="terms"
-                      checked={formData.agreeTerms}
-                      onCheckedChange={(checked) => setFormData({...formData, agreeTerms: checked as boolean})}
-                    />
-                    <Label htmlFor="terms" className="text-sm">
-                      I agree to the <a href="/terms" className="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>
-                    </Label>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting Application..." : "Submit Application"}
-                  </Button>
-                </form>
+                )}
               </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={step === 1 || isSubmitting}
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+
+                {step < 4 ? (
+                  <Button onClick={nextStep}>
+                    Next
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-green-600 hover:bg-green-700">
+                    {isSubmitting ? (
+                      <>Processing...</>
+                    ) : (
+                      <>
+                        Submit Application
+                        <CheckCircle className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                )}
+              </CardFooter>
             </Card>
           </div>
         </div>
