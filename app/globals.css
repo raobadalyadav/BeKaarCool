@@ -2,8 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+/* Premium E-commerce Typography */
+:root {
+  --font-heading: var(--font-outfit), 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
 
+/* Apply heading font to all headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Smooth font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

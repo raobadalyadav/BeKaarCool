@@ -6,6 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
 import { ProductCard } from "@/components/product/product-card"
 import {
   Carousel,
@@ -14,7 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { ChevronRight, Star, Truck, RefreshCcw, ShieldCheck, AlertCircle } from "lucide-react"
+import { ChevronRight, Star, Truck, RefreshCcw, ShieldCheck, AlertCircle, Clock, Zap, Heart, Gift, Percent, Tag } from "lucide-react"
 
 // Interfaces
 interface Product {
@@ -57,26 +58,94 @@ interface Banner {
   linkText?: string
 }
 
+interface Offer {
+  _id: string
+  title: string
+  code?: string
+  discount: number
+  type: "percentage" | "fixed"
+  image?: string
+  expiresAt?: string
+}
+
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
+  const [offers, setOffers] = useState<Offer[]>([])
+  const [recentlyViewed, setRecentlyViewed] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Flash sale timer
+  const [flashSaleEnd, setFlashSaleEnd] = useState<Date | null>(null)
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
+
   useEffect(() => {
     fetchHomeData()
+    loadRecentlyViewed()
+
+    // Set flash sale end time (e.g., midnight)
+    const now = new Date()
+    const midnight = new Date(now)
+    midnight.setHours(23, 59, 59, 999)
+    setFlashSaleEnd(midnight)
   }, [])
+
+  // Flash sale countdown timer
+  useEffect(() => {
+    if (!flashSaleEnd) return
+
+    const timer = setInterval(() => {
+      const now = new Date().getTime()
+      const end = flashSaleEnd.getTime()
+      const diff = end - now
+
+      if (diff <= 0) {
+        setTimeLeft({ hours: 0, minutes: 0, seconds: 0 })
+        return
+      }
+
+      setTimeLeft({
+        hours: Math.floor(diff / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000)
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [flashSaleEnd])
+
+  const loadRecentlyViewed = () => {
+    try {
+      const stored = localStorage.getItem("recentlyViewed")
+      if (stored) {
+        const productIds = JSON.parse(stored) as string[]
+        // We'll fetch these products if we have IDs
+        if (productIds.length > 0) {
+          fetch(`/api/products?ids=${productIds.slice(0, 10).join(",")}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.products) setRecentlyViewed(data.products)
+            })
+            .catch(() => { })
+        }
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }
 
   const fetchHomeData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const [productsRes, categoriesRes, bannersRes] = await Promise.all([
+      const [productsRes, categoriesRes, bannersRes, offersRes] = await Promise.all([
         fetch("/api/products?limit=50"),
         fetch("/api/categories?withCount=true&featured=true"),
-        fetch("/api/banners?placement=homepage")
+        fetch("/api/banners?placement=homepage"),
+        fetch("/api/offers?limit=6&active=true")
       ])
 
       if (productsRes.ok) {
@@ -92,6 +161,11 @@ export default function HomePage() {
       if (bannersRes.ok) {
         const bannersData = await bannersRes.json()
         setBanners(bannersData || [])
+      }
+
+      if (offersRes.ok) {
+        const offersData = await offersRes.json()
+        setOffers(offersData.offers || offersData || [])
       }
     } catch (err) {
       console.error("Error fetching home data:", err)
@@ -116,6 +190,8 @@ export default function HomePage() {
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   ).slice(0, 10)
   const featuredProducts = products.filter(p => p.featured).slice(0, 10)
+  const flashSaleProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price).slice(0, 10)
+  const recommendedProducts = products.filter(p => p.recommended || p.rating >= 4).slice(0, 10)
 
   // Empty State Component
   const EmptyState = ({ message }: { message: string }) => (
@@ -316,10 +392,59 @@ export default function HomePage() {
       {/* 2. Categories Grid */}
       <CategoriesGrid />
 
-      {/* 3. New Arrivals */}
+      {/* 3. Flash Sale Section */}
+      {flashSaleProducts.length > 0 && !loading && (
+        <section className="py-8 md:py-12 bg-gradient-to-r from-red-500 to-orange-500">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+              <div className="flex items-center gap-3">
+                <Zap className="w-8 h-8 text-yellow-300 animate-pulse" />
+                <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-wide">
+                  Flash Sale
+                </h2>
+              </div>
+              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                <Clock className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">Ends in:</span>
+                <div className="flex gap-1">
+                  <span className="bg-white text-red-600 font-bold px-2 py-1 rounded text-lg min-w-[40px] text-center">
+                    {String(timeLeft.hours).padStart(2, "0")}
+                  </span>
+                  <span className="text-white text-lg">:</span>
+                  <span className="bg-white text-red-600 font-bold px-2 py-1 rounded text-lg min-w-[40px] text-center">
+                    {String(timeLeft.minutes).padStart(2, "0")}
+                  </span>
+                  <span className="text-white text-lg">:</span>
+                  <span className="bg-white text-red-600 font-bold px-2 py-1 rounded text-lg min-w-[40px] text-center">
+                    {String(timeLeft.seconds).padStart(2, "0")}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {flashSaleProducts.map(product => (
+                  <CarouselItem key={product._id} className="pl-2 md:pl-4 basis-[45%] md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                    <div className="relative">
+                      <Badge className="absolute top-2 left-2 z-10 bg-yellow-400 text-black font-bold">
+                        {Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)}% OFF
+                      </Badge>
+                      <ProductCard product={product} />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4 bg-white" />
+              <CarouselNext className="hidden md:flex -right-4 bg-white" />
+            </Carousel>
+          </div>
+        </section>
+      )}
+
+      {/* 4. New Arrivals */}
       <ProductSlider title="New Arrivals" products={newArrivals} link="/products?sort=newest" />
 
-      {/* 4. Promotional Banner */}
+      {/* 5. Promotional Banner */}
       {!loading && products.length > 0 && (
         <div className="py-4 md:py-8 container mx-auto px-4">
           <div className="relative w-full aspect-[4/1] md:aspect-[6/1] bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg overflow-hidden flex items-center justify-center">
@@ -330,15 +455,109 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 5. Best Sellers */}
-      <ProductSlider title="Best Sellers" products={trendingProducts} link="/products?sort=trending" />
+      {/* 6. Best Sellers / Trending */}
+      <ProductSlider title="Trending Now" products={trendingProducts} link="/products?sort=trending" />
 
-      {/* 6. Featured Products */}
+      {/* 7. Recommended For You */}
+      {recommendedProducts.length > 0 && (
+        <section className="py-8 md:py-12 bg-gradient-to-br from-purple-50 to-pink-50">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-2 mb-6">
+              <Heart className="w-6 h-6 text-pink-500" />
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 tracking-wide uppercase">
+                Recommended For You
+              </h2>
+            </div>
+            <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {recommendedProducts.map(product => (
+                  <CarouselItem key={product._id} className="pl-2 md:pl-4 basis-[45%] md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                    <ProductCard product={product} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4" />
+              <CarouselNext className="hidden md:flex -right-4" />
+            </Carousel>
+          </div>
+        </section>
+      )}
+
+      {/* 8. Offers & Discounts Section */}
+      {offers.length > 0 && (
+        <section className="py-8 md:py-12 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Gift className="w-6 h-6 text-green-500" />
+                <h2 className="text-lg md:text-2xl font-bold text-gray-900 tracking-wide uppercase">
+                  Offers & Discounts
+                </h2>
+              </div>
+              <Link href="/offers" className="text-xs md:text-sm font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {offers.slice(0, 6).map(offer => (
+                <div key={offer._id} className="bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl p-4 border border-yellow-200 hover:shadow-lg transition-shadow">
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="bg-yellow-400 rounded-full p-3">
+                      {offer.type === "percentage" ? (
+                        <Percent className="w-6 h-6 text-black" />
+                      ) : (
+                        <Tag className="w-6 h-6 text-black" />
+                      )}
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-center text-sm mb-1">{offer.title}</h3>
+                  <p className="text-center text-2xl font-black text-orange-600">
+                    {offer.type === "percentage" ? `${offer.discount}% OFF` : `₹${offer.discount} OFF`}
+                  </p>
+                  {offer.code && (
+                    <div className="mt-3 bg-white border-2 border-dashed border-orange-300 rounded-lg py-1 px-2 text-center">
+                      <span className="text-xs text-gray-500">Use code:</span>
+                      <p className="font-bold text-orange-600 text-sm">{offer.code}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 9. Featured Products */}
       {featuredProducts.length > 0 && (
         <ProductSlider title="Featured" products={featuredProducts} link="/products?featured=true" />
       )}
 
-      {/* 7. Features / Trust Badges */}
+      {/* 10. Recently Viewed */}
+      {recentlyViewed.length > 0 && (
+        <section className="py-8 md:py-12 bg-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-2 mb-6">
+              <Clock className="w-6 h-6 text-gray-500" />
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 tracking-wide uppercase">
+                Recently Viewed
+              </h2>
+            </div>
+            <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {recentlyViewed.map(product => (
+                  <CarouselItem key={product._id} className="pl-2 md:pl-4 basis-[45%] md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
+                    <ProductCard product={product} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4" />
+              <CarouselNext className="hidden md:flex -right-4" />
+            </Carousel>
+          </div>
+        </section>
+      )}
+
+      {/* 11. Features / Trust Badges */}
       <section className="py-8 bg-white border-t mt-8">
         <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-4">
           <div className="flex flex-col items-center text-center gap-2">
