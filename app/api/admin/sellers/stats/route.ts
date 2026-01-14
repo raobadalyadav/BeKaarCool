@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
             totalSellers: total,
             activeSellers: active,
             pendingSellers: pending,
-            rejectedSellers: 0
+            rejectedSellers: 0,
+            totalRevenue: 0 // Would need Order aggregation for real revenue
         })
     } catch (error) {
         console.error("Admin sellers stats error:", error)

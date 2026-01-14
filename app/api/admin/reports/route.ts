@@ -15,159 +15,94 @@ export async function GET(request: NextRequest) {
 
         await connectDB()
 
-        const { searchParams } = new URL(request.url)
-        const type = searchParams.get("type") || "sales" // sales, inventory, customers, returns
-        const dateFrom = searchParams.get("from")
-        const dateTo = searchParams.get("to")
-
-        const dateQuery: any = {}
-        if (dateFrom) dateQuery.$gte = new Date(dateFrom)
-        if (dateTo) dateQuery.$lte = new Date(dateTo)
-
-        let report: any = {}
-
-        switch (type) {
-            case "sales":
-                const salesData = await Order.aggregate([
-                    { $match: dateFrom || dateTo ? { createdAt: dateQuery } : {} },
-                    {
-                        $group: {
-                            _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-                            orders: { $sum: 1 },
-                            revenue: { $sum: "$total" },
-                            avgOrderValue: { $avg: "$total" }
-                        }
-                    },
-                    { $sort: { _id: 1 } }
-                ])
-
-                const salesSummary = await Order.aggregate([
-                    { $match: dateFrom || dateTo ? { createdAt: dateQuery } : {} },
-                    {
-                        $group: {
-                            _id: null,
-                            totalOrders: { $sum: 1 },
-                            totalRevenue: { $sum: "$total" },
-                            avgOrderValue: { $avg: "$total" },
-                            paidOrders: { $sum: { $cond: [{ $eq: ["$paymentStatus", "paid"] }, 1, 0] } }
-                        }
+        // Fetch all data for complete ReportData structure expected by frontend
+        const [salesSummary, inventorySummary, customerSummary, topProducts] = await Promise.all([
+            // Sales summary
+            Order.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalOrders: { $sum: 1 },
+                        totalRevenue: { $sum: "$total" },
+                        avgOrderValue: { $avg: "$total" }
                     }
-                ])
-
-                report = {
-                    type: "sales",
-                    summary: salesSummary[0] || {},
-                    data: salesData
                 }
-                break
+            ]),
 
-            case "inventory":
-                const inventoryData = await Product.aggregate([
-                    { $match: { isActive: true } },
-                    {
-                        $lookup: {
-                            from: "categories",
-                            localField: "category",
-                            foreignField: "_id",
-                            as: "categoryInfo"
-                        }
-                    },
-                    { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
-                    {
-                        $group: {
-                            _id: "$categoryInfo.name",
-                            totalProducts: { $sum: 1 },
-                            totalStock: { $sum: "$stock" },
-                            avgPrice: { $avg: "$price" },
-                            lowStock: { $sum: { $cond: [{ $lte: ["$stock", 10] }, 1, 0] } },
-                            outOfStock: { $sum: { $cond: [{ $eq: ["$stock", 0] }, 1, 0] } }
-                        }
-                    },
-                    { $sort: { totalProducts: -1 } }
-                ])
-
-                report = {
-                    type: "inventory",
-                    data: inventoryData.map(i => ({
-                        category: i._id || "Uncategorized",
-                        ...i
-                    }))
+            // Inventory summary
+            Product.aggregate([
+                { $match: { isActive: true } },
+                {
+                    $group: {
+                        _id: null,
+                        totalProducts: { $sum: 1 },
+                        lowStock: { $sum: { $cond: [{ $and: [{ $gt: ["$stock", 0] }, { $lte: ["$stock", 10] }] }, 1, 0] } },
+                        outOfStock: { $sum: { $cond: [{ $eq: ["$stock", 0] }, 1, 0] } }
+                    }
                 }
-                break
+            ]),
 
-            case "customers":
-                const customerData = await User.aggregate([
-                    { $match: { role: "customer" } },
-                    {
-                        $lookup: {
-                            from: "orders",
-                            localField: "_id",
-                            foreignField: "user",
-                            as: "orders"
-                        }
-                    },
-                    {
-                        $project: {
-                            name: 1,
-                            email: 1,
-                            createdAt: 1,
-                            orderCount: { $size: "$orders" },
-                            totalSpent: { $sum: "$orders.total" }
-                        }
-                    },
-                    { $sort: { totalSpent: -1 } },
-                    { $limit: 100 }
-                ])
-
-                const customerSummary = await User.aggregate([
-                    { $match: { role: "customer" } },
-                    {
-                        $group: {
-                            _id: null,
-                            total: { $sum: 1 },
-                            newThisMonth: {
-                                $sum: {
-                                    $cond: [
-                                        { $gte: ["$createdAt", new Date(new Date().getFullYear(), new Date().getMonth(), 1)] },
-                                        1, 0
-                                    ]
-                                }
+            // Customer summary
+            User.aggregate([
+                { $match: { role: "customer" } },
+                {
+                    $group: {
+                        _id: null,
+                        total: { $sum: 1 },
+                        newThisMonth: {
+                            $sum: {
+                                $cond: [
+                                    { $gte: ["$createdAt", new Date(new Date().getFullYear(), new Date().getMonth(), 1)] },
+                                    1, 0
+                                ]
                             }
                         }
                     }
-                ])
-
-                report = {
-                    type: "customers",
-                    summary: customerSummary[0] || {},
-                    data: customerData
                 }
-                break
+            ]),
 
-            case "returns":
-                const returnsData = await Order.aggregate([
-                    { $match: { status: { $in: ["returned", "return_requested"] } } },
-                    {
-                        $group: {
-                            _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-                            count: { $sum: 1 },
-                            value: { $sum: "$total" }
-                        }
-                    },
-                    { $sort: { _id: -1 } }
-                ])
+            // Top products
+            Order.aggregate([
+                { $unwind: "$items" },
+                {
+                    $group: {
+                        _id: "$items.name",
+                        revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+                        quantity: { $sum: "$items.quantity" }
+                    }
+                },
+                { $sort: { revenue: -1 } },
+                { $limit: 10 }
+            ])
+        ])
 
-                report = {
-                    type: "returns",
-                    data: returnsData
-                }
-                break
-
-            default:
-                return NextResponse.json({ error: "Invalid report type" }, { status: 400 })
+        // Return in format expected by frontend ReportData interface
+        const response = {
+            sales: {
+                totalRevenue: salesSummary[0]?.totalRevenue || 0,
+                totalOrders: salesSummary[0]?.totalOrders || 0,
+                averageOrderValue: Math.round(salesSummary[0]?.avgOrderValue || 0),
+                topProducts: topProducts.map(p => ({
+                    name: p._id || "Product",
+                    revenue: p.revenue || 0,
+                    quantity: p.quantity || 0
+                }))
+            },
+            customers: {
+                totalCustomers: customerSummary[0]?.total || 0,
+                newCustomers: customerSummary[0]?.newThisMonth || 0,
+                returningCustomers: Math.max(0, (customerSummary[0]?.total || 0) - (customerSummary[0]?.newThisMonth || 0)),
+                topCustomers: []
+            },
+            inventory: {
+                totalProducts: inventorySummary[0]?.totalProducts || 0,
+                lowStockItems: inventorySummary[0]?.lowStock || 0,
+                outOfStockItems: inventorySummary[0]?.outOfStock || 0,
+                topCategories: []
+            }
         }
 
-        return NextResponse.json(report)
+        return NextResponse.json(response)
     } catch (error) {
         console.error("Admin reports error:", error)
         return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })

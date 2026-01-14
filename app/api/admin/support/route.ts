@@ -38,32 +38,27 @@ export async function GET(request: NextRequest) {
             ])
         ])
 
-        return NextResponse.json({
-            tickets: tickets.map(t => ({
-                id: t._id,
-                ticketNumber: t.ticketNumber,
-                subject: t.subject,
-                type: t.type,
-                priority: t.priority,
-                status: t.status,
-                customer: (t.user as any)?.name || "Guest",
-                email: (t.user as any)?.email || "",
-                orderId: (t.order as any)?.orderNumber,
-                repliesCount: t.replies?.length || 0,
-                createdAt: t.createdAt,
-                updatedAt: t.updatedAt
-            })),
-            stats: statusCounts.reduce((acc, s) => {
-                acc[s._id] = s.count
-                return acc
-            }, {} as Record<string, number>),
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
-        })
+        // Return tickets array directly (frontend expects array)
+        return NextResponse.json(tickets.map(t => ({
+            _id: t._id,
+            ticketId: t.ticketNumber || `TKT-${(t._id as any).toString().slice(-6).toUpperCase()}`,
+            subject: t.subject,
+            description: t.messages?.[0]?.message || "",
+            status: t.status,
+            priority: t.priority || "medium",
+            category: t.category || "other",
+            customerName: (t.user as any)?.name || "Guest",
+            customerEmail: (t.user as any)?.email || "",
+            assignedTo: t.assignedTo?.toString() || "",
+            createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : new Date().toISOString(),
+            updatedAt: t.updatedAt ? new Date(t.updatedAt).toISOString() : new Date().toISOString(),
+            messages: (t.messages || []).map((r: any) => ({
+                sender: r.sender === "support" ? "Admin" : (t.user as any)?.name || "Customer",
+                message: r.message,
+                timestamp: r.createdAt ? new Date(r.createdAt).toISOString() : new Date().toISOString(),
+                isAdmin: r.sender === "support"
+            }))
+        })))
     } catch (error) {
         console.error("Admin support error:", error)
         return NextResponse.json({ error: "Failed to fetch tickets" }, { status: 500 })

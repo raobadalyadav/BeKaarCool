@@ -37,10 +37,25 @@ export async function GET(request: NextRequest) {
             User.countDocuments(query)
         ])
 
-        return NextResponse.json({
-            sellers,
-            pagination: { page, limit, total, pages: Math.ceil(total / limit) }
-        })
+        // Return sellers array with all fields expected by frontend
+        return NextResponse.json(sellers.map(s => ({
+            _id: s._id,
+            name: s.name || "",
+            email: s.email || "",
+            phone: s.phone || "",
+            businessName: (s as any).businessName || s.name || "",
+            businessType: (s as any).businessType || "Individual",
+            status: s.isActive ? "approved" : "pending",
+            totalProducts: 0, // Would require Product count lookup
+            totalSales: 0,
+            revenue: 0,
+            joinedAt: s.createdAt ? new Date(s.createdAt).toISOString() : new Date().toISOString(),
+            documents: {
+                gst: (s as any).gstNumber || "",
+                pan: "",
+                businessLicense: ""
+            }
+        })))
     } catch (error) {
         console.error("Admin sellers error:", error)
         return NextResponse.json({ error: "Failed to fetch sellers" }, { status: 500 })

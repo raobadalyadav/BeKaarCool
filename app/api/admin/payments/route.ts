@@ -57,29 +57,18 @@ export async function GET(request: NextRequest) {
             ])
         ])
 
-        return NextResponse.json({
-            payments: payments.map(p => ({
-                id: p._id,
-                orderId: p.orderNumber,
-                customer: (p.user as any)?.name || "Guest",
-                email: (p.user as any)?.email || "",
-                amount: p.total,
-                status: p.paymentStatus,
-                method: p.paymentMethod,
-                transactionId: p.paymentId,
-                date: p.createdAt
-            })),
-            stats: stats.reduce((acc, s) => {
-                acc[s._id] = { count: s.count, total: s.total }
-                return acc
-            }, {} as Record<string, { count: number, total: number }>),
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
-        })
+        // Return payments array directly (frontend expects array)
+        return NextResponse.json(payments.map(p => ({
+            _id: p._id,
+            orderId: p.orderNumber,
+            customerName: (p.user as any)?.name || "Guest",
+            customerEmail: (p.user as any)?.email || "",
+            amount: p.total,
+            status: p.paymentStatus,
+            method: p.paymentMethod,
+            transactionId: p.paymentId,
+            createdAt: p.createdAt
+        })))
     } catch (error) {
         console.error("Admin payments error:", error)
         return NextResponse.json({ error: "Failed to fetch payments" }, { status: 500 })

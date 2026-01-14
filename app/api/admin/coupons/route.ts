@@ -47,15 +47,25 @@ export async function GET(request: NextRequest) {
             Coupon.countDocuments(query)
         ])
 
-        return NextResponse.json({
-            coupons,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
-        })
+        // Return coupons array directly (frontend expects array)
+        return NextResponse.json(coupons.map(c => ({
+            _id: c._id,
+            code: c.code,
+            description: c.description || "",
+            discountType: c.discountType,
+            discountValue: c.discountValue,
+            minOrderAmount: c.minOrderAmount || 0,
+            maxDiscountAmount: c.maxDiscount || null,
+            usageLimit: c.usageLimit || null,
+            usedCount: c.usedCount || 0,
+            validFrom: c.startDate ? new Date(c.startDate).toISOString() : new Date().toISOString(),
+            validTo: c.endDate ? new Date(c.endDate).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            isActive: c.isActive !== false,
+            applicableCategories: [],
+            applicableProducts: [],
+            createdAt: c.createdAt ? new Date(c.createdAt).toISOString() : new Date().toISOString(),
+            updatedAt: c.createdAt ? new Date(c.createdAt).toISOString() : new Date().toISOString()
+        })))
     } catch (error) {
         console.error("Admin coupons fetch error:", error)
         return NextResponse.json({ error: "Failed to fetch coupons" }, { status: 500 })

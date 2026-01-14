@@ -69,7 +69,57 @@ export async function GET(request: NextRequest) {
             current[keys[keys.length - 1]] = s.value
         })
 
-        return NextResponse.json({ settings: result })
+        // Return settings in format expected by frontend
+        return NextResponse.json({
+            general: {
+                siteName: result.store?.name || "BeKaarCool",
+                siteDescription: result.store?.description || "India's coolest fashion destination",
+                siteUrl: result.store?.url || "https://bekaarcool.com",
+                logo: "",
+                favicon: "",
+                contactEmail: result.store?.email || "support@bekaarcool.com",
+                supportEmail: result.store?.email || "support@bekaarcool.com",
+                phone: result.store?.phone || "",
+                address: result.store?.address || ""
+            },
+            email: {
+                smtpHost: "",
+                smtpPort: "587",
+                smtpUser: "",
+                smtpPass: "",
+                fromEmail: result.store?.email || "noreply@bekaarcool.com",
+                fromName: result.store?.name || "BeKaarCool"
+            },
+            payment: {
+                razorpayKeyId: "",
+                razorpayKeySecret: "",
+                paypalClientId: "",
+                paypalClientSecret: "",
+                stripePublishableKey: "",
+                stripeSecretKey: ""
+            },
+            shipping: {
+                shiprocketEmail: "",
+                shiprocketPassword: "",
+                freeShippingThreshold: result.shipping?.freeShippingThreshold || 599,
+                defaultShippingCost: result.shipping?.standardShippingRate || 49
+            },
+            features: {
+                enableRegistration: true,
+                enableGuestCheckout: true,
+                enableReviews: true,
+                enableWishlist: true,
+                enableCoupons: true,
+                enableInventoryTracking: true
+            },
+            seo: {
+                metaTitle: result.store?.name || "BeKaarCool",
+                metaDescription: result.store?.description || "",
+                metaKeywords: "",
+                googleAnalyticsId: "",
+                facebookPixelId: ""
+            }
+        })
     } catch (error) {
         console.error("Admin settings fetch error:", error)
         return NextResponse.json({ error: "Failed to fetch settings" }, { status: 500 })

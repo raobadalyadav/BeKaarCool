@@ -39,31 +39,25 @@ export async function GET(request: NextRequest) {
             ])
         ])
 
-        return NextResponse.json({
-            shipments: shipments.map(s => ({
-                id: s._id,
-                orderId: s.orderNumber,
-                customer: (s.user as any)?.name || "Guest",
-                phone: (s.user as any)?.phone || "",
-                address: s.shippingAddress,
-                status: s.status,
-                trackingNumber: s.trackingNumber,
-                carrier: s.carrier || "Delhivery",
-                itemCount: s.items?.length || 0,
-                createdAt: s.createdAt,
-                deliveredAt: s.deliveredAt
-            })),
-            stats: statusCounts.reduce((acc, s) => {
-                acc[s._id] = s.count
-                return acc
-            }, {} as Record<string, number>),
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
-        })
+        // Return shipments array directly (frontend expects array)
+        return NextResponse.json(shipments.map(s => ({
+            _id: s._id,
+            orderId: s.orderNumber,
+            trackingNumber: s.trackingNumber || "",
+            carrier: s.carrier || "Delhivery",
+            status: s.status === "shipped" ? "in_transit" : s.status,
+            customerName: (s.user as any)?.name || "Guest",
+            customerAddress: typeof s.shippingAddress === "object"
+                ? `${(s.shippingAddress as any)?.street || ""}, ${(s.shippingAddress as any)?.city || ""}`
+                : s.shippingAddress || "",
+            customerPhone: (s.user as any)?.phone || "",
+            weight: 0.5,
+            dimensions: { length: 20, width: 15, height: 10 },
+            shippingCost: 99,
+            estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+            actualDelivery: s.deliveredAt ? new Date(s.deliveredAt).toISOString() : undefined,
+            createdAt: s.createdAt ? new Date(s.createdAt).toISOString() : new Date().toISOString()
+        })))
     } catch (error) {
         console.error("Admin shipping error:", error)
         return NextResponse.json({ error: "Failed to fetch shipments" }, { status: 500 })
