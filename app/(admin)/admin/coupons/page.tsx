@@ -80,7 +80,7 @@ export default function AdminCouponsPage() {
       const params = new URLSearchParams()
       if (statusFilter !== "all") params.append("status", statusFilter)
 
-      const response = await fetch(`/api/marketing/coupons?${params}`)
+      const response = await fetch(`/api/admin/coupons?${params}`)
       const data = await response.json()
 
       if (response.ok) {
@@ -101,7 +101,7 @@ export default function AdminCouponsPage() {
 
   const handleCreateCoupon = async () => {
     try {
-      const response = await fetch("/api/marketing/coupons", {
+      const response = await fetch("/api/admin/coupons", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export default function AdminCouponsPage() {
     if (!editingCoupon) return
 
     try {
-      const response = await fetch(`/api/marketing/coupons/${editingCoupon._id}`, {
+      const response = await fetch(`/api/admin/coupons/${editingCoupon._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export default function AdminCouponsPage() {
     if (!confirm("Are you sure you want to delete this coupon?")) return
 
     try {
-      const response = await fetch(`/api/marketing/coupons/${couponId}`, {
+      const response = await fetch(`/api/admin/coupons/${couponId}`, {
         method: "DELETE",
       })
 
@@ -191,7 +191,7 @@ export default function AdminCouponsPage() {
 
   const handleToggleStatus = async (coupon: Coupon) => {
     try {
-      const response = await fetch(`/api/marketing/coupons/${coupon._id}`, {
+      const response = await fetch(`/api/admin/coupons/${coupon._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

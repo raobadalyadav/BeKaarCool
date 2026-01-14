@@ -1,469 +1,400 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Users,
   Package,
   ShoppingCart,
   DollarSign,
+  TrendingUp,
+  TrendingDown,
   Eye,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  Plus,
-  Search,
-  Filter,
-  Download,
+  RefreshCw,
+  AlertCircle,
 } from "lucide-react"
+import Link from "next/link"
+
+interface DashboardData {
+  stats: {
+    totalRevenue: number
+    todayRevenue: number
+    totalOrders: number
+    totalProducts: number
+    activeUsers: number
+    revenueChange: number
+  }
+  recentOrders: Array<{
+    id: string
+    customer: string
+    product: string
+    itemCount: number
+    amount: number
+    status: string
+    paymentStatus: string
+    date: string
+  }>
+  topProducts: Array<{
+    id: string
+    name: string
+    image: string
+    sold: number
+    revenue: number
+  }>
+  ordersByStatus: Record<string, number>
+}
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "₹2,45,678",
-      change: "+12.5%",
-      icon: DollarSign,
-      color: "text-green-600",
-    },
-    {
-      title: "Total Orders",
-      value: "1,234",
-      change: "+8.2%",
-      icon: ShoppingCart,
-      color: "text-blue-600",
-    },
-    {
-      title: "Total Products",
-      value: "456",
-      change: "+3.1%",
-      icon: Package,
-      color: "text-purple-600",
-    },
-    {
-      title: "Active Users",
-      value: "8,901",
-      change: "+15.3%",
-      icon: Users,
-      color: "text-orange-600",
-    },
-  ]
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch("/api/admin/dashboard")
+      if (!res.ok) {
+        if (res.status === 403) throw new Error("Access denied. Admin role required.")
+        throw new Error("Failed to fetch dashboard data")
+      }
+      const dashboardData = await res.json()
+      setData(dashboardData)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const recentOrders = [
-    {
-      id: "ORD-001",
-      customer: "John Doe",
-      product: "Custom T-Shirt",
-      amount: "₹599",
-      status: "Processing",
-      date: "2024-01-15",
-    },
-    {
-      id: "ORD-002",
-      customer: "Jane Smith",
-      product: "Premium Hoodie",
-      amount: "₹1,299",
-      status: "Shipped",
-      date: "2024-01-14",
-    },
-    {
-      id: "ORD-003",
-      customer: "Mike Johnson",
-      product: "Canvas Tote Bag",
-      amount: "₹399",
-      status: "Delivered",
-      date: "2024-01-13",
-    },
-  ]
+  useEffect(() => {
+    fetchDashboard()
+  }, [])
 
-  const products = [
-    {
-      id: "PRD-001",
-      name: "Premium Cotton T-Shirt",
-      category: "T-Shirts",
-      price: "₹599",
-      stock: 45,
-      status: "Active",
-      sales: 124,
-    },
-    {
-      id: "PRD-002",
-      name: "Custom Design Hoodie",
-      category: "Hoodies",
-      price: "₹1,299",
-      stock: 23,
-      status: "Active",
-      sales: 89,
-    },
-    {
-      id: "PRD-003",
-      name: "Canvas Tote Bag",
-      category: "Accessories",
-      price: "₹399",
-      stock: 67,
-      status: "Active",
-      sales: 156,
-    },
-  ]
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    }).format(amount)
+  }
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    })
+  }
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "processing":
-        return "bg-yellow-100 text-yellow-800"
-      case "shipped":
-        return "bg-blue-100 text-blue-800"
-      case "delivered":
-        return "bg-green-100 text-green-800"
-      case "active":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      case "pending": return "bg-yellow-100 text-yellow-800"
+      case "confirmed": return "bg-blue-100 text-blue-800"
+      case "processing": return "bg-purple-100 text-purple-800"
+      case "shipped": return "bg-indigo-100 text-indigo-800"
+      case "delivered": return "bg-green-100 text-green-800"
+      case "cancelled": return "bg-red-100 text-red-800"
+      case "returned": return "bg-orange-100 text-orange-800"
+      default: return "bg-gray-100 text-gray-800"
     }
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={fetchDashboard}>Try Again</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your BeKaarCool store</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">Manage your BeKaarCool store</p>
+          </div>
+          <Button onClick={fetchDashboard} variant="outline" disabled={loading}>
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="products">Products</TabsTrigger>
-            <TabsTrigger value="customers">Customers</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.map((stat, index) => (
-                <Card key={index}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                        <p className={`text-sm ${stat.color}`}>{stat.change} from last month</p>
-                      </div>
-                      <div className={`p-3 rounded-full bg-gray-100`}>
-                        <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                      </div>
-                    </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {loading ? (
+            <>
+              {[1, 2, 3, 4].map(i => (
+                <Card key={i}>
+                  <CardContent className="pt-6">
+                    <Skeleton className="h-4 w-24 mb-2" />
+                    <Skeleton className="h-8 w-32 mb-1" />
+                    <Skeleton className="h-3 w-16" />
                   </CardContent>
                 </Card>
               ))}
-            </div>
+            </>
+          ) : data && (
+            <>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Total Revenue</p>
+                      <p className="text-2xl font-bold text-gray-900">{formatCurrency(data.stats.totalRevenue)}</p>
+                      <div className="flex items-center mt-1">
+                        {data.stats.revenueChange >= 0 ? (
+                          <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+                        )}
+                        <span className={data.stats.revenueChange >= 0 ? "text-green-600 text-sm" : "text-red-600 text-sm"}>
+                          {data.stats.revenueChange > 0 ? "+" : ""}{data.stats.revenueChange}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <DollarSign className="w-6 h-6 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Recent Orders */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Total Orders</p>
+                      <p className="text-2xl font-bold text-gray-900">{data.stats.totalOrders.toLocaleString()}</p>
+                      <p className="text-sm text-gray-400">All time</p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <ShoppingCart className="w-6 h-6 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Total Products</p>
+                      <p className="text-2xl font-bold text-gray-900">{data.stats.totalProducts.toLocaleString()}</p>
+                      <p className="text-sm text-gray-400">Active</p>
+                    </div>
+                    <div className="p-3 bg-purple-100 rounded-lg">
+                      <Package className="w-6 h-6 text-purple-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Active Users</p>
+                      <p className="text-2xl font-bold text-gray-900">{data.stats.activeUsers.toLocaleString()}</p>
+                      <p className="text-sm text-gray-400">Last 30 days</p>
+                    </div>
+                    <div className="p-3 bg-orange-100 rounded-lg">
+                      <Users className="w-6 h-6 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recent Orders */}
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Recent Orders</CardTitle>
-                <Button variant="outline" size="sm">
-                  View All
-                </Button>
+                <Link href="/admin/orders">
+                  <Button variant="outline" size="sm">View All</Button>
+                </Link>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.id}</TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell>{order.product}</TableCell>
-                        <TableCell>{order.amount}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
-                        </TableCell>
-                        <TableCell>{order.date}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Update Status
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                {loading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <Skeleton key={i} className="h-12 w-full" />
                     ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="products" className="space-y-6">
-            {/* Products Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Products</h2>
-                <p className="text-gray-600">Manage your product catalog</p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Product
-                </Button>
-              </div>
-            </div>
-
-            {/* Products Filters */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input placeholder="Search products..." className="pl-10" />
-                    </div>
                   </div>
-                  <Select>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="t-shirts">T-Shirts</SelectItem>
-                      <SelectItem value="hoodies">Hoodies</SelectItem>
-                      <SelectItem value="accessories">Accessories</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline">
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filter
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Products Table */}
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Product ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Stock</TableHead>
-                      <TableHead>Sales</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell className="font-medium">{product.id}</TableCell>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>{product.category}</TableCell>
-                        <TableCell>{product.price}</TableCell>
-                        <TableCell>{product.stock}</TableCell>
-                        <TableCell>{product.sales}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(product.status)}>{product.status}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+                ) : data?.recentOrders && data.recentOrders.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Order</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {data.recentOrders.map(order => (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">{order.id}</TableCell>
+                          <TableCell>{order.customer}</TableCell>
+                          <TableCell>{formatCurrency(order.amount)}</TableCell>
+                          <TableCell>
+                            <Badge className={getStatusColor(order.status)}>
+                              {order.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-500">{formatDate(order.date)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No recent orders</p>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="orders" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Orders</h2>
-                <p className="text-gray-600">Manage customer orders</p>
-              </div>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export Orders
-              </Button>
-            </div>
-
+          {/* Top Products */}
+          <div>
             <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input placeholder="Search orders..." className="pl-10" />
-                    </div>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Top Products</CardTitle>
+                <Link href="/admin/products">
+                  <Button variant="outline" size="sm">View All</Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <div key={i} className="flex items-center gap-3">
+                        <Skeleton className="w-12 h-12 rounded" />
+                        <div className="flex-1">
+                          <Skeleton className="h-4 w-24 mb-1" />
+                          <Skeleton className="h-3 w-16" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <Select>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
-                      <SelectItem value="shipped">Shipped</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order ID</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Product</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentOrders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell className="font-medium">{order.id}</TableCell>
-                        <TableCell>{order.customer}</TableCell>
-                        <TableCell>{order.product}</TableCell>
-                        <TableCell>{order.amount}</TableCell>
-                        <TableCell>
-                          <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
-                        </TableCell>
-                        <TableCell>{order.date}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Update Status
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
+                ) : data?.topProducts && data.topProducts.length > 0 ? (
+                  <div className="space-y-4">
+                    {data.topProducts.map((product, index) => (
+                      <div key={product.id || index} className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                          {product.image && (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{product.name}</p>
+                          <p className="text-sm text-gray-500">{product.sold} sold</p>
+                        </div>
+                        <p className="font-semibold text-green-600">
+                          {formatCurrency(product.revenue)}
+                        </p>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-8">No products data</p>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="analytics" className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Analytics</h2>
-              <p className="text-gray-600">Track your store performance</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+            {/* Order Status Overview */}
+            {data?.ordersByStatus && Object.keys(data.ordersByStatus).length > 0 && (
+              <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Sales Trend</CardTitle>
+                  <CardTitle>Orders by Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
-                    <p className="text-gray-500">Sales Chart Placeholder</p>
+                  <div className="space-y-3">
+                    {Object.entries(data.ordersByStatus).map(([status, count]) => (
+                      <div key={status} className="flex items-center justify-between">
+                        <Badge className={getStatusColor(status)} variant="outline">
+                          {status}
+                        </Badge>
+                        <span className="font-semibold">{count}</span>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
+            )}
+          </div>
+        </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Products</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-64 flex items-center justify-center bg-gray-50 rounded">
-                    <p className="text-gray-500">Top Products Chart Placeholder</p>
-                  </div>
-                </CardContent>
-              </Card>
+        {/* Quick Links */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              <Link href="/admin/products">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <Package className="w-6 h-6" />
+                  Products
+                </Button>
+              </Link>
+              <Link href="/admin/orders">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <ShoppingCart className="w-6 h-6" />
+                  Orders
+                </Button>
+              </Link>
+              <Link href="/admin/users">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <Users className="w-6 h-6" />
+                  Users
+                </Button>
+              </Link>
+              <Link href="/admin/coupons">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <DollarSign className="w-6 h-6" />
+                  Coupons
+                </Button>
+              </Link>
+              <Link href="/admin/analytics">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <TrendingUp className="w-6 h-6" />
+                  Analytics
+                </Button>
+              </Link>
+              <Link href="/admin/settings">
+                <Button variant="outline" className="w-full h-20 flex-col gap-2">
+                  <Eye className="w-6 h-6" />
+                  Settings
+                </Button>
+              </Link>
             </div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
