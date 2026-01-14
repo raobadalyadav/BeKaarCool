@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status")
 
     const skip = (page - 1) * limit
-    
+
     // Resolve user ID to ensure it's a valid MongoDB ObjectId
     const userId = await resolveUserId(session.user.id, session.user.email)
     const filter: any = { user: userId }
@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
       discount,
       couponCode,
       affiliateCode,
+      paymentStatus, // Allow passing payment status
     } = await request.json()
 
     // Validate required fields
@@ -113,7 +114,11 @@ export async function POST(request: NextRequest) {
 
     // Create order
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-    
+
+    // Determine status
+    const initialPaymentStatus = paymentStatus || (paymentMethod === "cod" ? "pending" : "pending")
+    // If online payment is initialized, status is pending. If explicitly "completed" (e.g. from verify), use that.
+
     const order = new Order({
       orderNumber,
       user: userId,
@@ -143,8 +148,8 @@ export async function POST(request: NextRequest) {
       couponCode,
       affiliateCode,
       affiliateCommission,
-      status: paymentMethod === "cod" ? "confirmed" : "pending",
-      paymentStatus: paymentMethod === "cod" ? "pending" : "completed",
+      status: (initialPaymentStatus === "completed" || paymentMethod === "cod") ? "confirmed" : "pending",
+      paymentStatus: initialPaymentStatus,
       estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -152,7 +157,7 @@ export async function POST(request: NextRequest) {
 
     await order.save()
 
-    // Update product stock and sales (only for items with product)
+    // Update product stock and sales
     for (const item of items) {
       if (item.product || item.productId) {
         const productId = item.product || item.productId
@@ -175,12 +180,15 @@ export async function POST(request: NextRequest) {
       console.error("Failed to send order confirmation email:", emailError)
     }
 
-    // Create shipment if payment is confirmed
-    if (paymentMethod !== "cod") {
+    // Create shipment only if payment is confirmed or COD and we want immediate shipment
+    // For pending online payments, shipment should be created in callback/webhook
+    if (initialPaymentStatus === "completed" || paymentMethod === "cod") {
       try {
         const shipmentData = await createShipment(order, shippingAddress)
-        order.trackingNumber = shipmentData.awb_code
-        await order.save()
+        if (shipmentData?.awb_code) {
+          order.trackingNumber = shipmentData.awb_code
+          await order.save()
+        }
       } catch (shipmentError) {
         console.error("Shipment creation error:", shipmentError)
       }

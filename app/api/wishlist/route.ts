@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import connectDB from "@/lib/mongodb"
+import { connectDB } from "@/lib/mongodb"
+import { WishlistItem } from "@/models/Wishlist"
+import { Product } from "@/models/Product"
 import { User } from "@/models/User"
 
 // GET: Fetch user's wishlist
@@ -13,18 +15,33 @@ export async function GET() {
         }
 
         await connectDB()
-        const user = await User.findOne({ email: session.user.email })
-            .populate({
-                path: "wishlist",
-                select: "name price originalPrice images rating reviews category brand slug"
-            })
-            .lean()
 
+        // Find user
+        const user = await User.findOne({ email: session.user.email }).lean()
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
-        return NextResponse.json({ wishlist: user.wishlist || [] })
+        // Get wishlist items from WishlistItem collection
+        const wishlistItems = await WishlistItem.find({ user: user._id })
+            .populate({
+                path: "product",
+                select: "name price originalPrice images rating reviewCount category brand slug stock"
+            })
+            .sort({ addedAt: -1 })
+            .lean()
+
+        // Transform to expected format (array of products)
+        const wishlist = wishlistItems
+            .filter((item: any) => item.product) // Filter out items with deleted products
+            .map((item: any) => ({
+                ...item.product,
+                addedAt: item.addedAt,
+                priceAtAdd: item.priceAtAdd,
+                variant: item.variant
+            }))
+
+        return NextResponse.json({ wishlist })
     } catch (error: any) {
         console.error("Wishlist GET error:", error)
         return NextResponse.json({ error: error.message }, { status: 500 })
@@ -39,29 +56,54 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        const { productId } = await request.json()
+        const { productId, size, color } = await request.json()
         if (!productId) {
             return NextResponse.json({ error: "Product ID required" }, { status: 400 })
         }
 
         await connectDB()
-        const user = await User.findOne({ email: session.user.email })
 
+        // Find user
+        const user = await User.findOne({ email: session.user.email })
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
+        // Get product price
+        const product = await Product.findById(productId).select("price").lean()
+        if (!product) {
+            return NextResponse.json({ error: "Product not found" }, { status: 404 })
+        }
+
         // Check if already in wishlist
-        if (user.wishlist?.includes(productId)) {
-            return NextResponse.json({ message: "Already in wishlist", wishlist: user.wishlist })
+        const existing = await WishlistItem.findOne({
+            user: user._id,
+            product: productId
+        })
+
+        if (existing) {
+            return NextResponse.json({
+                message: "Already in wishlist",
+                inWishlist: true
+            })
         }
 
         // Add to wishlist
-        user.wishlist = user.wishlist || []
-        user.wishlist.push(productId)
-        await user.save()
+        await WishlistItem.create({
+            user: user._id,
+            product: productId,
+            priceAtAdd: product.price,
+            variant: size || color ? { size, color } : undefined
+        })
 
-        return NextResponse.json({ message: "Added to wishlist", wishlist: user.wishlist })
+        // Get updated count
+        const count = await WishlistItem.countDocuments({ user: user._id })
+
+        return NextResponse.json({
+            message: "Added to wishlist",
+            inWishlist: true,
+            count
+        })
     } catch (error: any) {
         console.error("Wishlist POST error:", error)
         return NextResponse.json({ error: error.message }, { status: 500 })
@@ -84,19 +126,27 @@ export async function DELETE(request: NextRequest) {
         }
 
         await connectDB()
-        const user = await User.findOne({ email: session.user.email })
 
+        // Find user
+        const user = await User.findOne({ email: session.user.email })
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
         // Remove from wishlist
-        user.wishlist = (user.wishlist || []).filter(
-            (id: any) => id.toString() !== productId
-        )
-        await user.save()
+        await WishlistItem.deleteOne({
+            user: user._id,
+            product: productId
+        })
 
-        return NextResponse.json({ message: "Removed from wishlist", wishlist: user.wishlist })
+        // Get updated count
+        const count = await WishlistItem.countDocuments({ user: user._id })
+
+        return NextResponse.json({
+            message: "Removed from wishlist",
+            inWishlist: false,
+            count
+        })
     } catch (error: any) {
         console.error("Wishlist DELETE error:", error)
         return NextResponse.json({ error: error.message }, { status: 500 })

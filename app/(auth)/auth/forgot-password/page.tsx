@@ -4,12 +4,11 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, ArrowLeft, Loader2, CheckCircle, KeyRound } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 
 interface ForgotPasswordForm {
   email: string
@@ -19,6 +18,7 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const { toast } = useToast()
 
   const {
     register,
@@ -47,29 +47,47 @@ export default function ForgotPasswordPage() {
       }
 
       setSuccess("Password reset email sent! Please check your inbox and spam folder.")
-      toast.success("Reset email sent!")
+      toast({
+        title: "Email sent!",
+        description: "Check your inbox for reset instructions"
+      })
     } catch (error: any) {
       setError(error.message || "An error occurred. Please try again.")
-      toast.error("Failed to send reset email")
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reset email",
+        variant: "destructive"
+      })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-            <KeyRound className="h-6 w-6 text-orange-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <div className="w-16 h-16 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-black font-bold text-2xl">B</span>
+            </div>
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">BeKaarCool</h1>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <div className="mx-auto w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+              <KeyRound className="h-7 w-7 text-yellow-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>
+            <p className="text-gray-600 mt-2">
+              No worries! Enter your email and we'll send you reset instructions.
+            </p>
           </div>
-          <CardTitle className="text-2xl font-bold">Forgot Password?</CardTitle>
-          <CardDescription>
-            No worries! Enter your email address and we'll send you a link to reset your password
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -84,14 +102,14 @@ export default function ForgotPasswordPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-10"
+                  className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -104,33 +122,40 @@ export default function ForgotPasswordPage() {
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-base"
+              disabled={loading}
+            >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Sending...
                 </>
               ) : (
-                "Send Reset Link"
+                "SEND RESET LINK"
               )}
             </Button>
 
-            <div className="text-center space-y-4">
-              <Link href="/auth/login" className="inline-flex items-center text-sm text-blue-600 hover:underline font-medium">
-                <ArrowLeft className="mr-1 h-4 w-4" />
+            <div className="text-center pt-4">
+              <Link
+                href="/auth/login"
+                className="inline-flex items-center text-sm text-gray-600 hover:text-yellow-600 font-medium transition-colors"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to login
               </Link>
-              
-              <div className="text-xs text-gray-500">
-                Remember your password?{" "}
-                <Link href="/auth/login" className="text-blue-600 hover:underline">
-                  Sign in instead
-                </Link>
-              </div>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+
+        <p className="text-center text-gray-500 text-sm mt-6">
+          Don't have an account?{" "}
+          <Link href="/auth/register" className="text-yellow-600 hover:text-yellow-700 font-semibold">
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }

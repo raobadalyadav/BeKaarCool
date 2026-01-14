@@ -17,10 +17,10 @@ import {
   MapPin,
   Send,
   Heart,
-  Palette,
   Shield,
   Truck,
   Award,
+  CreditCard,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
@@ -35,14 +35,21 @@ export function Footer() {
 
     setSubscribing(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast({
-        title: "Subscribed!",
-        description: "Thank you for subscribing to our newsletter.",
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
       })
-      setEmail("")
+
+      if (response.ok) {
+        toast({
+          title: "Subscribed!",
+          description: "Thank you for subscribing to our newsletter.",
+        })
+        setEmail("")
+      } else {
+        throw new Error("Failed to subscribe")
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -55,181 +62,182 @@ export function Footer() {
   }
 
   const features = [
-    { icon: Palette, text: "Custom Design Tools" },
-    { icon: Shield, text: "Secure Payments" },
-    { icon: Truck, text: "Fast Shipping" },
-    { icon: Award, text: "Quality Guarantee" },
+    { icon: CreditCard, text: "Secure Payments" },
+    { icon: Truck, text: "Fast Delivery" },
+    { icon: Shield, text: "100% Genuine" },
+    { icon: Award, text: "Best Quality" },
   ]
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-      {/* Top Section */}
-      <div className="border-b border-gray-700">
-        <div className="container py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div className="space-y-6">
-              <div className="flex items-center space-x-2">
-                <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">D</span>
-                </div>
-                <span className="font-bold text-2xl bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  BeKaarCool
-                </span>
+    <footer className="bg-gray-900 text-white">
+      {/* Features Bar */}
+      <div className="bg-yellow-400 py-4">
+        <div className="container">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center justify-center space-x-2 text-black">
+                <feature.icon className="h-5 w-5" />
+                <span className="font-semibold text-sm">{feature.text}</span>
               </div>
-              <p className="text-gray-300 leading-relaxed">
-                Transform your creativity into premium custom products. Design, print, and sell with our comprehensive
-                e-commerce platform trusted by thousands of creators worldwide.
-              </p>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              {/* Social Links */}
-              <div className="flex space-x-4">
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700">
-                  <Facebook className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700">
-                  <Twitter className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700">
-                  <Instagram className="h-5 w-5" />
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700">
-                  <Youtube className="h-5 w-5" />
-                </Button>
+      {/* Main Footer */}
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div className="space-y-6">
+            <div className="flex items-center space-x-2">
+              <div className="h-10 w-10 bg-yellow-400 rounded-lg flex items-center justify-center">
+                <span className="text-black font-bold text-lg">B</span>
               </div>
+              <span className="font-bold text-2xl text-yellow-400">
+                BeKaarCool
+              </span>
+            </div>
+            <p className="text-gray-400 leading-relaxed">
+              India's favourite online fashion store. Explore trendy t-shirts, hoodies, accessories and more at amazing prices. Shop the coolest styles with confidence!
+            </p>
 
-              {/* Features */}
-              <div className="grid grid-cols-2 gap-2">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-sm text-gray-400">
-                    <feature.icon className="h-4 w-4 text-blue-400" />
-                    <span>{feature.text}</span>
-                  </div>
-                ))}
+            {/* Social Links */}
+            <div className="flex space-x-3">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+                <Youtube className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Shop */}
+          <div className="space-y-6">
+            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Shop</h3>
+            <div className="space-y-3">
+              <Link href="/products?category=Men" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Men's Fashion
+              </Link>
+              <Link href="/products?category=Women" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Women's Fashion
+              </Link>
+              <Link href="/products?category=Accessories" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Accessories
+              </Link>
+              <Link href="/products?category=Footwear" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Footwear
+              </Link>
+              <Link href="/products?featured=true" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Featured Products
+              </Link>
+              <Link href="/products?sort=trending" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Trending Now
+              </Link>
+            </div>
+          </div>
+
+          {/* Help */}
+          <div className="space-y-6">
+            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Help</h3>
+            <div className="space-y-3">
+              <Link href="/track-order" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Track Your Order
+              </Link>
+              <Link href="/shipping" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Shipping Information
+              </Link>
+              <Link href="/returns" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Returns & Exchanges
+              </Link>
+              <Link href="/size-guide" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Size Guide
+              </Link>
+              <Link href="/faq" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                FAQs
+              </Link>
+              <Link href="/contact" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Contact Us
+              </Link>
+            </div>
+          </div>
+
+          {/* Contact & Newsletter */}
+          <div className="space-y-6">
+            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Contact</h3>
+
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3 text-gray-400">
+                <Mail className="h-5 w-5 text-yellow-400" />
+                <span className="text-sm">support@bekaarcool.com</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-400">
+                <Phone className="h-5 w-5 text-yellow-400" />
+                <span className="text-sm">+91 98765 43210</span>
+              </div>
+              <div className="flex items-center space-x-3 text-gray-400">
+                <MapPin className="h-5 w-5 text-yellow-400" />
+                <span className="text-sm">Mumbai, Maharashtra, India</span>
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-white">Quick Links</h3>
-              <div className="space-y-3">
-                <Link href="/products" className="block text-gray-300 hover:text-white transition-colors">
-                  Browse Products
-                </Link>
-                <Link href="/design" className="block text-gray-300 hover:text-white transition-colors">
-                  Design Studio
-                </Link>
-                <Link href="/about" className="block text-gray-300 hover:text-white transition-colors">
-                  About Us
-                </Link>
-                <Link href="/contact" className="block text-gray-300 hover:text-white transition-colors">
-                  Contact Support
-                </Link>
-                <Link href="/track-order" className="block text-gray-300 hover:text-white transition-colors">
-                  Track Order
-                </Link>
-                <Link href="/seller/register" className="block text-gray-300 hover:text-white transition-colors">
-                  Become a Seller
-                </Link>
-              </div>
-            </div>
-
-            {/* Customer Service */}
-            <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-white">Customer Service</h3>
-              <div className="space-y-3">
-                <Link href="/shipping" className="block text-gray-300 hover:text-white transition-colors">
-                  Shipping Information
-                </Link>
-                <Link href="/returns" className="block text-gray-300 hover:text-white transition-colors">
-                  Returns & Exchanges
-                </Link>
-                <Link href="/size-guide" className="block text-gray-300 hover:text-white transition-colors">
-                  Size Guide
-                </Link>
-                <Link href="/privacy" className="block text-gray-300 hover:text-white transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link href="/terms" className="block text-gray-300 hover:text-white transition-colors">
-                  Terms of Service
-                </Link>
-                <Link href="/faq" className="block text-gray-300 hover:text-white transition-colors">
-                  FAQ
-                </Link>
-              </div>
-            </div>
-
-            {/* Contact & Newsletter */}
-            <div className="space-y-6">
-              <h3 className="font-semibold text-lg text-white">Stay Connected</h3>
-
-              {/* Contact Info */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3 text-gray-300">
-                  <Mail className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p className="font-medium">Email</p>
-                    <p className="text-sm">support@bekaarcool.com</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 text-gray-300">
-                  <Phone className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p className="font-medium">Phone</p>
-                    <p className="text-sm">+91 12345 67890</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 text-gray-300">
-                  <MapPin className="h-5 w-5 text-blue-400" />
-                  <div>
-                    <p className="font-medium">Address</p>
-                    <p className="text-sm">Mumbai, Maharashtra, India</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Newsletter */}
-              <div className="space-y-3">
-                <p className="font-medium text-white">Subscribe to our newsletter</p>
-                <p className="text-sm text-gray-400">Get updates on new products and exclusive offers</p>
-                <form onSubmit={handleNewsletterSubmit} className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 focus:border-blue-500"
-                    required
-                  />
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    disabled={subscribing}
-                  >
-                    {subscribing ? (
-                      "Subscribing..."
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Subscribe
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </div>
+            {/* Newsletter */}
+            <div className="space-y-3">
+              <p className="font-semibold text-white">Newsletter</p>
+              <p className="text-sm text-gray-400">Get 10% off on your first order!</p>
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 flex-1"
+                  required
+                />
+                <Button
+                  type="submit"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-4"
+                  disabled={subscribing}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Legal Links */}
+      <div className="border-t border-gray-800">
+        <div className="container py-4">
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
+            <Link href="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
+            <span>•</span>
+            <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
+            <span>•</span>
+            <Link href="/seller/register" className="hover:text-yellow-400 transition-colors">Become a Seller</Link>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Section */}
-      <div className="border-t border-gray-700">
-        <div className="container py-6">
+      <div className="border-t border-gray-800 bg-black/30">
+        <div className="container py-4">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
-            <div className="flex items-center space-x-4 text-gray-400 text-sm">
-              <p>&copy; 2024 BeKaarCool. All rights reserved.</p>
-              <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-2 text-gray-500 text-sm">
+              <p>© 2024 BeKaarCool. All rights reserved.</p>
+              <span className="hidden md:inline">|</span>
+              <div className="hidden md:flex items-center space-x-1">
                 <span>Made with</span>
                 <Heart className="h-4 w-4 text-red-500 fill-current" />
                 <span>in India</span>
@@ -237,16 +245,19 @@ export function Footer() {
             </div>
 
             {/* Payment Methods */}
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-400 text-sm">We accept:</span>
+            <div className="flex items-center space-x-3">
+              <span className="text-gray-500 text-sm">We accept:</span>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-gray-600 text-gray-300">
-                  Razorpay
+                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
+                  Visa
                 </Badge>
-                <Badge variant="outline" className="text-xs border-gray-600 text-gray-300">
-                  PhonePe
+                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
+                  Mastercard
                 </Badge>
-                <Badge variant="outline" className="text-xs border-gray-600 text-gray-300">
+                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
+                  UPI
+                </Badge>
+                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
                   COD
                 </Badge>
               </div>

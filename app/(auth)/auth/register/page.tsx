@@ -6,16 +6,13 @@ import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
-import { Eye, EyeOff, User, Mail, Lock, Phone, Loader2, Chrome, CheckCircle, UserPlus } from "lucide-react"
+import { Eye, EyeOff, User, Mail, Lock, Phone, Loader2, Chrome, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 
 interface RegisterForm {
   name: string
@@ -23,7 +20,6 @@ interface RegisterForm {
   password: string
   confirmPassword: string
   phone: string
-  role: string
   agreeToTerms: boolean
 }
 
@@ -36,17 +32,17 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState("")
   const [passwordStrength, setPasswordStrength] = useState(0)
   const router = useRouter()
+  const { toast } = useToast()
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<RegisterForm>()
 
   const password = watch("password")
-  
+
   const calculatePasswordStrength = (password: string) => {
     let strength = 0
     if (password.length >= 6) strength += 25
@@ -78,7 +74,7 @@ export default function RegisterPage() {
           email: data.email,
           password: data.password,
           phone: data.phone,
-          role: data.role,
+          role: "customer",
         }),
       })
 
@@ -88,15 +84,22 @@ export default function RegisterPage() {
         throw new Error(result.message || "Registration failed")
       }
 
-      setSuccess("Registration successful! Please check your email to verify your account.")
-      toast.success("Account created successfully!")
-      
+      setSuccess("Account created successfully! Redirecting to login...")
+      toast({
+        title: "Account created!",
+        description: "Please login to continue"
+      })
+
       setTimeout(() => {
         router.push("/auth/login")
-      }, 3000)
+      }, 2000)
     } catch (error: any) {
       setError(error.message || "An error occurred. Please try again.")
-      toast.error("Registration failed")
+      toast({
+        title: "Error",
+        description: error.message || "Registration failed",
+        variant: "destructive"
+      })
     } finally {
       setLoading(false)
     }
@@ -107,25 +110,69 @@ export default function RegisterPage() {
     try {
       await signIn("google", { callbackUrl: "/" })
     } catch (error) {
-      toast.error("Google sign-up failed")
+      toast({
+        title: "Error",
+        description: "Google sign-up failed",
+        variant: "destructive"
+      })
     } finally {
       setGoogleLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <UserPlus className="h-6 w-6 text-green-600" />
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-yellow-400 items-center justify-center p-12">
+        <div className="max-w-md text-center">
+          <div className="w-24 h-24 bg-black rounded-2xl flex items-center justify-center mx-auto mb-8">
+            <span className="text-yellow-400 font-bold text-4xl">B</span>
           </div>
-          <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-          <CardDescription>
-            Join BeKaarCool and start your journey with us
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          <h1 className="text-4xl font-bold text-black mb-4">BeKaarCool</h1>
+          <p className="text-xl text-black/80 mb-8">
+            Join millions of shoppers and discover the coolest fashion trends at unbeatable prices!
+          </p>
+          <div className="space-y-4">
+            <div className="bg-black/10 p-4 rounded-lg text-left">
+              <p className="font-bold text-black flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" /> Exclusive member discounts
+              </p>
+            </div>
+            <div className="bg-black/10 p-4 rounded-lg text-left">
+              <p className="font-bold text-black flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" /> Early access to sales
+              </p>
+            </div>
+            <div className="bg-black/10 p-4 rounded-lg text-left">
+              <p className="font-bold text-black flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" /> Free shipping on first order
+              </p>
+            </div>
+            <div className="bg-black/10 p-4 rounded-lg text-left">
+              <p className="font-bold text-black flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" /> Track orders easily
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Register Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
+        <div className="w-full max-w-md py-8">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <div className="w-16 h-16 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-black font-bold text-2xl">B</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">BeKaarCool</h1>
+          </div>
+
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
+            <p className="text-gray-600 mt-2">Join the coolest fashion community!</p>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {error && (
               <Alert variant="destructive">
@@ -134,20 +181,21 @@ export default function RegisterPage() {
             )}
 
             {success && (
-              <Alert>
-                <AlertDescription>{success}</AlertDescription>
+              <Alert className="border-green-200 bg-green-50">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800">{success}</AlertDescription>
               </Alert>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-gray-700 font-medium">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
-                  className="pl-10"
+                  className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("name", {
                     required: "Name is required",
                     minLength: {
@@ -161,14 +209,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">Email Address</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-10"
+                  className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -182,14 +230,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-gray-700 font-medium">Phone Number</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="Enter your phone number"
-                  className="pl-10"
+                  className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("phone", {
                     required: "Phone number is required",
                     pattern: {
@@ -203,64 +251,37 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Account Type</Label>
-              <Select onValueChange={(value) => setValue("role", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select account type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="customer">Customer</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.role && <p className="text-sm text-red-600">Please select an account type</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
-                  className="pl-10 pr-10"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
                       value: 6,
                       message: "Password must be at least 6 characters",
                     },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                      message:
-                        "Password must contain at least one uppercase letter, one lowercase letter, and one number",
-                    },
                   })}
-                  onChange={(e) => {
-                    setPasswordStrength(calculatePasswordStrength(e.target.value))
-                  }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {password && (
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span>Password strength</span>
-                    <span className={`font-medium ${
-                      passwordStrength < 50 ? 'text-red-500' : 
-                      passwordStrength < 75 ? 'text-yellow-500' : 'text-green-500'
-                    }`}>
+                    <span className="text-gray-500">Password strength</span>
+                    <span className={`font-medium ${passwordStrength < 50 ? 'text-red-500' :
+                        passwordStrength < 75 ? 'text-yellow-500' : 'text-green-500'
+                      }`}>
                       {passwordStrength < 50 ? 'Weak' : passwordStrength < 75 ? 'Medium' : 'Strong'}
                     </span>
                   </div>
@@ -271,14 +292,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Confirm Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className="pl-10 pr-10"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
                   {...register("confirmPassword", {
                     required: "Please confirm your password",
                     validate: (value) => value === password || "Passwords do not match",
@@ -287,84 +308,83 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>}
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-start space-x-2">
               <Checkbox
                 id="agreeToTerms"
+                className="mt-1"
                 {...register("agreeToTerms", {
                   required: "You must agree to the terms and conditions",
                 })}
               />
-              <Label htmlFor="agreeToTerms" className="text-sm">
+              <Label htmlFor="agreeToTerms" className="text-sm text-gray-600 font-normal leading-tight">
                 I agree to the{" "}
-                <Link href="/terms" className="text-blue-600 hover:underline">
+                <Link href="/terms" className="text-yellow-600 hover:text-yellow-700 font-medium">
                   Terms and Conditions
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-blue-600 hover:underline">
+                <Link href="/privacy" className="text-yellow-600 hover:text-yellow-700 font-medium">
                   Privacy Policy
                 </Link>
               </Label>
             </div>
             {errors.agreeToTerms && <p className="text-sm text-red-600">{errors.agreeToTerms.message}</p>}
 
-            <Button type="submit" className="w-full" disabled={loading || googleLoading}>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-base mt-2"
+              disabled={loading || googleLoading}
+            >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Creating account...
                 </>
               ) : (
-                "Create account"
+                "CREATE ACCOUNT"
               )}
             </Button>
 
-            <div className="relative">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <Separator className="w-full" />
+                <div className="w-full border-t border-gray-200"></div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-4 text-gray-500">or continue with</span>
               </div>
             </div>
 
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full h-12 border-gray-300 hover:bg-gray-50"
               onClick={handleGoogleSignUp}
               disabled={loading || googleLoading}
             >
               {googleLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
-                <Chrome className="mr-2 h-4 w-4" />
+                <Chrome className="mr-2 h-5 w-5" />
               )}
               Sign up with Google
             </Button>
 
-            <div className="text-center">
-              <span className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
-                  Sign in
-                </Link>
-              </span>
-            </div>
+            <p className="text-center text-gray-600 mt-6">
+              Already have an account?{" "}
+              <Link href="/auth/login" className="text-yellow-600 hover:text-yellow-700 font-semibold">
+                Sign in
+              </Link>
+            </p>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

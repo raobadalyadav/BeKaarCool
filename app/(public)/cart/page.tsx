@@ -190,9 +190,9 @@ export default function CartPage() {
                   Continue Shopping
                 </Button>
               </Link>
-              <Link href="/design">
+              <Link href="/categories">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto bg-transparent">
-                  Create Custom Design
+                  Browse Categories
                 </Button>
               </Link>
             </div>

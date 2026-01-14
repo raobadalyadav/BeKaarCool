@@ -59,86 +59,81 @@ export default function TrackOrderPage() {
     setError("")
 
     try {
-      // Simulate API call - replace with actual API
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Try to find order by order number first
+      const response = await fetch(`/api/orders/track?orderNumber=${encodeURIComponent(trackingInput.trim())}`)
 
-      // Mock tracking data
-      const mockData: TrackingInfo = {
-        orderNumber: trackingInput.toUpperCase(),
-        status: "In Transit",
-        estimatedDelivery: "Tomorrow, Dec 25",
-        currentLocation: "Mumbai Distribution Center",
-        trackingNumber: "DR" + trackingInput.slice(-8).toUpperCase(),
-        carrier: "Blue Dart",
-        timeline: [
-          {
-            status: "Order Confirmed",
-            description: "Your order has been confirmed and is being prepared",
-            location: "BeKaarCool Warehouse, Mumbai",
-            timestamp: "Dec 20, 2024 at 2:30 PM",
-            completed: true,
-          },
-          {
-            status: "Packed",
-            description: "Your order has been packed and ready for shipment",
-            location: "BeKaarCool Warehouse, Mumbai",
-            timestamp: "Dec 21, 2024 at 10:15 AM",
-            completed: true,
-          },
-          {
-            status: "Shipped",
-            description: "Your order has been shipped and is on its way",
-            location: "Mumbai Sorting Facility",
-            timestamp: "Dec 21, 2024 at 6:45 PM",
-            completed: true,
-          },
-          {
-            status: "In Transit",
-            description: "Your package is currently in transit to your city",
-            location: "Mumbai Distribution Center",
-            timestamp: "Dec 22, 2024 at 8:20 AM",
-            completed: true,
-          },
-          {
-            status: "Out for Delivery",
-            description: "Your package is out for delivery and will arrive today",
-            location: "Local Delivery Hub",
-            timestamp: "Expected: Dec 25, 2024",
-            completed: false,
-          },
-          {
-            status: "Delivered",
-            description: "Your package has been successfully delivered",
-            location: "Your Address",
-            timestamp: "Expected: Dec 25, 2024",
-            completed: false,
-          },
-        ],
-        orderDetails: {
-          items: [
-            {
-              name: "Wireless Bluetooth Headphones",
-              quantity: 1,
-              image: "/placeholder.jpg",
-            },
-            {
-              name: "Phone Case - Clear",
-              quantity: 2,
-              image: "/placeholder.jpg",
-            },
-          ],
-          total: 2499,
-          shippingAddress: {
-            name: "John Doe",
-            address: "123 Main Street, Apartment 4B",
-            city: "Mumbai",
-            state: "Maharashtra",
-            pincode: "400001",
-          },
-        },
+      if (!response.ok) {
+        throw new Error("Order not found")
       }
 
-      setTrackingInfo(mockData)
+      const data = await response.json()
+
+      if (!data.order) {
+        throw new Error("Order not found")
+      }
+
+      // Map API response to tracking info format
+      const order = data.order
+      const trackingData: TrackingInfo = {
+        orderNumber: order.orderNumber,
+        status: order.status,
+        estimatedDelivery: order.estimatedDelivery
+          ? new Date(order.estimatedDelivery).toLocaleDateString('en-IN', {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric'
+          })
+          : "3-5 business days",
+        currentLocation: order.tracking?.currentLocation || "Processing Center",
+        trackingNumber: order.tracking?.trackingNumber || order.orderNumber,
+        carrier: order.tracking?.carrier || "BeKaarCool Logistics",
+        timeline: order.statusHistory?.map((event: any) => ({
+          status: event.status,
+          description: getStatusDescription(event.status),
+          location: event.location || "BeKaarCool",
+          timestamp: new Date(event.timestamp).toLocaleString('en-IN', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+          }),
+          completed: true
+        })) || [],
+        orderDetails: {
+          items: order.items?.map((item: any) => ({
+            name: item.product?.name || item.name || "Product",
+            quantity: item.quantity,
+            image: item.product?.images?.[0] || "/placeholder.svg"
+          })) || [],
+          total: order.total || order.totalAmount || 0,
+          shippingAddress: order.shippingAddress || {
+            name: "Customer",
+            address: "",
+            city: "",
+            state: "",
+            pincode: ""
+          }
+        }
+      }
+
+      // Add pending statuses to timeline
+      const allStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered']
+      const currentIndex = allStatuses.indexOf(order.status.toLowerCase().replace(' ', '_'))
+
+      allStatuses.forEach((status, index) => {
+        if (index > currentIndex) {
+          trackingData.timeline.push({
+            status: formatStatusName(status),
+            description: getStatusDescription(status),
+            location: "Pending",
+            timestamp: "Expected",
+            completed: false
+          })
+        }
+      })
+
+      setTrackingInfo(trackingData)
       toast({
         title: "Order Found!",
         description: "Your order tracking information has been loaded.",
@@ -153,6 +148,24 @@ export default function TrackOrderPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const getStatusDescription = (status: string) => {
+    const descriptions: Record<string, string> = {
+      'pending': 'Your order has been placed and is awaiting confirmation',
+      'confirmed': 'Your order has been confirmed and is being prepared',
+      'processing': 'Your order is being packed and prepared for shipment',
+      'shipped': 'Your order has been shipped and is on its way',
+      'out_for_delivery': 'Your package is out for delivery today',
+      'delivered': 'Your package has been successfully delivered'
+    }
+    return descriptions[status.toLowerCase().replace(' ', '_')] || 'Status update'
+  }
+
+  const formatStatusName = (status: string) => {
+    return status.split('_').map(word =>
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ')
   }
 
   const getStatusColor = (status: string) => {
@@ -289,11 +302,10 @@ export default function TrackOrderPage() {
                     <div key={index} className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            event.completed
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${event.completed
                               ? "bg-green-100 border-2 border-green-500"
                               : "bg-gray-100 border-2 border-gray-300"
-                          }`}
+                            }`}
                         >
                           {event.completed ? (
                             <CheckCircle className="h-5 w-5 text-green-600" />
@@ -315,9 +327,8 @@ export default function TrackOrderPage() {
                           {event.description}
                         </p>
                         <p
-                          className={`text-xs mt-1 flex items-center ${
-                            event.completed ? "text-gray-500" : "text-gray-400"
-                          }`}
+                          className={`text-xs mt-1 flex items-center ${event.completed ? "text-gray-500" : "text-gray-400"
+                            }`}
                         >
                           <MapPin className="h-3 w-3 mr-1" />
                           {event.location}

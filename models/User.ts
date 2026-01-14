@@ -200,17 +200,12 @@ const userSchema = new mongoose.Schema({
 })
 
 // ============================================
-// INDEXES for performance and security
+// INDEXES for performance (avoiding duplicates with field-level definitions)
 // ============================================
-userSchema.index({ email: 1 }, { unique: true })
-userSchema.index({ phone: 1 }, { sparse: true })
 userSchema.index({ role: 1 })
 userSchema.index({ isActive: 1, isBanned: 1 })
 userSchema.index({ createdAt: -1 })
-userSchema.index({ affiliateCode: 1 }, { sparse: true })
 userSchema.index({ loyaltyTier: 1 })
-userSchema.index({ googleId: 1 }, { sparse: true })
-userSchema.index({ facebookId: 1 }, { sparse: true })
 
 // Compound index for searching
 userSchema.index({ name: "text", email: "text" })
@@ -237,7 +232,7 @@ userSchema.virtual("initials").get(function () {
 // ============================================
 // PRE-SAVE HOOKS
 // ============================================
-userSchema.pre("save", function (next) {
+userSchema.pre("save", function (next: any) {
   // Generate affiliate code if not exists
   if (this.isNew && !this.affiliateCode) {
     this.affiliateCode = "BKC" + this._id.toString().slice(-8).toUpperCase()

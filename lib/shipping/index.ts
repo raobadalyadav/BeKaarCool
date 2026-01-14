@@ -527,6 +527,150 @@ export async function trackEcomExpressShipment(awbNumber: string): Promise<Track
     }
 }
 
+
+export async function createBluedartShipment(
+    input: ShipmentInput
+): Promise<ShipmentResult> {
+    try {
+        // Bluedart Waybill Generation
+        const response = await fetch(`${BLUEDART_API_URL}/WayBill/WayBillGeneration`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                Request: {
+                    Consignee: {
+                        Name: input.deliveryAddress.name,
+                        Address1: input.deliveryAddress.address,
+                        Pincode: input.deliveryAddress.pincode,
+                        City: input.deliveryAddress.city,
+                        State: input.deliveryAddress.state,
+                        Mobile: input.deliveryAddress.phone,
+                        Email: "customer@example.com"
+                    },
+                    Services: {
+                        PieceCount: 1,
+                        ActualWeight: input.weight,
+                        CollectableAmount: input.paymentMode === "cod" ? input.codAmount : 0,
+                        CreditReferenceNo: input.orderNumber,
+                        DeclaredValue: input.items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+                        Dimensions: [
+                            {
+                                Length: input.dimensions?.length || 10,
+                                Breadth: input.dimensions?.breadth || 10,
+                                Height: input.dimensions?.height || 10,
+                                Count: 1
+                            }
+                        ]
+                    },
+                    Shipper: {
+                        OriginArea: "DEL",
+                        CustomerCode: BLUEDART_LOGIN_ID
+                    }
+                },
+                Profile: {
+                    LicenceKey: BLUEDART_LICENSE_KEY,
+                    LoginID: BLUEDART_LOGIN_ID,
+                    Api_type: "S"
+                }
+            })
+        })
+
+        const data = await response.json()
+
+        if (data.WayBillGenerationStatus?.StatusInformation === "Success") {
+            return {
+                success: true,
+                provider: "bluedart",
+                orderId: input.orderId,
+                awbNumber: data.WayBillGenerationStatus.WaybillNo,
+                shipmentId: data.WayBillGenerationStatus.TokenNumber
+            }
+        }
+
+        return {
+            success: false,
+            provider: "bluedart",
+            orderId: input.orderId,
+            error: data.WayBillGenerationStatus?.StatusDescription || "Failed to create shipment"
+        }
+    } catch (error: any) {
+        console.error("Bluedart createShipment error:", error)
+        return {
+            success: false,
+            provider: "bluedart",
+            orderId: input.orderId,
+            error: error.message
+        }
+    }
+}
+
+export async function createEcomExpressShipment(
+    input: ShipmentInput
+): Promise<ShipmentResult> {
+    try {
+        const formData = new URLSearchParams()
+        formData.append("username", ECOMEXPRESS_USERNAME)
+        formData.append("password", ECOMEXPRESS_PASSWORD)
+
+        const jsonInput = [{
+            CONSIGNEE_NAME: input.deliveryAddress.name,
+            CONSIGNEE_ADDRESS1: input.deliveryAddress.address,
+            CONSIGNEE_CITY: input.deliveryAddress.city,
+            CONSIGNEE_STATE: input.deliveryAddress.state,
+            CONSIGNEE_PINCODE: input.deliveryAddress.pincode,
+            CONSIGNEE_MOBILE: input.deliveryAddress.phone,
+            ORDER_NUMBER: input.orderNumber,
+            PAYMENT_MODE: input.paymentMode === "cod" ? "COD" : "PPD",
+            COD_AMOUNT: input.paymentMode === "cod" ? (input.codAmount || 0) : 0,
+            PRODUCT: input.paymentMode === "cod" ? "COD" : "PPD",
+            ITEM_DESCRIPTION: input.items.map(i => i.name).join(", "),
+            PIECES: input.items.reduce((sum, i) => sum + i.quantity, 0),
+            ACTUAL_WEIGHT: input.weight,
+            DECLARED_VALUE: input.items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+            PICKUP_NAME: "BeKaarCool Warehouse",
+            PICKUP_PINCODE: input.pickupLocation
+        }]
+
+        formData.append("json_input", JSON.stringify(jsonInput))
+
+        const response = await fetch(`${ECOMEXPRESS_API_URL}/manifest_awb/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: formData
+        })
+
+        const data = await response.json()
+        const shipResult = data[0]
+
+        if (shipResult && shipResult.success) {
+            return {
+                success: true,
+                provider: "ecomexpress",
+                orderId: input.orderId,
+                awbNumber: shipResult.awb_number,
+                shipmentId: shipResult.order_number
+            }
+        }
+
+        return {
+            success: false,
+            provider: "ecomexpress",
+            orderId: input.orderId,
+            error: shipResult?.reason || "Failed to create shipment"
+        }
+    } catch (error: any) {
+        console.error("EcomExpress createShipment error:", error)
+        return {
+            success: false,
+            provider: "ecomexpress",
+            orderId: input.orderId,
+            error: error.message
+        }
+    }
+}
+
 // ============================================
 // UNIFIED SHIPPING INTERFACE
 // ============================================
@@ -540,6 +684,10 @@ export async function createShipment(
             return createShiprocketShipment(input)
         case "delhivery":
             return createDelhiveryShipment(input)
+        case "bluedart":
+            return createBluedartShipment(input)
+        case "ecomexpress":
+            return createEcomExpressShipment(input)
         default:
             return {
                 success: false,
