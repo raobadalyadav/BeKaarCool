@@ -15,13 +15,13 @@ import { addToCartLocal } from "@/store/slices/cart-slice"
 interface WishlistProduct {
     _id: string
     name: string
+    slug: string
     price: number
     originalPrice?: number
     images: string[]
     rating: number
     category: string
     brand?: string
-    slug: string
 }
 
 export default function WishlistPage() {
@@ -115,7 +115,7 @@ export default function WishlistPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                     {wishlist.map((product) => (
                         <Card key={product._id} className="group overflow-hidden border-0 shadow-sm hover:shadow-lg transition-shadow">
-                            <Link href={`/products/${product._id}`} className="block">
+                            <Link href={`/products/${product.slug || product._id}`} className="block">
                                 <div className="relative aspect-[3/4] bg-gray-100">
                                     <Image
                                         src={product.images?.[0] || "/placeholder.svg"}

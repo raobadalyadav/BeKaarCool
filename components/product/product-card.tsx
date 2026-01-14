@@ -86,7 +86,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
   const isLowStock = product.stock > 0 && product.stock <= 5
 
   return (
-    <Link href={`/products/${product._id}`} className="block h-full">
+    <Link href={`/products/${product.slug || product._id}`} className="block h-full">
       <Card
         className={`group h-full flex flex-col hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border-0 shadow-none hover:shadow-xl ${viewMode === "list" ? "flex-row" : ""
           } ${isOutOfStock ? "opacity-75" : ""}`}

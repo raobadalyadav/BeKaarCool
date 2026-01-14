@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectDB } from "@/lib/mongodb"
 import { Product } from "@/models/Product"
+import { Category } from "@/models/Category"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { generateQRCode } from "@/lib/qr-code"
@@ -29,11 +30,19 @@ export async function GET(request: NextRequest) {
 
     if (category && category !== "all") {
       // Handle multiple categories separated by comma
-      const categories = category.split(",").map(c => c.trim()).filter(c => c)
-      if (categories.length === 1) {
-        filter.category = { $regex: new RegExp(`^${categories[0]}$`, "i") }
-      } else if (categories.length > 1) {
-        filter.category = { $in: categories.map(c => new RegExp(`^${c}$`, "i")) }
+      const categoryNames = category.split(",").map(c => c.trim()).filter(c => c)
+
+      // Find category ObjectIds by name
+      const categoryDocs = await Category.find({
+        name: { $in: categoryNames.map(name => new RegExp(`^${name}$`, "i")) }
+      }).select("_id").lean()
+
+      const categoryIds = categoryDocs.map(c => c._id)
+
+      if (categoryIds.length === 1) {
+        filter.category = categoryIds[0]
+      } else if (categoryIds.length > 1) {
+        filter.category = { $in: categoryIds }
       }
     }
 
@@ -60,8 +69,6 @@ export async function GET(request: NextRequest) {
         $or: [
           { name: { $regex: search.trim(), $options: "i" } },
           { description: { $regex: search.trim(), $options: "i" } },
-          { category: { $regex: search.trim(), $options: "i" } },
-          { subcategory: { $regex: search.trim(), $options: "i" } },
           { brand: { $regex: search.trim(), $options: "i" } },
           { tags: { $in: [new RegExp(search.trim(), "i")] } },
           { "seo.keywords": { $in: [new RegExp(search.trim(), "i")] } },

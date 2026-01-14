@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast"
 interface Product {
   _id: string
   name: string
+  slug: string
   price: number
   stock: number
   sold: number
@@ -215,7 +216,7 @@ export default function SellerProductsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Link href={`/products/${product._id}`}>
+                        <Link href={`/products/${product.slug || product._id}`}>
                           <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -253,7 +254,7 @@ export default function SellerProductsPage() {
           >
             Previous
           </Button>
-          
+
           {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
             <Button
               key={page}
@@ -263,7 +264,7 @@ export default function SellerProductsPage() {
               {page}
             </Button>
           ))}
-          
+
           <Button
             variant="outline"
             disabled={pagination.page === pagination.pages}

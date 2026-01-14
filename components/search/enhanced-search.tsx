@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 interface SearchResult {
   _id: string
   name: string
+  slug: string
   category: string
   brand?: string
   price: number
@@ -29,11 +30,11 @@ interface EnhancedSearchProps {
   onSearch?: (query: string) => void
 }
 
-export function EnhancedSearch({ 
-  className, 
-  placeholder = "Search products, brands, categories...", 
+export function EnhancedSearch({
+  className,
+  placeholder = "Search products, brands, categories...",
   showFilters = true,
-  onSearch 
+  onSearch
 }: EnhancedSearchProps) {
   const [query, setQuery] = useState("")
   const [isOpen, setIsOpen] = useState(false)
@@ -42,7 +43,7 @@ export function EnhancedSearch({
   const [recentSearches, setRecentSearches] = useState<string[]>([])
   const [trendingSearches] = useState(["Custom T-shirts", "Hoodies", "Mugs", "Posters", "Phone Cases"])
   const [loading, setLoading] = useState(false)
-  
+
   const router = useRouter()
   const searchRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -98,7 +99,7 @@ export function EnhancedSearch({
 
     setIsOpen(false)
     setQuery("")
-    
+
     if (onSearch) {
       onSearch(searchQuery)
     } else {
@@ -170,7 +171,7 @@ export function EnhancedSearch({
                   {results.map((product) => (
                     <div
                       key={product._id}
-                      onClick={() => router.push(`/products/${product._id}`)}
+                      onClick={() => router.push(`/products/${product.slug || product._id}`)}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
                     >
                       <img
