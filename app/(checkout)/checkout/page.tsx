@@ -22,7 +22,7 @@ declare global {
     }
 }
 
-type PaymentMethod = "razorpay" | "phonepe" | "cod" | "stripe"
+type PaymentMethod = "razorpay" | "cod"
 
 export default function CheckoutPage() {
     const { data: session } = useSession()
@@ -121,14 +121,6 @@ export default function CheckoutPage() {
                 await createOrder(null, "cod")
             } else if (paymentMethod === "razorpay") {
                 await initiateRazorpayPayment()
-            } else if ((paymentMethod as string) === "phonepe") {
-                await initiatePhonePePayment()
-            } else if ((paymentMethod as string) === "paytm") {
-                await initiatePaytmPayment()
-            } else if ((paymentMethod as string) === "payu") {
-                await initiatePayUPayment()
-            } else if ((paymentMethod as string) === "stripe") {
-                await initiateStripePayment()
             }
         } catch (error: any) {
             toast({
@@ -199,99 +191,7 @@ export default function CheckoutPage() {
         razorpay.open()
     }
 
-    const initiatePhonePePayment = async () => {
-        // Create pending order first
-        const orderData = await createOrder(null, "phonepe", false)
-        if (!orderData) return
-
-        const response = await fetch("/api/payments/phonepe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: Math.round(total * 100),
-                orderId: orderData.orderNumber,
-                customerPhone: address.phone,
-                customerEmail: session?.user?.email
-            })
-        })
-
-        const data = await response.json()
-        if (data.success && data.paymentLink) {
-            window.location.href = data.paymentLink
-        } else {
-            throw new Error(data.error || "PhonePe payment failed")
-        }
-    }
-
-    const initiatePaytmPayment = async () => {
-        const orderData = await createOrder(null, "paytm", false)
-        if (!orderData) return
-
-        const response = await fetch("/api/payments/paytm", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: Math.round(total * 100),
-                orderId: orderData.orderNumber,
-                customerPhone: address.phone,
-                customerEmail: session?.user?.email
-            })
-        })
-
-        const data = await response.json()
-        if (data.success && data.paymentLink) {
-            // For Paytm linkage, usually a form submit or redirect
-            window.location.href = data.paymentLink
-        } else {
-            throw new Error(data.error || "Paytm payment failed")
-        }
-    }
-
-    const initiatePayUPayment = async () => {
-        const orderData = await createOrder(null, "payu", false)
-        if (!orderData) return
-
-        const response = await fetch("/api/payments/payu", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: Math.round(total * 100),
-                orderId: orderData.orderNumber,
-                customerPhone: address.phone,
-                customerEmail: session?.user?.email
-            })
-        })
-
-        const data = await response.json()
-        if (data.success && data.paymentLink) {
-            window.location.href = data.paymentLink
-        } else {
-            throw new Error(data.error || "PayU payment failed")
-        }
-    }
-
-    const initiateStripePayment = async () => {
-        const response = await fetch("/api/payments/stripe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: Math.round(total * 100),
-                currency: "inr"
-            })
-        })
-
-        const data = await response.json()
-        if (data.clientSecret) {
-            // For Stripe, we'd use Stripe Elements - for now redirect
-            toast({
-                title: "Coming Soon",
-                description: "Stripe payment integration is being set up."
-            })
-            setLoading(false)
-        } else {
-            throw new Error(data.error)
-        }
-    }
+    // Only Razorpay and COD supported
 
     const createOrder = async (paymentId: string | null, method: string, redirect: boolean = true) => {
         const response = await fetch("/api/orders", {
@@ -485,43 +385,10 @@ export default function CheckoutPage() {
                                             <RadioGroupItem value="razorpay" id="razorpay" />
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2">
-                                                    <Smartphone className="h-5 w-5 text-blue-600" />
+                                                    <CreditCard className="h-5 w-5 text-blue-600" />
                                                     <span className="font-medium">UPI / Cards / Net Banking</span>
                                                 </div>
-                                                <p className="text-xs text-gray-500 mt-1">Pay with GPay, PhonePe, Credit/Debit Card, Net Banking</p>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-center space-x-3 border p-4 rounded cursor-pointer transition-colors ${(paymentMethod as string) === "phonepe" ? "border-yellow-400 bg-yellow-50" : "hover:border-gray-400"}`}>
-                                            <RadioGroupItem value="phonepe" id="phonepe" />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Smartphone className="h-5 w-5 text-purple-600" />
-                                                    <span className="font-medium">PhonePe</span>
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-1">UPI, Wallet, Card</p>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-center space-x-3 border p-4 rounded cursor-pointer transition-colors ${(paymentMethod as string) === "paytm" ? "border-yellow-400 bg-yellow-50" : "hover:border-gray-400"}`}>
-                                            <RadioGroupItem value="paytm" id="paytm" />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Wallet className="h-5 w-5 text-blue-400" />
-                                                    <span className="font-medium">Paytm</span>
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-1">Wallet, UPI, NetBanking</p>
-                                            </div>
-                                        </label>
-
-                                        <label className={`flex items-center space-x-3 border p-4 rounded cursor-pointer transition-colors ${(paymentMethod as string) === "payu" ? "border-yellow-400 bg-yellow-50" : "hover:border-gray-400"}`}>
-                                            <RadioGroupItem value="payu" id="payu" />
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Globe className="h-5 w-5 text-green-600" />
-                                                    <span className="font-medium">PayU / Cards</span>
-                                                </div>
-                                                <p className="text-xs text-gray-500 mt-1">Credit/Debit Card, NetBanking</p>
+                                                <p className="text-xs text-gray-500 mt-1">Pay with GPay, PhonePe, Credit/Debit Card, Net Banking via Razorpay</p>
                                             </div>
                                         </label>
 

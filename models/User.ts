@@ -132,6 +132,11 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0
   },
+  walletBalance: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
 
   // ============================================
   // Referral System (basic fields, use Referral model for tracking)
@@ -232,7 +237,7 @@ userSchema.virtual("initials").get(function () {
 // ============================================
 // PRE-SAVE HOOKS
 // ============================================
-userSchema.pre("save", function (next: any) {
+userSchema.pre("save", async function () {
   // Generate affiliate code if not exists
   if (this.isNew && !this.affiliateCode) {
     this.affiliateCode = "BKC" + this._id.toString().slice(-8).toUpperCase()
@@ -250,8 +255,6 @@ userSchema.pre("save", function (next: any) {
       this.loyaltyTier = "bronze"
     }
   }
-
-  next()
 })
 
 // ============================================

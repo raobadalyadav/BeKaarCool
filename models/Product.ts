@@ -263,7 +263,7 @@ const productSchema = new mongoose.Schema({
 })
 
 // Indexes
-productSchema.index({ slug: 1 }, { unique: true })
+// productSchema.index({ slug: 1 }, { unique: true }) // Redundant
 productSchema.index({ name: "text", description: "text", tags: "text", brand: "text" })
 productSchema.index({ category: 1 })
 productSchema.index({ subcategory: 1 })
@@ -277,7 +277,7 @@ productSchema.index({ recommended: 1, isActive: 1 })
 productSchema.index({ newArrival: 1, createdAt: -1 })
 productSchema.index({ bestSeller: 1 })
 productSchema.index({ seller: 1 })
-productSchema.index({ sku: 1 }, { sparse: true })
+// productSchema.index({ sku: 1 }, { sparse: true }) // Redundant
 productSchema.index({ createdAt: -1 })
 productSchema.index({ stock: 1 })
 productSchema.index({ tags: 1 })
@@ -306,7 +306,7 @@ productSchema.virtual("primaryImage").get(function () {
 })
 
 // Pre-save hooks
-productSchema.pre("save", async function (next) {
+productSchema.pre("save", async function () {
   // Generate slug if not exists or name changed
   if (this.isModified("name") || this.isNew) {
     let baseSlug = this.name
@@ -358,8 +358,6 @@ productSchema.pre("save", async function (next) {
     this.newArrival = true
     this.publishedAt = new Date()
   }
-
-  next()
 })
 
 // Post-save hook to update category product count

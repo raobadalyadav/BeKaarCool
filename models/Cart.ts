@@ -186,7 +186,7 @@ cartSchema.virtual("amountToFreeShipping").get(function () {
 })
 
 // Pre-save hook to calculate totals
-cartSchema.pre("save", function (next) {
+cartSchema.pre("save", function () {
   // Calculate subtotal
   this.subtotal = this.items.reduce((sum, item) => {
     return sum + (item.price * item.quantity)
@@ -206,8 +206,6 @@ cartSchema.pre("save", function (next) {
 
   // Update last activity
   this.lastActivity = new Date()
-
-  next()
 })
 
 // Instance methods

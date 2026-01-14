@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import mongoose from "mongoose"
 import { connectDB } from "@/lib/mongodb"
 import { Order } from "@/models/Order"
 import { Cart } from "@/models/Cart"
@@ -8,7 +9,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { resolveUserId } from "@/lib/auth-utils"
 import { sendOrderConfirmationEmail } from "@/lib/email"
-import { createShipment } from "@/lib/shiprocket"
+import DelhiveryService from "@/lib/delhivery"
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     const userId = await resolveUserId(session.user.id, session.user.email)
 
     const {
-      items,
+      items: rawItems,
       shippingAddress,
       billingAddress,
       paymentMethod,
@@ -86,14 +87,35 @@ export async function POST(request: NextRequest) {
     } = await request.json()
 
     // Validate required fields
-    if (!items || !shippingAddress || !paymentMethod || !total) {
+    if (!rawItems || !shippingAddress || !paymentMethod || !total) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
+    }
+
+    // Filter out items with invalid Product IDs (legacy data cleanup)
+    const items = rawItems.filter((item: any) => {
+      const pid = item.product || item.productId
+      // Keep items without product (custom?) or with VALID ObjectId
+      // If item has product ID but it's invalid, skip it.
+      if ((item.product || item.productId) && !mongoose.isValidObjectId(pid)) {
+        return false;
+      }
+      return true;
+    })
+
+    if (items.length === 0) {
+      return NextResponse.json({ message: "No valid items in order (Please clear your cart)" }, { status: 400 })
     }
 
     // Validate stock availability (only for items with product)
     for (const item of items) {
       if (item.product || item.productId) {
         const productId = item.product || item.productId
+
+        // Skip invalid IDs (e.g. from dummy data in old carts)
+        if (!mongoose.isValidObjectId(productId)) {
+          continue;
+        }
+
         const product = await Product.findById(productId)
         if (!product || product.stock < item.quantity) {
           return NextResponse.json({ message: `Insufficient stock for ${product?.name || "product"}` }, { status: 400 })
@@ -119,23 +141,44 @@ export async function POST(request: NextRequest) {
     const initialPaymentStatus = paymentStatus || (paymentMethod === "cod" ? "pending" : "pending")
     // If online payment is initialized, status is pending. If explicitly "completed" (e.g. from verify), use that.
 
-    const order = new Order({
-      orderNumber,
-      user: userId,
-      customer: userId,
-      items: items.map((item: any) => ({
-        product: item.product || item.productId || null,
+    // Build order items with required fields
+    const orderItems = await Promise.all(items.map(async (item: any) => {
+      const productId = item.product || item.productId
+      let productName = item.name || "Custom Product"
+      let productImage = item.image || "/placeholder.svg"
+
+      // Fetch product details for name and image if we have a product ID
+      if (productId && mongoose.isValidObjectId(productId)) {
+        const product = await Product.findById(productId).select("name images")
+        if (product) {
+          productName = product.name
+          productImage = product.images?.[0] || "/placeholder.svg"
+        }
+      }
+
+      return {
+        product: productId || null,
         customProduct: item.customProduct ? {
           name: item.customProduct.name,
           type: item.customProduct.type,
           basePrice: item.customProduct.basePrice,
         } : null,
+        name: productName,
+        image: productImage,
         quantity: item.quantity,
         price: item.price,
         size: item.size,
         color: item.color,
         customization: item.customization,
-      })),
+        status: "pending" as const
+      }
+    }))
+
+    const order = new Order({
+      orderNumber,
+      user: userId,
+      customer: userId,
+      items: orderItems,
       shippingAddress,
       billingAddress: billingAddress || shippingAddress,
       paymentMethod,
@@ -184,13 +227,36 @@ export async function POST(request: NextRequest) {
     // For pending online payments, shipment should be created in callback/webhook
     if (initialPaymentStatus === "completed" || paymentMethod === "cod") {
       try {
-        const shipmentData = await createShipment(order, shippingAddress)
-        if (shipmentData?.awb_code) {
-          order.trackingNumber = shipmentData.awb_code
+        const shipmentResult = await DelhiveryService.createShipment({
+          orderId: order._id.toString(),
+          orderNumber: order.orderNumber,
+          customer: {
+            name: shippingAddress.name,
+            phone: shippingAddress.phone,
+            address: `${shippingAddress.address}, ${shippingAddress.landmark || ""}`,
+            city: shippingAddress.city,
+            state: shippingAddress.state,
+            pincode: shippingAddress.pincode,
+            country: "India"
+          },
+          items: order.items.map((item: any) => ({
+            name: item.name || "Product",
+            sku: item.product?.toString() || `SKU-${item._id}`,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          totalWeight: 0.5, // Default weight
+          paymentMode: paymentMethod === "cod" ? "cod" : "prepaid",
+          codAmount: paymentMethod === "cod" ? order.total : 0,
+          invoiceValue: order.total
+        })
+        if (shipmentResult.success && shipmentResult.awbNumber) {
+          order.trackingNumber = shipmentResult.awbNumber
+          order.carrier = "delhivery"
           await order.save()
         }
       } catch (shipmentError) {
-        console.error("Shipment creation error:", shipmentError)
+        console.error("Delhivery shipment creation error:", shipmentError)
       }
     }
 

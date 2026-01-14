@@ -38,7 +38,9 @@ export async function POST(request: NextRequest) {
 
         const data = await request.json()
 
-        if (!data.name || !data.phone || !data.address || !data.city || !data.state || !data.pincode) {
+        // Support both "address" and "addressLine1" field names
+        const addressText = data.addressLine1 || data.address
+        if (!data.name || !data.phone || !addressText || !data.city || !data.state || !data.pincode) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
         }
 
@@ -49,12 +51,22 @@ export async function POST(request: NextRequest) {
         // If this is the first address, make it default
         const existingCount = await Address.countDocuments({ user: userId })
 
+        // If setting as default, unset other defaults first
+        if (data.isDefault && existingCount > 0) {
+            await Address.updateMany(
+                { user: userId },
+                { isDefault: false }
+            )
+        }
+
         const address = await Address.create({
             user: userId,
             name: data.name,
             phone: data.phone,
             alternatePhone: data.alternatePhone,
-            address: data.address,
+            address: addressText,
+            addressLine1: data.addressLine1 || addressText,
+            addressLine2: data.addressLine2,
             landmark: data.landmark,
             city: data.city,
             state: data.state,

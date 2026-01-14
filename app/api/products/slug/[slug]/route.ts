@@ -1,7 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectDB } from "@/lib/mongodb"
 import { Product } from "@/models/Product"
+import { User } from "@/models/User"
+import { Category } from "@/models/Category"
 
+// Ensure models are registered before populate
+void User
+void Category
 interface RouteParams {
     params: Promise<{ slug: string }>
 }

@@ -323,7 +323,7 @@ orderSchema.virtual("canReturn").get(function () {
 })
 
 // Pre-save hooks
-orderSchema.pre("save", async function (next) {
+orderSchema.pre("save", async function () {
   // Generate order number if new
   if (this.isNew && !this.orderNumber) {
     const date = new Date()
@@ -357,11 +357,9 @@ orderSchema.pre("save", async function (next) {
   // Validate items
   for (const item of this.items) {
     if (!item.product && !item.customProduct?.name) {
-      return next(new Error("Each item must have either a product or customProduct"))
+      throw new Error("Each item must have either a product or customProduct")
     }
   }
-
-  next()
 })
 
 // Instance methods

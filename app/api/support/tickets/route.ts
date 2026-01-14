@@ -1,11 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { SupportTicket } from "@/models/SupportTicket"
-import { User } from "@/models/User"
+import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { sendSupportTicketEmail } from "@/lib/email"
+import { connectDB } from "@/lib/mongodb"
+import { SupportTicket } from "@/models/SupportTicket"
+import { resolveUserId } from "@/lib/auth-utils"
 
+// GET: List user's support tickets
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,29 +15,46 @@ export async function GET(request: NextRequest) {
 
     await connectDB()
 
+    const userId = await resolveUserId(session.user.id, session.user.email)
+
     const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get("page") || "1")
+    const limit = parseInt(searchParams.get("limit") || "10")
     const status = searchParams.get("status")
-    const priority = searchParams.get("priority")
 
-    const filter: any = {}
+    const skip = (page - 1) * limit
+    const filter: any = { user: userId }
 
-    // Regular users can only see their own tickets
-    if (session.user.role === "customer") {
-      filter.user = session.user.id
+    if (status && status !== "all") {
+      filter.status = status
     }
 
-    if (status && status !== "all") filter.status = status
-    if (priority && priority !== "all") filter.priority = priority
+    const [tickets, total] = await Promise.all([
+      SupportTicket.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("orderId", "orderNumber total")
+        .lean(),
+      SupportTicket.countDocuments(filter)
+    ])
 
-    const tickets = await SupportTicket.find(filter).populate("user", "name email").sort({ createdAt: -1 })
-
-    return NextResponse.json(tickets)
-  } catch (error) {
-    console.error("Error fetching support tickets:", error)
-    return NextResponse.json({ error: "Failed to fetch support tickets" }, { status: 500 })
+    return NextResponse.json({
+      tickets,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    })
+  } catch (error: any) {
+    console.error("Support tickets fetch error:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
+// POST: Create new support ticket
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
@@ -47,26 +64,40 @@ export async function POST(request: NextRequest) {
 
     await connectDB()
 
-    const { subject, description, category, priority = "medium" } = await request.json()
+    const userId = await resolveUserId(session.user.id, session.user.email)
+    const body = await request.json()
 
-    const ticket = new SupportTicket({
-      user: session.user.id,
+    const { subject, category, message, orderId, priority } = body
+
+    if (!subject || !category || !message) {
+      return NextResponse.json({
+        error: "Subject, category, and message are required"
+      }, { status: 400 })
+    }
+
+    const ticket = await SupportTicket.create({
+      user: userId,
       subject,
-      description,
       category,
-      priority,
-      status: "open",
+      priority: priority || "medium",
+      orderId: orderId || undefined,
+      messages: [{
+        sender: "customer",
+        message,
+        createdAt: new Date()
+      }]
     })
 
-    await ticket.save()
-    await ticket.populate("user", "name email")
-
-    // Send notification email to support team
-    await sendSupportTicketEmail(ticket)
-
-    return NextResponse.json(ticket, { status: 201 })
-  } catch (error) {
-    console.error("Error creating support ticket:", error)
-    return NextResponse.json({ error: "Failed to create support ticket" }, { status: 500 })
+    return NextResponse.json({
+      message: "Ticket created successfully",
+      ticket: {
+        _id: ticket._id,
+        ticketNumber: ticket.ticketNumber,
+        status: ticket.status
+      }
+    }, { status: 201 })
+  } catch (error: any) {
+    console.error("Support ticket creation error:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
