@@ -23,10 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit
     const filter: any = {}
 
-    // If seller, only show their products
-    if (session.user.role === "seller") {
-      filter.seller = session.user.id
-    }
+
 
     if (category && category !== "all") {
       filter.category = category
@@ -86,7 +83,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session || (session.user.role !== "admin" && session.user.role !== "seller")) {
+    if (!session || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -99,10 +96,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
-    // Check if user owns the product or is admin
-    if (product.seller.toString() !== session.user.id && session.user.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
+
 
     const updatedProduct = await Product.findByIdAndUpdate(productId, { stock }, { new: true })
 

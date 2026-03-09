@@ -21,11 +21,6 @@ interface Product {
   reviews: number
   featured: boolean
   isActive: boolean
-  seller: {
-    id: string
-    name: string
-    avatar?: string
-  }
   seo: {
     title: string
     description: string

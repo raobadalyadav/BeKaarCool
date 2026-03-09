@@ -12,7 +12,6 @@ export async function GET() {
     })
       .limit(6)
       .sort({ createdAt: -1 })
-      .populate("seller", "name email")
 
     return NextResponse.json(products)
   } catch (error) {

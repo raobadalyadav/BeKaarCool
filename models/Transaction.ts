@@ -113,14 +113,13 @@ transactionSchema.index({ createdAt: -1 })
 transactionSchema.index({ providerTransactionId: 1 })
 
 // Pre-save hook to generate transaction ID
-transactionSchema.pre("save", function (next) {
+transactionSchema.pre("save", async function () {
     if (this.isNew && !this.transactionId) {
         const prefix = this.type === "refund" ? "REF" : "TXN"
         const timestamp = Date.now().toString(36).toUpperCase()
         const random = Math.random().toString(36).substring(2, 8).toUpperCase()
         this.transactionId = `${prefix}${timestamp}${random}`
     }
-    next()
 })
 
 // Static methods

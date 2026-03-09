@@ -33,10 +33,6 @@ interface Product {
   recommended?: boolean
   createdAt: string
   stock: number
-  seller?: {
-    name: string
-    avatar?: string
-  }
 }
 
 interface Category {

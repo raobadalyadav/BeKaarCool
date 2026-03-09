@@ -20,11 +20,7 @@ export async function GET(request: NextRequest) {
 
     let cart = await Cart.findOne({ user: userId }).populate({
       path: "items.product",
-      select: "name price originalPrice images stock seller isActive",
-      populate: {
-        path: "seller",
-        select: "name",
-      },
+      select: "name price originalPrice images stock isActive",
     })
 
     if (!cart) {
@@ -105,7 +101,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: "Invalid product or quantity" }, { status: 400 })
       }
 
-      const product = await Product.findById(productId).populate("seller", "name")
+      const product = await Product.findById(productId)
       if (!product || !product.isActive) {
         return NextResponse.json({ message: "Product not found or inactive" }, { status: 404 })
       }
@@ -140,11 +136,7 @@ export async function POST(request: NextRequest) {
     // Recalculate totals
     await cart.populate({
       path: "items.product",
-      select: "name price originalPrice images stock seller",
-      populate: {
-        path: "seller",
-        select: "name",
-      },
+      select: "name price originalPrice images stock",
     })
 
     cart.subtotal = cart.items.reduce((sum: number, item: any) => {

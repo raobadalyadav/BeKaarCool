@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get("maxPrice")
     const sort = searchParams.get("sort") || "createdAt"
     const featured = searchParams.get("featured")
-    const sellerId = searchParams.get("sellerId")
     const sale = searchParams.get("sale")
     const recommended = searchParams.get("recommended")
 
@@ -44,10 +43,6 @@ export async function GET(request: NextRequest) {
       } else if (categoryIds.length > 1) {
         filter.category = { $in: categoryIds }
       }
-    }
-
-    if (sellerId) {
-      filter.seller = sellerId
     }
 
     if (featured === "true") {
@@ -127,7 +122,6 @@ export async function GET(request: NextRequest) {
       .sort(sortObj)
       .skip(skip)
       .limit(limit)
-      .populate("seller", "name email avatar")
       .lean()
 
     const total = await Product.countDocuments(filter)
@@ -150,8 +144,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session || (session.user.role !== "seller" && session.user.role !== "admin")) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json({ message: "Unauthorized: Admins only" }, { status: 401 })
     }
 
     await connectDB()
@@ -175,7 +169,6 @@ export async function POST(request: NextRequest) {
 
     const product = new Product({
       ...body,
-      seller: session.user.id,
       slug,
       qrCode: qrCodeData,
       seo: {
@@ -193,7 +186,6 @@ export async function POST(request: NextRequest) {
     })
 
     await product.save()
-    await product.populate("seller", "name email avatar")
 
     return NextResponse.json(product, { status: 201 })
   } catch (error) {

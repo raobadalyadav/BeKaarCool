@@ -66,10 +66,6 @@ export default function FAQPage() {
         {
           q: "What's your return policy?",
           a: "30-day return policy for unused items in original condition. Custom items can only be returned if there's a production error."
-        },
-        {
-          q: "How do I become a seller?",
-          a: "Visit our Seller Registration page to apply. We review applications within 2-3 business days."
         }
       ]
     }

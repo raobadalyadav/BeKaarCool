@@ -223,8 +223,7 @@ export function Footer() {
             <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
             <span>•</span>
             <Link href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
-            <span>•</span>
-            <Link href="/seller/register" className="hover:text-yellow-400 transition-colors">Become a Seller</Link>
+
           </div>
         </div>
       </div>

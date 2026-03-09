@@ -18,10 +18,6 @@ interface CartItem {
     position?: { x: number; y: number }
     elements?: any[]
   }
-  seller: {
-    id: string
-    name: string
-  }
   customProduct?: {
     type: string
     name: string
@@ -63,10 +59,6 @@ const transformCartItem = (item: any): CartItem => ({
   size: item.size,
   color: item.color,
   customization: item.customization,
-  seller: item.product?.seller ? {
-    id: item.product.seller._id,
-    name: item.product.seller.name,
-  } : { id: 'custom', name: 'Custom Design' },
   stock: item.product?.stock || 999,
   customProduct: item.customProduct,
 })
@@ -184,7 +176,7 @@ const cartSlice = createSlice({
       const storedCoupon = getStoredCoupon()
 
       if (storedCart) {
-        state.items = storedCart.items
+        state.items = storedCart.items as CartItem[]
         state.total = storedCart.total
         state.subtotal = storedCart.subtotal
         state.shipping = storedCart.shipping
@@ -217,8 +209,7 @@ const cartSlice = createSlice({
           quantity: newItem.quantity,
           size: newItem.size,
           color: newItem.color,
-          stock: 100,
-          seller: { id: 'demo', name: 'Demo Seller' }
+          stock: 100
         }
         state.items.push(cartItem)
       }

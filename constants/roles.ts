@@ -1,6 +1,5 @@
 export const USER_ROLES = {
   ADMIN: 'admin',
-  SELLER: 'seller',
   CUSTOMER: 'customer',
 } as const
 
@@ -17,14 +16,8 @@ export const ROLE_PERMISSIONS = {
     'manage_analytics',
     'manage_settings',
     'manage_support',
-    'manage_sellers',
   ],
-  [USER_ROLES.SELLER]: [
-    'manage_own_products',
-    'manage_own_orders',
-    'view_own_analytics',
-    'manage_own_inventory',
-  ],
+
   [USER_ROLES.CUSTOMER]: [
     'place_orders',
     'view_own_orders',

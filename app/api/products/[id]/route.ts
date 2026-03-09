@@ -16,7 +16,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const product = await Product.findById(id)
-      .populate("seller", "name email avatar")
       // .populate("reviews", "rating comment user createdAt")
 
     if (!product) {
@@ -48,8 +47,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: "Product not found" }, { status: 404 })
     }
 
-    if (product.seller.toString() !== userId && session.user.role !== "admin") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 })
+    if (session.user.role !== "admin") {
+      return NextResponse.json({ message: "Forbidden: Admins only" }, { status: 403 })
     }
 
     const body = await request.json()
@@ -57,7 +56,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       id,
       { ...body, updatedAt: new Date() },
       { new: true, runValidators: true }
-    ).populate("seller", "name email avatar")
+    )
 
     return NextResponse.json(updatedProduct)
   } catch (error) {
@@ -82,8 +81,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ message: "Product not found" }, { status: 404 })
     }
 
-    if (product.seller.toString() !== userId && session.user.role !== "admin") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 })
+    if (session.user.role !== "admin") {
+      return NextResponse.json({ message: "Forbidden: Admins only" }, { status: 403 })
     }
 
     await Product.findByIdAndDelete(id)

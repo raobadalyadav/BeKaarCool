@@ -46,15 +46,6 @@ const seedData = {
         },
       ],
     },
-    {
-      name: "Jane Smith",
-      email: "jane@example.com",
-      password: bcrypt.hashSync("password123", 12),
-      role: "seller",
-      isVerified: true,
-      isActive: true,
-      phone: "+91 98765 43211",
-    },
   ],
   products: [
     // Fashion - T-Shirts
@@ -611,14 +602,12 @@ async function seedDatabase() {
     const users = await User.insertMany(seedData.users);
     const adminUser = users.find(u => u.role === "admin");
     const customerUser = users.find(u => u.role === "customer");
-    const sellerUser = users.find(u => u.role === "seller");
 
     console.log("Creating products...");
     const productsWithDetails = seedData.products.map((product, index) => ({
       ...product,
       slug: generateSlug(product.name),
       sku: `BFK-${String(index + 1).padStart(3, '0')}`,
-      seller: sellerUser._id,
       seoTitle: `${product.name} | Baefikra`.substring(0, 60),
       seoDescription: product.description.length > 160 ? product.description.substring(0, 157) + '...' : product.description,
       seoKeywords: [

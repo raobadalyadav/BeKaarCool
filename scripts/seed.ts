@@ -378,9 +378,9 @@ async function main() {
         }
 
         // Get or create admin user
-        let seller = await User.findOne({ role: "admin" })
-        if (!seller) {
-            seller = await User.create({
+        let admin = await User.findOne({ role: "admin" })
+        if (!admin) {
+            admin = await User.create({
                 name: "Baefikra Admin",
                 email: "admin@baefikra.com",
                 role: "admin",
@@ -417,7 +417,6 @@ async function main() {
                     ...product,
                     slug,
                     category: categoryId,
-                    seller: seller._id,
                     rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
                     sold: Math.floor(Math.random() * 500),
                     views: Math.floor(Math.random() * 2000),

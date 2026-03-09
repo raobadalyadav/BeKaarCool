@@ -214,10 +214,6 @@ export async function requireAdmin(): Promise<AuthContext> {
     return requireRole(["admin"])
 }
 
-export async function requireSeller(): Promise<AuthContext> {
-    return requireRole(["seller", "admin"])
-}
-
 // ============================================
 // API HANDLER WRAPPER
 // ============================================

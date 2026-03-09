@@ -4,12 +4,17 @@ export const COUPON_STORAGE_KEY = "baefikra-coupon";
 
 export interface CartItem {
   id: string;
+  productId?: string | null;
   name: string;
   price: number;
+  originalPrice?: number;
   quantity: number;
   image?: string;
   size?: string;
   color?: string;
+  stock?: number;
+  customization?: any;
+  customProduct?: any;
 }
 
 export interface StoredCart {

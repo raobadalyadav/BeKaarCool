@@ -60,7 +60,6 @@ export interface IProduct extends Document {
   bestSeller: boolean
   isActive: boolean
   isDigital: boolean
-  seller: mongoose.Types.ObjectId
   seo: IProductSEO
   customizable: boolean
   customizationOptions?: {
@@ -222,11 +221,6 @@ const productSchema = new mongoose.Schema({
   bestSeller: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
   isDigital: { type: Boolean, default: false },
-  seller: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
   seo: {
     type: seoSchema,
     default: {}
@@ -276,7 +270,6 @@ productSchema.index({ featured: 1, isActive: 1 })
 productSchema.index({ recommended: 1, isActive: 1 })
 productSchema.index({ newArrival: 1, createdAt: -1 })
 productSchema.index({ bestSeller: 1 })
-productSchema.index({ seller: 1 })
 // productSchema.index({ sku: 1 }, { sparse: true }) // Redundant
 productSchema.index({ createdAt: -1 })
 productSchema.index({ stock: 1 })

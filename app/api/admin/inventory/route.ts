@@ -43,9 +43,8 @@ export async function GET(request: NextRequest) {
 
         const [products, total, lowStockCount, outOfStockCount] = await Promise.all([
             Product.find(query)
-                .select("name sku images stock price category seller")
+                .select("name sku images stock price category")
                 .populate("category", "name")
-                .populate("seller", "name")
                 .sort({ stock: 1 })
                 .skip((page - 1) * limit)
                 .limit(limit)
@@ -58,8 +57,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
             products: products.map(p => ({
                 ...p,
-                categoryName: (p.category as any)?.name || "Uncategorized",
-                sellerName: (p.seller as any)?.name || "Unknown"
+                categoryName: (p.category as any)?.name || "Uncategorized"
             })),
             stats: {
                 lowStock: lowStockCount,

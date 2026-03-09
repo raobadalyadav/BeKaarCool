@@ -15,8 +15,6 @@ const PROTECTED_ROUTES = {
     auth: ["/account", "/checkout", "/orders"],
     // Routes requiring admin role
     admin: ["/admin"],
-    // Routes requiring seller or admin role
-    seller: ["/seller"],
 }
 
 const AUTH_PAGES = ["/auth/login", "/auth/register", "/auth/forgot-password"]
@@ -54,18 +52,6 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // --- Seller routes: require seller or admin role ---
-    if (PROTECTED_ROUTES.seller.some((route) => pathname.startsWith(route))) {
-        if (!isAuthenticated) {
-            const loginUrl = new URL("/auth/login", request.url)
-            loginUrl.searchParams.set("callbackUrl", pathname)
-            return NextResponse.redirect(loginUrl)
-        }
-        if (!["seller", "admin"].includes(userRole)) {
-            return NextResponse.redirect(new URL("/", request.url))
-        }
-    }
-
     // --- Auth-required routes: require any authenticated user ---
     if (PROTECTED_ROUTES.auth.some((route) => pathname.startsWith(route))) {
         if (!isAuthenticated) {
@@ -86,7 +72,6 @@ export const config = {
     matcher: [
         // Protected routes
         "/admin/:path*",
-        "/seller/:path*",
         "/account/:path*",
         "/checkout/:path*",
         "/orders/:path*",

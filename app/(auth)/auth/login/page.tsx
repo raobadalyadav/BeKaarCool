@@ -36,8 +36,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (session) {
-      const redirectPath = session.user.role === "admin" ? "/admin" :
-        session.user.role === "seller" ? "/seller" : "/"
+      const redirectPath = session.user.role === "admin" ? "/admin" : "/"
       router.push(redirectPath)
     }
 
@@ -85,8 +84,7 @@ function LoginForm() {
         })
 
         const session = await getSession()
-        const redirectPath = session?.user?.role === "admin" ? "/admin" :
-          session?.user?.role === "seller" ? "/seller/dashboard" : "/"
+        const redirectPath = session?.user?.role === "admin" ? "/admin" : "/"
 
         setTimeout(() => {
           router.push(redirectPath)

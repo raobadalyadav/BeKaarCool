@@ -41,11 +41,6 @@ interface Product {
     sizes: string[]
     colors: { name: string; code: string }[]
   }
-  seller: {
-    _id: string
-    name: string
-    email: string
-  }
   createdAt: string
   updatedAt: string
 }
@@ -802,7 +797,6 @@ export default function AdminProductsPage() {
                         </div>
                         <div>
                           <p className="font-medium">{product.name}</p>
-                          <p className="text-sm text-gray-500">{product.seller?.name}</p>
                           {product.featured && (
                             <Badge variant="secondary" className="mt-1">
                               <Star className="h-3 w-3 mr-1" />Featured

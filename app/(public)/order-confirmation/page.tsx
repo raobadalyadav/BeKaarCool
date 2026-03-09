@@ -289,7 +289,7 @@ function OrderConfirmationContent() {
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span className="text-blue-600">₹{Math.round(order.total || order.totalAmount)}</span>
+                  <span className="text-blue-600">₹{Math.round(order.total)}</span>
                 </div>
               </CardContent>
             </Card>

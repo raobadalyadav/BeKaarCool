@@ -126,7 +126,7 @@ categorySchema.virtual("children", {
 })
 
 // Pre-save hook to generate slug and set ancestors
-categorySchema.pre("save", async function (next) {
+categorySchema.pre("save", async function () {
     // Generate slug from name if not set
     if (this.isModified("name") && !this.slug) {
         this.slug = this.name
@@ -150,8 +150,6 @@ categorySchema.pre("save", async function (next) {
             this.level = 0
         }
     }
-
-    next()
 })
 
 // Static method to get category tree

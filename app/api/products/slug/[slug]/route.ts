@@ -25,7 +25,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         await connectDB()
 
         const product = await Product.findOne({ slug, isActive: true })
-            .populate("seller", "name email avatar")
             .populate("category", "name slug")
             .lean()
 

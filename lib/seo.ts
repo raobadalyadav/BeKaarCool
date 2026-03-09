@@ -60,8 +60,7 @@ export function generateProductSchema(product: any) {
       "@type": "Offer",
       price: product.price,
       priceCurrency: "INR",
-      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      seller: { "@type": "Organization", name: product.seller?.name || "Baefikra" }
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
     },
     aggregateRating: product.rating > 0 ? {
       "@type": "AggregateRating",

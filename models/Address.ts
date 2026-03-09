@@ -103,14 +103,13 @@ addressSchema.index({ user: 1, isDefault: 1 })
 addressSchema.index({ pincode: 1 })
 
 // Ensure only one default address per user
-addressSchema.pre("save", async function (next) {
+addressSchema.pre("save", async function () {
     if (this.isModified("isDefault") && this.isDefault) {
         await mongoose.model("Address").updateMany(
             { user: this.user, _id: { $ne: this._id } },
             { isDefault: false }
         )
     }
-    next()
 })
 
 // Static methods

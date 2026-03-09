@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     await connectDB()
 
     const { id } = await params
-    const product = await Product.findById(id).populate("seller", "name email avatar")
+    const product = await Product.findById(id)
 
     if (!product) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 })
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         updatedAt: new Date(),
       },
       { new: true },
-    ).populate("seller", "name email avatar")
+    )
 
     if (!product) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 })

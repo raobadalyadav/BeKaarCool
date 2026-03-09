@@ -56,17 +56,7 @@ export async function GET(request: NextRequest) {
         }
       },
       { $sort: { relevanceScore: -1, rating: -1, sold: -1 } },
-      { $limit: limit },
-      {
-        $lookup: {
-          from: "users",
-          localField: "seller",
-          foreignField: "_id",
-          as: "seller",
-          pipeline: [{ $project: { name: 1, email: 1, avatar: 1 } }]
-        }
-      },
-      { $unwind: { path: "$seller", preserveNullAndEmptyArrays: true } }
+      { $limit: limit }
     ])
 
     // Generate search suggestions
@@ -92,14 +82,14 @@ async function generateSuggestions(query: string): Promise<string[]> {
       category: { $regex: query, $options: "i" },
       isActive: true
     })
-    categories.forEach(cat => suggestions.add(cat))
+    categories.forEach((cat: string) => suggestions.add(cat))
 
     // Get brand suggestions
     const brands = await Product.distinct("brand", {
       brand: { $regex: query, $options: "i" },
       isActive: true
     })
-    brands.forEach(brand => brand && suggestions.add(brand))
+    brands.forEach((brand: string) => brand && suggestions.add(brand))
 
     // Get popular product name suggestions
     const nameMatches = await Product.find(
@@ -112,9 +102,9 @@ async function generateSuggestions(query: string): Promise<string[]> {
     .sort({ sold: -1 })
     .limit(5)
 
-    nameMatches.forEach(product => {
+    nameMatches.forEach((product: { name: string }) => {
       const words = product.name.split(' ')
-      words.forEach(word => {
+      words.forEach((word: string) => {
         if (word.toLowerCase().includes(query.toLowerCase()) && word.length > 2) {
           suggestions.add(word)
         }
@@ -131,11 +121,9 @@ async function generateSuggestions(query: string): Promise<string[]> {
     ).limit(10)
 
     tagMatches.forEach(product => {
-      product.tags.forEach(tag => {
-        if (tag.toLowerCase().includes(query.toLowerCase())) {
-          suggestions.add(tag)
-        }
-      })
+      const tagSuggestions = product.tags
+        .filter((tag: string) => tag.toLowerCase().includes(query.toLowerCase()))
+        .forEach((tag: string) => suggestions.add(tag))
     })
 
     return Array.from(suggestions).slice(0, 8)

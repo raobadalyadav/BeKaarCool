@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("seller", "name email avatar")
 
     const total = await Product.countDocuments(filter)
 
@@ -90,7 +89,6 @@ export async function POST(request: NextRequest) {
 
     const product = new Product({
       ...body,
-      seller: session.user.id,
       slug,
       seo: {
         title: body.name,
@@ -106,7 +104,6 @@ export async function POST(request: NextRequest) {
     })
 
     await product.save()
-    await product.populate("seller", "name email avatar")
 
     return NextResponse.json(product, { status: 201 })
   } catch (error) {

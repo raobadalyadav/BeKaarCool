@@ -25,7 +25,7 @@ export interface ITimestamps {
 // USER ENTITIES
 // ============================================
 
-export type UserRole = "customer" | "seller" | "admin"
+export type UserRole = "customer" | "admin"
 export type LoyaltyTier = "bronze" | "silver" | "gold" | "platinum"
 export type ThemePreference = "light" | "dark"
 
@@ -125,7 +125,6 @@ export interface IProduct extends IBaseEntity {
     featured: boolean
     recommended: boolean
     isActive: boolean
-    seller: Types.ObjectId | IUser
     sku?: string
     views: number
     customizable: boolean
@@ -145,7 +144,6 @@ export interface IProductCreateDTO {
     tags?: string[]
     variations?: Partial<IProductVariations>
     stock: number
-    seller: string
 }
 
 export interface IProductUpdateDTO extends Partial<IProductCreateDTO> {

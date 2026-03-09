@@ -129,7 +129,7 @@ export function Header() {
                       <Link href="/products?category=Women" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Women</Link>
                       <Link href="/products?category=Mobile%20Covers" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Mobile Covers</Link>
                       <hr className="my-2" />
-                      <Link href="/orders" className="px-4 py-3 hover:bg-muted rounded-md font-medium">My Orders</Link>
+                      <Link href="/account" className="px-4 py-3 hover:bg-muted rounded-md font-medium">My Account</Link>
                       <Link href="/contact" className="px-4 py-3 hover:bg-muted rounded-md font-medium">Contact Us</Link>
                       {session ? (
                         <div onClick={handleSignOut} className="px-4 py-3 hover:bg-muted rounded-md font-medium cursor-pointer text-red-500">Sign Out</div>
@@ -202,11 +202,7 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link href="/orders">Orders</Link>
                       </DropdownMenuItem>
-                      {session.user?.role === "seller" && (
-                        <DropdownMenuItem asChild>
-                          <Link href="/seller/dashboard">Seller Dashboard</Link>
-                        </DropdownMenuItem>
-                      )}
+
                       {session.user?.role === "admin" && (
                         <DropdownMenuItem asChild>
                           <Link href="/admin">Admin Dashboard</Link>

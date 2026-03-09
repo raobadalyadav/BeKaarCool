@@ -171,7 +171,7 @@ returnRequestSchema.index({ user: 1, createdAt: -1 })
 returnRequestSchema.index({ status: 1 })
 
 // Pre-save hook to generate return number
-returnRequestSchema.pre("save", async function (next) {
+returnRequestSchema.pre("save", async function () {
     if (this.isNew && !this.returnNumber) {
         const date = new Date()
         const prefix = `RET${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}`
@@ -189,7 +189,6 @@ returnRequestSchema.pre("save", async function (next) {
             note: "Return request created"
         })
     }
-    next()
 })
 
 // Instance methods

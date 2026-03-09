@@ -145,7 +145,7 @@ interface Order {
   deliveredAt?: string
   cancelledAt?: string
   cancellationReason?: string
-  cancelledBy?: "customer" | "seller" | "admin" | "system"
+  cancelledBy?: "customer" | "admin" | "system"
   notes?: string
   internalNotes?: string
   isGift: boolean

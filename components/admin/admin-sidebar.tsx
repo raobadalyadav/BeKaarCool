@@ -50,11 +50,7 @@ const navigation = [
     href: "/admin/payments",
     icon: CreditCard,
   },
-  {
-    name: "Sellers",
-    href: "/admin/sellers",
-    icon: Store,
-  },
+
   {
     name: "Inventory",
     href: "/admin/inventory",

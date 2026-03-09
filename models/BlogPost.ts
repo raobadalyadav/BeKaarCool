@@ -141,7 +141,7 @@ blogPostSchema.index({ tags: 1 })
 blogPostSchema.index({ title: "text", content: "text" })
 
 // Pre-save hook to generate slug
-blogPostSchema.pre("save", function (next) {
+blogPostSchema.pre("save", function () {
     if (this.isModified("title") && !this.slug) {
         this.slug = this.title
             .toLowerCase()

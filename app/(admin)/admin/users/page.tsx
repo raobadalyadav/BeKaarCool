@@ -93,7 +93,6 @@ interface UserStats {
   active: number
   verified: number
   banned: number
-  sellers: number
   admins: number
 }
 
@@ -112,7 +111,7 @@ export default function AdminUsersPage() {
   const [newRole, setNewRole] = useState("")
   const [banReason, setBanReason] = useState("")
   const [userDetailsLoading, setUserDetailsLoading] = useState(false)
-  const [stats, setStats] = useState<UserStats>({ total: 0, active: 0, verified: 0, banned: 0, sellers: 0, admins: 0 })
+  const [stats, setStats] = useState<UserStats>({ total: 0, active: 0, verified: 0, banned: 0, admins: 0 })
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -367,8 +366,6 @@ export default function AdminUsersPage() {
       case "admin":
       case "super_admin":
         return "bg-purple-100 text-purple-800"
-      case "seller":
-        return "bg-blue-100 text-blue-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -434,17 +431,7 @@ export default function AdminUsersPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Sellers</p>
-                <p className="text-2xl font-bold">{stats.sellers}</p>
-              </div>
-              <ShoppingBag className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -492,7 +479,6 @@ export default function AdminUsersPage() {
               <SelectContent>
                 <SelectItem value="all">All Roles</SelectItem>
                 <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="seller">Seller</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>
             </Select>
@@ -900,7 +886,6 @@ export default function AdminUsersPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="customer">Customer</SelectItem>
-                  <SelectItem value="seller">Seller</SelectItem>
                   <SelectItem value="admin">Admin</SelectItem>
                 </SelectContent>
               </Select>

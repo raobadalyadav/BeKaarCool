@@ -64,7 +64,7 @@ export const userRegisterSchema = z.object({
         .regex(/[0-9]/, "Password must contain at least one number")
         .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
     phone: phoneSchema,
-    role: z.enum(["customer", "seller"]).optional().default("customer")
+    role: z.enum(["customer", "admin"]).optional().default("customer")
 })
 
 export const userLoginSchema = z.object({

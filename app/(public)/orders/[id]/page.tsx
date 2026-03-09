@@ -566,7 +566,7 @@ export default function OrderDetailsPage({ params }: OrderPageProps) {
               <Separator className="my-3" />
               <div className="flex justify-between font-bold text-xl py-2">
                 <span>Total</span>
-                <span className="text-blue-600">₹{Math.round(order.total || order.totalAmount)}</span>
+                <span className="text-blue-600">₹{Math.round(order.total || 0)}</span>
               </div>
             </CardContent>
           </Card>

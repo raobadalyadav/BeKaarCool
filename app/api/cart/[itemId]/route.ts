@@ -51,11 +51,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     await cart.populate({
       path: "items.product",
-      select: "name price originalPrice images stock seller",
-      populate: {
-        path: "seller",
-        select: "name",
-      },
+      select: "name price originalPrice images stock",
     })
 
     return NextResponse.json(cart)
@@ -101,11 +97,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     await cart.populate({
       path: "items.product",
-      select: "name price originalPrice images stock seller",
-      populate: {
-        path: "seller",
-        select: "name",
-      },
+      select: "name price originalPrice images stock",
     })
 
     return NextResponse.json(cart)

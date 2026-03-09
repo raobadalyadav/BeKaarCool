@@ -35,7 +35,6 @@ export interface IOrderItem {
     preview?: string
   }
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled" | "returned"
-  seller?: mongoose.Types.ObjectId
 }
 
 export interface IShippingAddress {
@@ -94,7 +93,7 @@ export interface IOrder extends Document {
   deliveredAt?: Date
   cancelledAt?: Date
   cancellationReason?: string
-  cancelledBy?: "customer" | "seller" | "admin" | "system"
+  cancelledBy?: "customer" | "admin" | "system"
   returnRequest?: mongoose.Types.ObjectId
   refundDetails?: {
     amount: number
@@ -163,8 +162,7 @@ const orderItemSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "processing", "shipped", "delivered", "cancelled", "returned"],
     default: "pending"
-  },
-  seller: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+  }
 }, { _id: true })
 
 // Address Schema
@@ -264,7 +262,7 @@ const orderSchema = new mongoose.Schema({
 
   cancelledAt: Date,
   cancellationReason: String,
-  cancelledBy: { type: String, enum: ["customer", "seller", "admin", "system"] },
+  cancelledBy: { type: String, enum: ["customer", "admin", "system"] },
 
   returnRequest: { type: mongoose.Schema.Types.ObjectId, ref: "ReturnRequest" },
   refundDetails: {
@@ -302,7 +300,6 @@ orderSchema.index({ user: 1, createdAt: -1 })
 orderSchema.index({ status: 1 })
 orderSchema.index({ paymentStatus: 1 })
 orderSchema.index({ createdAt: -1 })
-orderSchema.index({ "items.seller": 1 })
 orderSchema.index({ "shippingAddress.pincode": 1 })
 orderSchema.index({ paymentId: 1 })
 orderSchema.index({ "shipment.awbNumber": 1 })
@@ -380,7 +377,7 @@ orderSchema.methods.updateStatus = async function (
 
 orderSchema.methods.cancel = async function (
   reason: string,
-  cancelledBy: "customer" | "seller" | "admin" | "system"
+  cancelledBy: "customer" | "admin" | "system"
 ) {
   if (!this.canCancel) {
     throw new Error("Order cannot be cancelled at this stage")

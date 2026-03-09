@@ -49,37 +49,7 @@ async function createAdmin() {
             console.log("   Password: Admin@123")
         }
 
-        // Also create/update seller
-        const sellerPassword = await bcrypt.hash("Seller@123", 10)
-        const existingSeller = await User.findOne({ email: "seller@baefikra.com" })
 
-        if (existingSeller) {
-            await User.updateOne(
-                { email: "seller@baefikra.com" },
-                {
-                    $set: {
-                        password: sellerPassword,
-                        role: "seller",
-                        isVerified: true,
-                        isActive: true
-                    }
-                }
-            )
-            console.log("\n✅ Seller password updated!")
-        } else {
-            await User.create({
-                name: "Demo Seller",
-                email: "seller@baefikra.com",
-                password: sellerPassword,
-                role: "seller",
-                phone: "8888888888",
-                isVerified: true,
-                isActive: true
-            })
-            console.log("\n✅ Seller user created!")
-        }
-        console.log("   Email: seller@baefikra.com")
-        console.log("   Password: Seller@123")
 
         console.log("\n🎉 Done! You can now login.")
     } catch (error) {

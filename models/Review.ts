@@ -192,7 +192,7 @@ reviewSchema.virtual("isEditable").get(function () {
 })
 
 // Pre-save hook
-reviewSchema.pre("save", async function (next) {
+reviewSchema.pre("save", async function () {
   // Check if order exists and belongs to user
   if (this.isNew) {
     const order = await mongoose.model("Order").findOne({
@@ -212,8 +212,6 @@ reviewSchema.pre("save", async function (next) {
   if (this.reportCount >= 3 && this.status === "approved") {
     this.status = "flagged"
   }
-
-  next()
 })
 
 // Post-save hook to update product rating
