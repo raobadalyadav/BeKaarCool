@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectDB } from "@/lib/mongodb"
 import { User } from "@/models/User"
-import { sendPasswordResetEmail } from "@/lib/email"
+import { sendPasswordResetEmail, sendPasswordChangedEmail } from "@/lib/email"
 import bcrypt from "bcryptjs"
 import crypto from "crypto"
 
@@ -77,6 +77,11 @@ export async function PUT(request: NextRequest) {
       resetTokenExpiry: undefined,
       updatedAt: new Date(),
     })
+    
+    // Dispatch password changed notification
+    sendPasswordChangedEmail(user.email, user.name).catch((err: any) => {
+      console.error("Failed to send password changed email:", err);
+    });
 
     return NextResponse.json({
       message: "Password reset successfully",

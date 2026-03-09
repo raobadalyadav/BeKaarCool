@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { connectDB } from "./mongodb"
 import { User } from "@/models/User"
 import bcrypt from "bcryptjs"
+import { sendLoginAlertEmail } from "@/lib/email"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
@@ -30,6 +31,16 @@ export const authOptions: NextAuthOptions = {
           const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
           if (!isPasswordValid) {
             return null
+          }
+          
+          // Dispatch security login alert
+          try {
+            const userAgent = req?.headers?.['user-agent'] || 'Unknown Device'
+            const ip = req?.headers?.['x-forwarded-for'] || 'Direct Connection'
+            const time = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+            sendLoginAlertEmail(user.email, user.name, userAgent, ip, time).catch(console.error)
+          } catch (e) {
+             console.error("Failed to parse login alert data", e)
           }
 
           return {

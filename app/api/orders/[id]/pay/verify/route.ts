@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { resolveUserId } from "@/lib/auth-utils";
+import { sendPaymentSuccessEmail } from "@/lib/email";
 
 export async function POST(
   request: NextRequest,
@@ -78,6 +79,9 @@ export async function POST(
     order.paymentId = paymentId;
 
     await order.save();
+    
+    // Dispatch Payment Success Email
+    sendPaymentSuccessEmail(session.user.email!, session.user.name!, order).catch(console.error);
 
     return NextResponse.json({
       verified: true,

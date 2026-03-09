@@ -4,6 +4,7 @@
  */
 
 import mongoose, { Document, Model } from "mongoose"
+import { sendReferralRewardEmail, sendLoyaltyPointsUpdateEmail } from "@/lib/email"
 
 export interface IReferral extends Document {
     referrer: mongoose.Types.ObjectId
@@ -139,9 +140,25 @@ referralSchema.statics.completeReferral = async function (
 
     // Add points to referrer (would typically trigger notification too)
     const User = mongoose.model("User")
-    await User.findByIdAndUpdate(referral.referrer, {
+    const referrerUser = await User.findByIdAndUpdate(referral.referrer, {
         $inc: { loyaltyPoints: referral.referrerReward.value }
-    })
+    }, { new: true })
+
+    if (referrerUser && referrerUser.email) {
+        // Dispatch reward emails asynchronously
+        sendReferralRewardEmail(
+            referrerUser.email, 
+            referrerUser.name, 
+            `₹${commission} limit + ${referral.referrerReward.value} points`
+        ).catch(console.error);
+
+        sendLoyaltyPointsUpdateEmail(
+            referrerUser.email, 
+            referrerUser.name, 
+            referral.referrerReward.value, 
+            referrerUser.loyaltyPoints || 0
+        ).catch(console.error);
+    }
 
     return referral
 }

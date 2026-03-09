@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb"
 import { Address } from "@/models/Address"
 import { User } from "@/models/User"
 import { resolveUserId } from "@/lib/auth-utils"
+import { sendAddressUpdatedEmail } from "@/lib/email"
 
 // GET: Fetch user's addresses
 export async function GET() {
@@ -76,6 +77,11 @@ export async function POST(request: NextRequest) {
             isDefault: existingCount === 0 || data.isDefault
         })
 
+        // Notify user asynchronously
+        if (session.user?.email && session.user?.name) {
+            sendAddressUpdatedEmail(session.user.email, session.user.name, 'added', address.type).catch(console.error);
+        }
+
         return NextResponse.json({
             message: "Address added successfully",
             address
@@ -132,6 +138,11 @@ export async function PUT(request: NextRequest) {
             { new: true, runValidators: true }
         )
 
+        // Notify user asynchronously
+        if (session.user?.email && session.user?.name) {
+            sendAddressUpdatedEmail(session.user.email, session.user.name, 'updated', updated?.type || 'home').catch(console.error);
+        }
+
         return NextResponse.json({
             message: "Address updated successfully",
             address: updated
@@ -176,6 +187,11 @@ export async function DELETE(request: NextRequest) {
                 nextAddress.isDefault = true
                 await nextAddress.save()
             }
+        }
+        
+        // Notify user asynchronously
+        if (session.user?.email && session.user?.name) {
+            sendAddressUpdatedEmail(session.user.email, session.user.name, 'removed', address.type || 'home').catch(console.error);
         }
 
         return NextResponse.json({ message: "Address deleted successfully" })

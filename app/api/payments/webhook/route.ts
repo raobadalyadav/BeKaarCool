@@ -20,6 +20,7 @@ import {
     sendPaymentFailedEmail,
     sendRefundProcessedEmail,
     sendShippingNotificationEmail,
+    sendPaymentSuccessEmail
 } from "@/lib/email"
 import DelhiveryService from "@/lib/delhivery"
 
@@ -185,9 +186,9 @@ async function handlePaymentCaptured(payment: any) {
         },
     })
 
-    // Send order confirmation email (queued)
+    // Send payment success email (queued)
     if (user?.email) {
-        await sendOrderConfirmationEmail(user.email, user.name, order).catch((err) =>
+        await sendPaymentSuccessEmail(user.email, user.name, order).catch((err: any) =>
             console.error("[Webhook] Email error:", err)
         )
     }

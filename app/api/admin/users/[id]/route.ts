@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb"
 import { User } from "@/models/User"
 import { Order } from "@/models/Order"
 import { Address } from "@/models/Address"
+import { sendAccountLockedEmail, sendAccountDeletionEmail } from "@/lib/email"
 
 // GET single user with details (orders, addresses)
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -69,6 +70,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (typeof isBanned === "boolean") {
       if (isBanned) {
         await user.ban(banReason || "No reason provided")
+        // Dispatch account locked email
+        const unlockTime = "Indefinite. Please contact support."
+        sendAccountLockedEmail(user.email, user.name, unlockTime).catch(console.error)
       } else {
         await user.unban()
       }
@@ -108,6 +112,9 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 })
     }
+    
+    // Dispatch account deletion email
+    sendAccountDeletionEmail(user.email, user.name).catch(console.error);
 
     return NextResponse.json({ message: "User deleted successfully" })
   } catch (error) {

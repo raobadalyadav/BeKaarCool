@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { connectDB } from "@/lib/mongodb"
 import { User } from "@/models/User"
+import { sendWelcomeEmail } from "@/lib/email"
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,6 +28,11 @@ export async function POST(request: NextRequest) {
       verificationToken: undefined,
       verificationTokenExpiry: undefined,
       updatedAt: new Date(),
+    })
+    
+    // Send Welcome Email asynchronously
+    sendWelcomeEmail(user.email, user.name).catch((err) => {
+      console.error("Failed to send welcome email:", err)
     })
 
     return NextResponse.json({

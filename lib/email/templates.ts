@@ -329,3 +329,377 @@ export function supportTicketEmail(ticket: any): {
     },
   };
 }
+
+// ============================================
+// NEW AUTHENTICATION & ACCOUNT TEMPLATES
+// ============================================
+
+// --- Login Alert ---
+export function loginAlertEmail(name: string, device: string, location: string, time: string): EmailTemplate {
+  return {
+    subject: `New login to your ${BRAND_NAME} account`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">New Login Alert</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we noticed a new login to your account from an unrecognized device.</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 8px;"><strong>Device:</strong> ${device}</p>
+        <p style="margin: 0 0 8px;"><strong>Location:</strong> ${location}</p>
+        <p style="margin: 0;"><strong>Time:</strong> ${time}</p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">If this was you, you can safely ignore this email. If you don't recognize this activity, please reset your password immediately.</p>
+      ${primaryButton("Secure My Account", `${BASE_URL}/auth/forgot-password`)}
+    `),
+  };
+}
+
+// --- Password Changed ---
+export function passwordChangedEmail(name: string): EmailTemplate {
+  return {
+    subject: `Your ${BRAND_NAME} password has been changed`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Password Changed Successfully</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, your account password was recently updated.</p>
+      <p style="color: #475569; line-height: 1.6;">If you made this change, no further action is required.</p>
+      <p style="color: #475569; line-height: 1.6;">If you did not make this change, please contact support immediately to secure your account.</p>
+      ${primaryButton("Contact Support", `mailto:${SUPPORT_EMAIL}`)}
+    `),
+  };
+}
+
+// --- Account Locked ---
+export function accountLockedEmail(name: string, unlockTime: string): EmailTemplate {
+  return {
+    subject: `Security Alert: Your ${BRAND_NAME} account has been temporarily locked`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Account Temporarily Locked</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, due to multiple failed login attempts, your account has been temporarily locked for your security.</p>
+      <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fecaca;">
+        <p style="margin: 0; color: #991b1b;">Your account will automatically unlock at: <strong>${unlockTime}</strong></p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">If you forgot your password, you can reset it below.</p>
+      ${primaryButton("Reset Password", `${BASE_URL}/auth/forgot-password`)}
+    `),
+  };
+}
+
+// --- Account Deletion ---
+export function accountDeletionEmail(name: string): EmailTemplate {
+  return {
+    subject: `Your ${BRAND_NAME} account has been deleted`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Account Deletion Confirmed</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, your request to delete your account has been processed. All associated personal data has been securely removed from our systems.</p>
+      <p style="color: #475569; line-height: 1.6;">We're sorry to see you go! If you ever wish to return, you can always create a new account.</p>
+      ${primaryButton("Return to Shop", `${BASE_URL}/`)}
+    `),
+  };
+}
+
+// --- Profile Updated ---
+export function profileUpdatedEmail(name: string): EmailTemplate {
+  return {
+    subject: `Your ${BRAND_NAME} profile has been updated`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Profile Updated</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, the personal information on your profile was recently updated.</p>
+      <p style="color: #475569; line-height: 1.6;">If you made this change, no further action is required. If you did not authorize this change, please secure your account.</p>
+      ${primaryButton("View Profile", `${BASE_URL}/account/profile`)}
+    `),
+  };
+}
+
+// --- Address Updated ---
+export function addressUpdatedEmail(name: string, action: 'added' | 'updated' | 'removed', addressType: string): EmailTemplate {
+  return {
+    subject: `Address ${action} on your ${BRAND_NAME} account`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Address Book Updated</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, a ${addressType} address was recently ${action} in your account address book.</p>
+      <p style="color: #475569; line-height: 1.6;">Please review your saved addresses to ensure everything is correct before your next order.</p>
+      ${primaryButton("Manage Addresses", `${BASE_URL}/account/addresses`)}
+    `),
+  };
+}
+
+// --- Payment Method Updated ---
+export function paymentMethodUpdatedEmail(name: string, action: 'added' | 'removed', methodInfo: string): EmailTemplate {
+  return {
+    subject: `Payment method ${action} on your ${BRAND_NAME} account`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Payment Methods Updated</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, a payment method ending in <strong>${methodInfo}</strong> was recently ${action} on your account.</p>
+      <p style="color: #475569; line-height: 1.6;">If you made this change, no action is needed.</p>
+    `),
+  };
+}
+
+// --- Account Activity ---
+export function accountActivityEmail(name: string, activityDescription: string): EmailTemplate {
+  return {
+    subject: `Recent activity on your ${BRAND_NAME} account`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Account Activity Notice</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we noticed the following recent activity on your account:</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${BRAND_COLOR};">
+        <p style="margin: 0; color: #1e293b; font-weight: 500;">${activityDescription}</p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">If you performed this action, please safely ignore this email.</p>
+    `),
+  };
+}
+// ============================================
+// NEW ORDERS & SHIPPING TEMPLATES
+// ============================================
+
+export function paymentSuccessEmail(name: string, order: any): EmailTemplate {
+  return {
+    subject: `Payment Successful! Order ${order.orderNumber} is confirmed`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Payment Successful ✅</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we have successfully received your payment of <strong>₹${order.total}</strong>.</p>
+      <p style="color: #475569; line-height: 1.6;">Your order is now confirmed and is being prepared for shipment.</p>
+      ${primaryButton("View Order Details", `${BASE_URL}/account/orders/${order._id}`)}
+    `),
+  };
+}
+
+export function orderProcessingEmail(name: string, order: any): EmailTemplate {
+  return {
+    subject: `Your order ${order.orderNumber} is now being processed`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Order is Processing ⚙️</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, good news! We have started processing your order.</p>
+      <p style="color: #475569; line-height: 1.6;">Our team is currently quality-checking and packing your items. We'll send you another email as soon as it ships.</p>
+      ${primaryButton("Check Status", `${BASE_URL}/account/orders/${order._id}`)}
+    `),
+  };
+}
+
+export function outForDeliveryEmail(name: string, order: any): EmailTemplate {
+  return {
+    subject: `Your order ${order.orderNumber} is OUT FOR DELIVERY today!`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Out for Delivery 📦💨</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, get ready! Your order is on the styling vehicle and out for delivery today.</p>
+      <p style="color: #475569; line-height: 1.6;">Please make sure someone is available at your shipping address to receive the package.</p>
+      ${primaryButton("Track Delivery", order.shipment?.trackingUrl || `${BASE_URL}/account/orders/${order._id}`)}
+    `),
+  };
+}
+
+export function orderDeliveredEmail(name: string, order: any): EmailTemplate {
+  return {
+    subject: `Delivered! Enjoy your new items from ${BRAND_NAME}`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Package Delivered! 🛍️</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, your order has been successfully delivered to your address.</p>
+      <p style="color: #475569; line-height: 1.6;">We hope you love your new pieces! If you have any issues, please don't hesitate to contact our support team.</p>
+      ${primaryButton("Review Your Items", `${BASE_URL}/account/orders/${order._id}`)}
+    `),
+  };
+}
+
+export function deliveryDelayEmail(name: string, order: any, newEta: string): EmailTemplate {
+  return {
+    subject: `Update on your ${BRAND_NAME} order ${order.orderNumber}`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Delivery Update ⚠️</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we wanted to let you know that there is a slight delay with your delivery.</p>
+      <div style="background-color: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fde68a;">
+        <p style="margin: 0; color: #92400e;">Your new estimated delivery date is: <strong>${newEta}</strong></p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">We apologize for the inconvenience and appreciate your patience.</p>
+    `),
+  };
+}
+
+export function deliveryAttemptFailedEmail(name: string, order: any): EmailTemplate {
+  return {
+    subject: `Delivery Attempt Failed for Order ${order.orderNumber}`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Missed Delivery 🚪</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, our courier tried to deliver your package today but was unsuccessful.</p>
+      <p style="color: #475569; line-height: 1.6;">They will typically attempt delivery again on the next business day. Please reach out to the courier using your tracking link if you need to reschedule.</p>
+      ${primaryButton("Track Package", order.shipment?.trackingUrl || `${BASE_URL}/account/orders/${order._id}`)}
+    `),
+  };
+}
+
+export function deliveryCompletedEmail(name: string, order: any): EmailTemplate {
+  return orderDeliveredEmail(name, order); // Alias for consistency
+}
+
+
+// ============================================
+// NEW CART & CONVERSION TEMPLATES
+// ============================================
+
+export function abandonedCartEmail(name: string, cartUrl: string): EmailTemplate {
+  return {
+    subject: `You left some great items behind, ${name}!`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Did you forget something? 🛒</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we noticed you left some amazing items in your shopping cart.</p>
+      <p style="color: #475569; line-height: 1.6;">Complete your purchase now before they sell out!</p>
+      ${primaryButton("Return to Cart", cartUrl)}
+    `),
+  };
+}
+
+export function cartDiscountEmail(name: string, discountCode: string, cartUrl: string): EmailTemplate {
+  return {
+    subject: `Here's a special discount to complete your order! 🎁`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">A gift just for you!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, those items in your cart are calling your name. Use the promo code below for a special discount on us.</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; border: 2px dashed ${BRAND_COLOR};">
+        <h3 style="margin: 0; color: #1e293b; font-size: 24px; letter-spacing: 2px;">${discountCode}</h3>
+      </div>
+      ${primaryButton("Checkout Now", cartUrl)}
+    `),
+  };
+}
+
+export function priceDropEmail(name: string, product: any, productUrl: string): EmailTemplate {
+  return {
+    subject: `Price drop alert! An item you liked is on sale 📉`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Alert: Price Drop!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, an item you recently viewed or added to your wishlist has just dropped in price!</p>
+      <p style="color: #475569; line-height: 1.6;"><strong>${product?.name || "The product"}</strong> is now available at a lower price.</p>
+      ${primaryButton("Shop the Sale", productUrl)}
+    `),
+  };
+}
+
+export function backInStockEmail(name: string, product: any, productUrl: string): EmailTemplate {
+  return {
+    subject: `Good News! ${product?.name || 'Your item'} is back in stock! ✨`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Back In Stock 🎉</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, the wait is over! An item you were waiting for has just been restocked.</p>
+      <p style="color: #475569; line-height: 1.6;"><strong>${product?.name || "The product"}</strong> is now available. Grab it before it sells out again!</p>
+      ${primaryButton("Shop Now", productUrl)}
+    `),
+  };
+}
+
+
+// ============================================
+// NEW MARKETING TEMPLATES
+// ============================================
+
+export function promotionalEmail(name: string, campaignDetails: string, ctaUrl: string): EmailTemplate {
+  return {
+    subject: `Special Offer from ${BRAND_NAME}!`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Exclusive Offer Inside</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we've got something special for you.</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0; color: #1e293b; font-size: 16px;">${campaignDetails}</p>
+      </div>
+      ${primaryButton("Explore Now", ctaUrl)}
+    `),
+  };
+}
+
+export function flashSaleEmail(name: string, saleDetails: string, ctaUrl: string): EmailTemplate {
+  return {
+    subject: `⚡ FLASH SALE is Live! Hurry, ${name}!`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Flash Sale Active! ⚡</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, our highly anticipated Flash Sale has just begun!</p>
+      <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fecaca;">
+        <p style="margin: 0; color: #991b1b; font-weight: 600; font-size: 16px;">${saleDetails}</p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">Prices like these won't last long. Shop while supplies last.</p>
+      ${primaryButton("Shop the Sale", ctaUrl)}
+    `),
+  };
+}
+
+export function productLaunchEmail(name: string, productDetails: string, productUrl: string): EmailTemplate {
+  return {
+    subject: `Introducing the newest drop from ${BRAND_NAME} 🔥`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">New Arrival Alert!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, be the first to check out our newest collection.</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0; color: #1e293b;">${productDetails}</p>
+      </div>
+      ${primaryButton("See What's New", productUrl)}
+    `),
+  };
+}
+
+export function personalizedRecommendationsEmail(name: string, recommendationsUrl: string): EmailTemplate {
+  return {
+    subject: `Hand-picked for you, ${name} 🌟`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Top Picks Just For You</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, based on your recent activity, we've curated a selection of items we think you'll absolute love.</p>
+      ${primaryButton("View Your Recommendations", recommendationsUrl)}
+    `),
+  };
+}
+
+
+// ============================================
+// NEW LOYALTY & REFERRAL TEMPLATES
+// ============================================
+
+export function referralInvitationEmail(name: string, referrerName: string, referralUrl: string): EmailTemplate {
+  return {
+    subject: `${referrerName} has invited you to join ${BRAND_NAME} 🤝`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">You've Been Invited!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, your friend <strong>${referrerName}</strong> thinks you'd love ${BRAND_NAME}!</p>
+      <p style="color: #475569; line-height: 1.6;">Click the link below to accept their invite and get a special welcome bonus on your first order.</p>
+      ${primaryButton("Accept Invitation", referralUrl)}
+    `),
+  };
+}
+
+export function referralRewardEmail(name: string, rewardAmount: string): EmailTemplate {
+  return {
+    subject: `You've earned a reward! Thank you for sharing ${BRAND_NAME} 🏆`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Reward Unlocked!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, someone you referred just completed their first purchase!</p>
+      <div style="background-color: #f0fdf4; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #bbf7d0;">
+        <p style="margin: 0; color: #166534; font-weight: 600; font-size: 16px;">You have earned: ${rewardAmount}</p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">Thank you for spreading the word about us.</p>
+      ${primaryButton("Spend Your Reward", `${BASE_URL}/`)}
+    `),
+  };
+}
+
+export function loyaltyPointsUpdateEmail(name: string, pointsAdded: number, totalPoints: number): EmailTemplate {
+  return {
+    subject: `You just earned ${pointsAdded} loyalty points! ✨`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Points Added!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, you've successfully earned <strong>${pointsAdded}</strong> points from your recent activity.</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${BRAND_COLOR};">
+        <p style="margin: 0; color: #1e293b; font-size: 16px;">Your new total balance is: <strong>${totalPoints} points</strong></p>
+      </div>
+      ${primaryButton("View Rewards", `${BASE_URL}/account/rewards`)}
+    `),
+  };
+}
+
+export function loyaltyPointsExpiryEmail(name: string, pointsExpiring: number, expiryDate: string): EmailTemplate {
+  return {
+    subject: `Action Required: Your ${BRAND_NAME} points are expiring soon ⏰`,
+    html: emailLayout(`
+      <h2 style="color: #1e293b; margin: 0 0 16px;">Points Expiring Soon!</h2>
+      <p style="color: #475569; line-height: 1.6;">Hi ${name}, we wanted to remind you that some of your loyalty points are about to expire.</p>
+      <div style="background-color: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fde68a;">
+        <p style="margin: 0; color: #92400e;"><strong>${pointsExpiring} points</strong> will expire on <strong>${expiryDate}</strong>.</p>
+      </div>
+      <p style="color: #475569; line-height: 1.6;">Don't let them go to waste! Redeem them now on your next purchase.</p>
+      ${primaryButton("Redeem Points Now", `${BASE_URL}/`)}
+    `),
+  };
+}

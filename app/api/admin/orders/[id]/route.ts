@@ -3,6 +3,13 @@ import { connectDB } from "@/lib/mongodb"
 import { Order } from "@/models/Order"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { 
+  sendOrderStatusUpdateEmail, 
+  sendShippingNotificationEmail, 
+  sendRefundProcessedEmail,
+  sendOutForDeliveryEmail,
+  sendOrderDeliveredEmail
+} from "@/lib/email"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -81,6 +88,68 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       .populate("items.product", "name images")
       .populate("statusHistory.by", "name")
       .select("+internalNotes")
+      
+    // Handle Email Notifications Asynchronously
+    if (updatedOrder && updatedOrder.customer?.email) {
+      const customerEmail = updatedOrder.customer.email;
+      const customerName = updatedOrder.customer.name;
+      
+      const emailPromises = [];
+
+      // 1. Status Changes
+      if (status && status !== order.status) {
+        if (status === "shipped") {
+          emailPromises.push(
+            sendShippingNotificationEmail(
+              customerEmail, 
+              customerName, 
+              updatedOrder, 
+              updatedOrder.shipment?.awbNumber || "N/A", 
+              updatedOrder.shipment?.trackingUrl || ""
+            )
+          );
+        } else if (status === "out_for_delivery") {
+          emailPromises.push(
+            sendOutForDeliveryEmail(customerEmail, customerName, updatedOrder)
+          );
+        } else if (status === "delivered") {
+          emailPromises.push(
+            sendOrderDeliveredEmail(customerEmail, customerName, updatedOrder)
+          );
+        } else if (status === "returned") {
+          emailPromises.push(
+            sendOrderStatusUpdateEmail(customerEmail, customerName, updatedOrder, "returned")
+          );
+        } else if (status === "cancelled") {
+          emailPromises.push(
+            sendOrderStatusUpdateEmail(customerEmail, customerName, updatedOrder, "cancelled")
+          );
+        } else {
+           emailPromises.push(
+            sendOrderStatusUpdateEmail(customerEmail, customerName, updatedOrder, status)
+          );
+        }
+      }
+
+      // 2. Refund Processing
+      if (otherUpdates.paymentStatus === "refunded" && order.paymentStatus !== "refunded") {
+        emailPromises.push(
+          sendRefundProcessedEmail(
+            customerEmail, 
+            customerName, 
+            updatedOrder, 
+            updatedOrder.refundDetails?.amount || updatedOrder.total
+          )
+        );
+      }
+
+      // Execute but don't block the API response
+      Promise.allSettled(emailPromises).then((results) => {
+        results.forEach((res, i) => {
+          if (res.status === 'rejected') console.error(`Failed to send order email ${i}:`, res.reason);
+        });
+      });
+    }
 
     return NextResponse.json(updatedOrder)
   } catch (error) {
