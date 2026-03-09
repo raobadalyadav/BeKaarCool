@@ -103,16 +103,16 @@ export function Footer() {
 
             {/* Social Links */}
             <div className="flex space-x-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -122,22 +122,22 @@ export function Footer() {
           <div className="space-y-6">
             <h3 className="font-bold text-lg text-white uppercase tracking-wide">Shop</h3>
             <div className="space-y-3">
-              <Link href="/products?category=Men" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Men" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Men&apos;s Fashion
               </Link>
-              <Link href="/products?category=Women" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Women" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Women&apos;s Fashion
               </Link>
-              <Link href="/products?category=Accessories" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Accessories" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Accessories
               </Link>
-              <Link href="/products?category=Footwear" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Footwear" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Footwear
               </Link>
-              <Link href="/products?featured=true" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?featured=true" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Featured Products
               </Link>
-              <Link href="/products?sort=trending" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?sort=trending" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Trending Now
               </Link>
             </div>
@@ -147,22 +147,22 @@ export function Footer() {
           <div className="space-y-6">
             <h3 className="font-bold text-lg text-white uppercase tracking-wide">Help</h3>
             <div className="space-y-3">
-              <Link href="/track-order" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/track-order" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Track Your Order
               </Link>
-              <Link href="/shipping" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/shipping" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Shipping Information
               </Link>
-              <Link href="/returns" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/returns" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Returns & Exchanges
               </Link>
-              <Link href="/size-guide" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/size-guide" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Size Guide
               </Link>
-              <Link href="/faq" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/faq" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 FAQs
               </Link>
-              <Link href="/contact" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/contact" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Contact Us
               </Link>
             </div>
@@ -218,12 +218,11 @@ export function Footer() {
       <div className="border-t border-gray-800">
         <div className="container py-4">
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-            <Link href="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
+            <Link suppressHydrationWarning href="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
             <span>•</span>
-            <Link href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
+            <Link suppressHydrationWarning href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
             <span>•</span>
-            <Link href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
-
+            <Link suppressHydrationWarning href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

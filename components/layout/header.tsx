@@ -93,17 +93,17 @@ export function Header() {
         <div className="bg-muted/30 py-1 border-b text-[10px] md:text-xs">
           <div className="container mx-auto px-4 flex justify-between items-center text-muted-foreground font-medium">
             <div className="flex items-center space-x-4 md:space-x-6">
-              <Link href="/offers" className="hover:text-primary transition-colors">Offers</Link>
-              <Link href="/fanbook" className="hidden md:inline hover:text-primary transition-colors">Fanbook</Link>
-              <Link href="/apps" className="flex items-center hover:text-primary transition-colors">
+              <Link suppressHydrationWarning href="/offers" className="hover:text-primary transition-colors">Offers</Link>
+              <Link suppressHydrationWarning href="/fanbook" className="hidden md:inline hover:text-primary transition-colors">Fanbook</Link>
+              <Link suppressHydrationWarning href="/apps" className="flex items-center hover:text-primary transition-colors">
                 <span className="hidden md:inline mr-1">Download App</span>
                 <span className="md:hidden">App</span>
               </Link>
-              <Link href="/stores" className="hidden md:inline hover:text-primary transition-colors">Find a store near me</Link>
+              <Link suppressHydrationWarning href="/stores" className="hidden md:inline hover:text-primary transition-colors">Find a store near me</Link>
             </div>
             <div className="flex items-center space-x-4 md:space-x-6">
-              <Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
-              <Link href="/track-order" className="hover:text-primary transition-colors">Track Order</Link>
+              <Link suppressHydrationWarning href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
+              <Link suppressHydrationWarning href="/track-order" className="hover:text-primary transition-colors">Track Order</Link>
             </div>
           </div>
         </div>
@@ -149,13 +149,13 @@ export function Header() {
 
               {/* Desktop Navigation */}
               <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold tracking-wide uppercase">
-                <Link href="/products?category=Men" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Men" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
                   Men
                 </Link>
-                <Link href="/products?category=Women" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Women" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
                   Women
                 </Link>
-                <Link href="/products?category=Mobile%20Covers" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Mobile%20Covers" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
                   Mobile Covers
                 </Link>
               </nav>
@@ -196,15 +196,15 @@ export function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 mt-2">
                       <DropdownMenuItem asChild>
-                        <Link href="/account/profile">Profile</Link>
+                        <Link suppressHydrationWarning href="/account/profile">Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/account/orders">Orders</Link>
+                        <Link suppressHydrationWarning href="/account/orders">Orders</Link>
                       </DropdownMenuItem>
 
                       {session.user?.role === "admin" && (
                         <DropdownMenuItem asChild>
-                          <Link href="/admin">Admin Dashboard</Link>
+                          <Link suppressHydrationWarning href="/admin">Admin Dashboard</Link>
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
@@ -212,7 +212,7 @@ export function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Link href="/auth/login" className="hidden md:block text-xs font-bold hover:underline px-2">
+                  <Link suppressHydrationWarning href="/auth/login" className="hidden md:block text-xs font-bold hover:underline px-2">
                     Login
                   </Link>
                 )}
@@ -261,12 +261,12 @@ export function Header() {
           <div className="w-full border-t hidden md:block">
             <div className="container mx-auto px-4">
               <div className="flex items-center space-x-6 h-10 text-xs font-medium text-muted-foreground overflow-x-auto no-scrollbar">
-                <Link href="/products?sort=trending" className="whitespace-nowrap hover:text-foreground">LIVE NOW</Link>
-                <Link href="/products?category=Men" className="whitespace-nowrap hover:text-foreground">MEN</Link>
-                <Link href="/products?category=Women" className="whitespace-nowrap hover:text-foreground">WOMEN</Link>
-                <Link href="/products?category=Accessories" className="whitespace-nowrap hover:text-foreground">ACCESSORIES</Link>
-                <Link href="/products?sale=true" className="whitespace-nowrap hover:text-foreground">WINTERWEAR</Link>
-                <Link href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-foreground">PLUS SIZE</Link>
+                <Link suppressHydrationWarning href="/products?sort=trending" className="whitespace-nowrap hover:text-foreground">LIVE NOW</Link>
+                <Link suppressHydrationWarning href="/products?category=Men" className="whitespace-nowrap hover:text-foreground">MEN</Link>
+                <Link suppressHydrationWarning href="/products?category=Women" className="whitespace-nowrap hover:text-foreground">WOMEN</Link>
+                <Link suppressHydrationWarning href="/products?category=Accessories" className="whitespace-nowrap hover:text-foreground">ACCESSORIES</Link>
+                <Link suppressHydrationWarning href="/products?sale=true" className="whitespace-nowrap hover:text-foreground">WINTERWEAR</Link>
+                <Link suppressHydrationWarning href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-foreground">PLUS SIZE</Link>
               </div>
             </div>
           </div>

@@ -80,6 +80,20 @@ export interface DelhiveryServiceabilityResult {
 }
 
 // ============================================
+// HELPERS
+// ============================================
+
+async function safeJsonParse(response: Response) {
+    const text = await response.text()
+    try {
+        return JSON.parse(text)
+    } catch (e) {
+        console.error("Failed to parse Delhivery JSON response. Raw response:", text)
+        throw new Error(`Invalid JSON response from Delhivery (Status: ${response.status})`)
+    }
+}
+
+// ============================================
 // SHIPMENT CREATION
 // ============================================
 
@@ -134,7 +148,7 @@ export async function createShipment(
             body: JSON.stringify(shipmentPayload)
         })
 
-        const data = await response.json()
+        const data = await safeJsonParse(response)
 
         if (data.success || data.packages?.[0]?.waybill) {
             return {
@@ -179,7 +193,7 @@ export async function trackShipment(
             }
         )
 
-        const data = await response.json()
+        const data = await safeJsonParse(response)
         const shipment = data.ShipmentData?.[0]?.Shipment
 
         if (shipment) {
@@ -241,7 +255,7 @@ export async function checkServiceability(
             }
         )
 
-        const data = await response.json()
+        const data = await safeJsonParse(response)
         const pincodeData = data.delivery_codes?.[0]?.postal_code
 
         if (pincodeData) {
@@ -335,7 +349,7 @@ export async function cancelShipment(
             })
         })
 
-        const data = await response.json()
+        const data = await safeJsonParse(response)
 
         if (data.status) {
             return { success: true }
