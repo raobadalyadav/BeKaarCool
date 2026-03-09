@@ -318,7 +318,7 @@ export function transformProductForGA4(product: any, index?: number): GA4Product
     return {
         item_id: product._id?.toString() || product.id,
         item_name: product.name,
-        item_brand: product.brand || "BeKaarCool",
+        item_brand: product.brand || "Baefikra",
         item_category: product.category,
         item_variant: product.selectedSize || product.selectedColor,
         price: product.price,

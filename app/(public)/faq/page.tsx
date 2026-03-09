@@ -137,7 +137,7 @@ export default function FAQPage() {
                   <Mail className="h-5 w-5 text-green-600" />
                   <div>
                     <p className="font-medium text-sm">Email Support</p>
-                    <p className="text-xs text-gray-600">support@bekaarcool.com</p>
+                    <p className="text-xs text-gray-600">support@Baefikra.com</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">

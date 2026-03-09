@@ -15,12 +15,12 @@ async function createAdmin() {
         const hashedPassword = await bcrypt.hash("Admin@123", 10)
 
         // Check if admin already exists
-        const existingAdmin = await User.findOne({ email: "admin@bekaarcool.com" })
+        const existingAdmin = await User.findOne({ email: "admin@baefikra.com" })
 
         if (existingAdmin) {
             // Update password for existing admin
             await User.updateOne(
-                { email: "admin@bekaarcool.com" },
+                { email: "admin@baefikra.com" },
                 {
                     $set: {
                         password: hashedPassword,
@@ -31,13 +31,13 @@ async function createAdmin() {
                 }
             )
             console.log("✅ Admin password updated!")
-            console.log("   Email: admin@bekaarcool.com")
+            console.log("   Email: admin@baefikra.com")
             console.log("   Password: Admin@123")
         } else {
             // Create new admin
             await User.create({
                 name: "Admin",
-                email: "admin@bekaarcool.com",
+                email: "admin@baefikra.com",
                 password: hashedPassword,
                 role: "admin",
                 phone: "9999999999",
@@ -45,17 +45,17 @@ async function createAdmin() {
                 isActive: true
             })
             console.log("✅ Admin user created!")
-            console.log("   Email: admin@bekaarcool.com")
+            console.log("   Email: admin@baefikra.com")
             console.log("   Password: Admin@123")
         }
 
         // Also create/update seller
         const sellerPassword = await bcrypt.hash("Seller@123", 10)
-        const existingSeller = await User.findOne({ email: "seller@bekaarcool.com" })
+        const existingSeller = await User.findOne({ email: "seller@baefikra.com" })
 
         if (existingSeller) {
             await User.updateOne(
-                { email: "seller@bekaarcool.com" },
+                { email: "seller@baefikra.com" },
                 {
                     $set: {
                         password: sellerPassword,
@@ -69,7 +69,7 @@ async function createAdmin() {
         } else {
             await User.create({
                 name: "Demo Seller",
-                email: "seller@bekaarcool.com",
+                email: "seller@baefikra.com",
                 password: sellerPassword,
                 role: "seller",
                 phone: "8888888888",
@@ -78,7 +78,7 @@ async function createAdmin() {
             })
             console.log("\n✅ Seller user created!")
         }
-        console.log("   Email: seller@bekaarcool.com")
+        console.log("   Email: seller@baefikra.com")
         console.log("   Password: Seller@123")
 
         console.log("\n🎉 Done! You can now login.")

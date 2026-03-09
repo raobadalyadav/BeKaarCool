@@ -100,7 +100,7 @@ export function SellerSidebar({ open, onOpenChange }: SellerSidebarProps = {}) {
                 <Store className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-gray-900 text-lg tracking-tight">BeKaarCool</h2>
+                <h2 className="font-bold text-gray-900 text-lg tracking-tight">Baefikra</h2>
                 <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">Seller Central</p>
               </div>
             </div>

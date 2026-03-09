@@ -11,15 +11,15 @@ export interface SEOConfig {
 }
 
 const defaultSEO = {
-  title: "BeKaarCool - Custom Print-on-Demand & Design Marketplace",
+  title: "Baefikra - Custom Print-on-Demand & Design Marketplace",
   description: "Create and sell custom designs on t-shirts, hoodies, mugs, and more. Premium quality printing with fast delivery across India.",
   keywords: ["custom printing", "print on demand", "t-shirt design", "custom merchandise", "personalized gifts"],
   image: "/og-image.jpg",
-  url: process.env.NEXTAUTH_URL || "https://bekaarcool.com"
+  url: process.env.NEXTAUTH_URL || "https://baefikra.com"
 }
 
 export function generateMetadata(config: SEOConfig = {}): Metadata {
-  const title = config.title ? `${config.title} | BeKaarCool` : defaultSEO.title
+  const title = config.title ? `${config.title} | Baefikra` : defaultSEO.title
   const description = config.description || defaultSEO.description
   const keywords = [...(config.keywords || []), ...defaultSEO.keywords]
   const image = config.image || defaultSEO.image
@@ -30,16 +30,16 @@ export function generateMetadata(config: SEOConfig = {}): Metadata {
     title,
     description,
     keywords: keywords.join(", "),
-    authors: [{ name: "BeKaarCool" }],
-    creator: "BeKaarCool",
-    publisher: "BeKaarCool",
+    authors: [{ name: "Baefikra" }],
+    creator: "Baefikra",
+    publisher: "Baefikra",
     robots: config.noIndex ? "noindex,nofollow" : "index,follow",
     twitter: {
       card: "summary_large_image",
       title,
       description,
       images: [image],
-      creator: "@bekaarcool"
+      creator: "@baefikra"
     },
     alternates: {
       canonical: url
@@ -54,14 +54,14 @@ export function generateProductSchema(product: any) {
     name: product.name,
     description: product.description,
     image: product.images,
-    brand: { "@type": "Brand", name: product.brand || "BeKaarCool" },
+    brand: { "@type": "Brand", name: product.brand || "Baefikra" },
     category: product.category,
     offers: {
       "@type": "Offer",
       price: product.price,
       priceCurrency: "INR",
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      seller: { "@type": "Organization", name: product.seller?.name || "BeKaarCool" }
+      seller: { "@type": "Organization", name: product.seller?.name || "Baefikra" }
     },
     aggregateRating: product.rating > 0 ? {
       "@type": "AggregateRating",

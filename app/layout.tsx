@@ -23,7 +23,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "BeKaarCool ",
+  title: "Baefikra ",
   description: " fast delivery across India.",
   keywords: ["custom printing", "print on demand", "t-shirt design", "custom merchandise", "personalized gifts", "online marketplace"]
 });
@@ -55,13 +55,13 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "Organization",
-                "name": "BeKaarCool",
-                "url": process.env.NEXTAUTH_URL || "https://bekaarcool.com",
-                "logo": `${process.env.NEXTAUTH_URL || "https://bekaarcool.com"}/logo.png`,
+                "name": "Baefikra",
+                "url": process.env.NEXTAUTH_URL || "https://baefikra.com",
+                "logo": `${process.env.NEXTAUTH_URL || "https://baefikra.com"}/logo.png`,
                 "description": "Premium custom print-on-demand marketplace in India",
                 "sameAs": [
-                  "https://instagram.com/bekaarcool",
-                  "https://twitter.com/bekaarcool"
+                  "https://instagram.com/baefikra",
+                  "https://twitter.com/baefikra"
                 ],
                 "contactPoint": {
                   "@type": "ContactPoint",
@@ -79,13 +79,13 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "BeKaarCool",
-                "url": process.env.NEXTAUTH_URL || "https://bekaarcool.com",
+                "name": "Baefikra",
+                "url": process.env.NEXTAUTH_URL || "https://baefikra.com",
                 "potentialAction": {
                   "@type": "SearchAction",
                   "target": {
                     "@type": "EntryPoint",
-                    "urlTemplate": `${process.env.NEXTAUTH_URL || "https://bekaarcool.com"}/products?search={search_term_string}`
+                    "urlTemplate": `${process.env.NEXTAUTH_URL || "https://baefikra.com"}/products?search={search_term_string}`
                   },
                   "query-input": "required name=search_term_string"
                 }

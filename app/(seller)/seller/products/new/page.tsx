@@ -46,7 +46,7 @@ export default function NewProductPage() {
     if (field === "name") {
       setFormData(prev => ({
         ...prev,
-        seoTitle: value + " - Buy Online at BeKaarCool",
+        seoTitle: value + " - Buy Online at Baefikra",
         [field]: value
       }))
     }
@@ -119,7 +119,7 @@ export default function NewProductPage() {
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-          <p className="text-gray-600">Create a new product for BeKaarCool</p>
+          <p className="text-gray-600">Create a new product for Baefikra</p>
         </div>
       </div>
 

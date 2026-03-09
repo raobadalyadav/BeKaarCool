@@ -86,11 +86,11 @@ export default function TrackOrderPage() {
           : "3-5 business days",
         currentLocation: order.tracking?.currentLocation || "Processing Center",
         trackingNumber: order.tracking?.trackingNumber || order.orderNumber,
-        carrier: order.tracking?.carrier || "BeKaarCool Logistics",
+        carrier: order.tracking?.carrier || "Baefikra Logistics",
         timeline: order.statusHistory?.map((event: any) => ({
           status: event.status,
           description: getStatusDescription(event.status),
-          location: event.location || "BeKaarCool",
+          location: event.location || "Baefikra",
           timestamp: new Date(event.timestamp).toLocaleString('en-IN', {
             month: 'short',
             day: 'numeric',

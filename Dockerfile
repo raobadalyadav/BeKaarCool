@@ -1,8 +1,8 @@
-# BeKaarCool E-commerce Dockerfile
+# Baefikra E-commerce Dockerfile
 # Multi-stage build for production
 
 # ======================================
-# Stage 1: Dependencies
+# Stage 1: Dependencies (production only)
 # ======================================
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
@@ -11,8 +11,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install production dependencies only
+RUN npm ci --omit=dev
 
 # ======================================
 # Stage 2: Builder
@@ -20,8 +20,11 @@ RUN npm ci --only=production
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Install ALL dependencies (including devDeps for build)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy source code
 COPY . .
 
 # Set environment variables for build

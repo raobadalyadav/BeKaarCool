@@ -40,13 +40,13 @@ export default function ReferralPage() {
             const res = await fetch("/api/referral")
             if (res.ok) {
                 const data = await res.json()
-                setReferralCode(data.referralCode || session?.user?.id?.slice(-6).toUpperCase() || "BEKAAR")
+                setReferralCode(data.referralCode || session?.user?.id?.slice(-6).toUpperCase() || "BAEFIKRA")
                 setReferrals(data.referrals || [])
                 setTotalEarned(data.totalEarned || 0)
             }
         } catch (error) {
             // Use session-based fallback
-            setReferralCode(session?.user?.id?.slice(-6).toUpperCase() || "BEKAAR")
+            setReferralCode(session?.user?.id?.slice(-6).toUpperCase() || "BAEFIKRA")
         }
     }
 
@@ -60,7 +60,7 @@ export default function ReferralPage() {
     }
 
     const shareToWhatsApp = () => {
-        const text = `Hey! Use my referral code ${referralCode} to get ₹100 off on your first order at BeKaarCool! ${referralLink}`
+        const text = `Hey! Use my referral code ${referralCode} to get ₹100 off on your first order at Baefikra! ${referralLink}`
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
     }
 

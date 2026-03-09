@@ -102,7 +102,7 @@ function SidebarContent() {
           <div className="h-8 w-8 rounded bg-blue-600 flex items-center justify-center">
             <span className="text-white font-bold text-sm">D</span>
           </div>
-          <span className="text-xl font-bold">BeKaarCool Admin</span>
+          <span className="text-xl font-bold">Baefikra Admin</span>
         </Link>
       </div>
 

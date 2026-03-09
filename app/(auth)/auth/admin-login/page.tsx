@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
                     </div>
                     <h1 className="text-4xl font-bold text-white mb-4">Admin Portal</h1>
                     <p className="text-xl text-gray-300 mb-8">
-                        Secure access to BeKaarCool's administrative dashboard
+                        Secure access to Baefikra's administrative dashboard
                     </p>
                     <div className="space-y-4 text-left">
                         <div className="flex items-center gap-3 bg-white/10 p-4 rounded-lg">
@@ -154,7 +154,7 @@ export default function AdminLoginPage() {
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="admin@bekaarcool.com"
+                                    placeholder="admin@Baefikra.com"
                                     className="pl-11 h-12 border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                                     {...register("email", {
                                         required: "Email is required",

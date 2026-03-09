@@ -12,7 +12,7 @@ export default function CheckoutLayout({
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <Link href="/" className="flex-shrink-0">
                         <span className="font-bold text-2xl tracking-tight text-yellow-500">
-                            BeKaarCool
+                            Baefikra
                         </span>
                     </Link>
                     <div className="flex items-center gap-2 text-green-700 bg-green-50 px-3 py-1.5 rounded-full">

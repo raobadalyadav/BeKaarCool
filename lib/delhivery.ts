@@ -1,6 +1,6 @@
 /**
  * Delhivery Shipping Integration - Production Ready
- * Single courier partner for BeKaarCool
+ * Single courier partner for Baefikra
  */
 
 // ============================================
@@ -9,8 +9,8 @@
 
 const DELHIVERY_API_KEY = process.env.DELHIVERY_API_KEY || ""
 const DELHIVERY_API_URL = process.env.DELHIVERY_API_URL || "https://track.delhivery.com/api"
-const DELHIVERY_CLIENT_NAME = process.env.DELHIVERY_CLIENT_NAME || "BeKaarCool"
-const DELHIVERY_PICKUP_LOCATION = process.env.DELHIVERY_PICKUP_LOCATION || "BeKaarCool Warehouse"
+const DELHIVERY_CLIENT_NAME = process.env.DELHIVERY_CLIENT_NAME || "Baefikra"
+const DELHIVERY_PICKUP_LOCATION = process.env.DELHIVERY_PICKUP_LOCATION || "Baefikra Warehouse"
 
 // ============================================
 // TYPES

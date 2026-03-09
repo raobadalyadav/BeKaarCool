@@ -54,7 +54,7 @@ export function SearchFilters({
   ]
 
   const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"]
-  const brands = ["Nike", "Adidas", "Puma", "BeKaarCool", "Zara", "H&M"]
+  const brands = ["Nike", "Adidas", "Puma", "Baefikra", "Zara", "H&M"]
   const ratings = [4, 3, 2, 1]
 
   const toggleSection = (section: keyof typeof openSections) => {

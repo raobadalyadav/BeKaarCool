@@ -10,7 +10,7 @@ export default function TermsPage() {
     {
       title: "1. Acceptance of Terms",
       content: [
-        "By accessing and using BeKaarCool's website and services, you accept and agree to be bound by the terms and provision of this agreement.",
+        "By accessing and using Baefikra's website and services, you accept and agree to be bound by the terms and provision of this agreement.",
         "If you do not agree to abide by the above, please do not use this service.",
         "These terms apply to all visitors, users, and others who access or use the service.",
       ],
@@ -18,7 +18,7 @@ export default function TermsPage() {
     {
       title: "2. Use License",
       content: [
-        "Permission is granted to temporarily download one copy of the materials on BeKaarCool's website for personal, non-commercial transitory viewing only.",
+        "Permission is granted to temporarily download one copy of the materials on Baefikra's website for personal, non-commercial transitory viewing only.",
         "This is the grant of a license, not a transfer of title, and under this license you may not:",
         "• Modify or copy the materials",
         "• Use the materials for any commercial purpose or for any public display",
@@ -96,7 +96,7 @@ export default function TermsPage() {
     {
       title: "10. Intellectual Property",
       content: [
-        "The service and its original content, features, and functionality are and will remain the exclusive property of BeKaarCool and its licensors.",
+        "The service and its original content, features, and functionality are and will remain the exclusive property of Baefikra and its licensors.",
         "The service is protected by copyright, trademark, and other laws.",
         "Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.",
       ],
@@ -104,7 +104,7 @@ export default function TermsPage() {
     {
       title: "11. Limitation of Liability",
       content: [
-        "In no event shall BeKaarCool, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.",
+        "In no event shall Baefikra, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages.",
         "This includes without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the service.",
         "Our total liability to you for all claims arising from or relating to the service shall not exceed the amount you paid us in the 12 months preceding the claim.",
       ],
@@ -130,7 +130,7 @@ export default function TermsPage() {
       title: "14. Contact Information",
       content: [
         "If you have any questions about these Terms of Service, please contact us:",
-        "• Email: legal@bekaarcool.com",
+        "• Email: legal@Baefikra.com",
         "• Phone: +91 98765 43210",
         "• Address: 123 Business District, Mumbai, Maharashtra 400001, India",
       ],
@@ -164,7 +164,7 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold text-orange-900 mb-2">Important Notice</h3>
                 <p className="text-orange-800 text-sm">
-                  These terms constitute a legally binding agreement between you and BeKaarCool. By using our services, you
+                  These terms constitute a legally binding agreement between you and Baefikra. By using our services, you
                   acknowledge that you have read, understood, and agree to be bound by these terms.
                 </p>
               </div>
@@ -207,8 +207,8 @@ export default function TermsPage() {
                   Contact Support
                 </a>
                 <span className="hidden sm:inline text-gray-400">•</span>
-                <a href="mailto:legal@bekaarcool.com" className="text-blue-600 hover:text-blue-800 font-medium">
-                  legal@bekaarcool.com
+                <a href="mailto:legal@Baefikra.com" className="text-blue-600 hover:text-blue-800 font-medium">
+                  legal@Baefikra.com
                 </a>
               </div>
             </CardContent>

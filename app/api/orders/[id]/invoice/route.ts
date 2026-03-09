@@ -1,34 +1,37 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { Order } from "@/models/Order"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { resolveUserId } from "@/lib/auth-utils"
+import { type NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import { Order } from "@/models/Order";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { resolveUserId } from "@/lib/auth-utils";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    await connectDB()
+    await connectDB();
 
-    const userId = await resolveUserId(session.user.id, session.user.email)
-    const { id } = await params
+    const userId = await resolveUserId(session.user.id, session.user.email);
+    const { id } = await params;
 
     const order = await Order.findById(id)
       .populate("items.product", "name images")
-      .populate("user", "name email")
+      .populate("user", "name email");
 
     if (!order) {
-      return NextResponse.json({ message: "Order not found" }, { status: 404 })
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
     // Handle case where user might not be populated
-    const orderUserId = order.user?._id?.toString() || order.user?.toString()
+    const orderUserId = order.user?._id?.toString() || order.user?.toString();
     if (orderUserId !== userId && session.user.role !== "admin") {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 })
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     // Generate invoice data
@@ -38,18 +41,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       date: order.createdAt,
       dueDate: order.estimatedDelivery,
       status: order.paymentStatus,
-      
+
       // Company details
       company: {
-        name: "BeKaarCool",
+        name: "Baefikra",
         address: "123 Business Street",
         city: "Mumbai",
         state: "Maharashtra",
         pincode: "400001",
         country: "India",
-        email: "support@bekaar-cool.com",
+        email: "support@baefikra.com",
         phone: "+91 9876543210",
-        gst: "27ABCDE1234F1Z5"
+        gst: "27ABCDE1234F1Z5",
       },
 
       // Customer details
@@ -61,7 +64,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         city: order.shippingAddress?.city || "",
         state: order.shippingAddress?.state || "",
         pincode: order.shippingAddress?.pincode || "",
-        country: order.shippingAddress?.country || "India"
+        country: order.shippingAddress?.country || "India",
       },
 
       // Items
@@ -71,7 +74,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         price: item.quantity ? item.price / item.quantity : item.price,
         total: item.price || 0,
         size: item.size || "",
-        color: item.color || ""
+        color: item.color || "",
       })),
 
       // Totals
@@ -84,12 +87,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       // Payment details
       paymentMethod: order.paymentMethod,
       paymentId: order.paymentId,
-      paymentStatus: order.paymentStatus
-    }
+      paymentStatus: order.paymentStatus,
+    };
 
-    return NextResponse.json(invoice)
+    return NextResponse.json(invoice);
   } catch (error) {
-    console.error("Error generating invoice:", error)
-    return NextResponse.json({ message: "Failed to generate invoice" }, { status: 500 })
+    console.error("Error generating invoice:", error);
+    return NextResponse.json(
+      { message: "Failed to generate invoice" },
+      { status: 500 },
+    );
   }
 }

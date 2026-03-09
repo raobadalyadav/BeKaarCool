@@ -1,5 +1,5 @@
 # Docker Compose for local development
-version: '3.8'
+version: "3.8"
 
 services:
   # Next.js Application
@@ -19,7 +19,7 @@ services:
       - redis
       - mongodb
     networks:
-      - bekaarcool-network
+      - baefikra-network
 
   # Redis for caching and sessions
   redis:
@@ -30,7 +30,7 @@ services:
       - redis-data:/data
     command: redis-server --appendonly yes
     networks:
-      - bekaarcool-network
+      - baefikra-network
 
   # MongoDB (for local development only)
   mongodb:
@@ -40,11 +40,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: bekaarcool
+      MONGO_INITDB_DATABASE: baefikra
     volumes:
       - mongo-data:/data/db
     networks:
-      - bekaarcool-network
+      - baefikra-network
 
   # MongoDB Express (Admin UI)
   mongo-express:
@@ -58,12 +58,12 @@ services:
     depends_on:
       - mongodb
     networks:
-      - bekaarcool-network
+      - baefikra-network
 
 volumes:
   redis-data:
   mongo-data:
 
 networks:
-  bekaarcool-network:
+  baefikra-network:
     driver: bridge

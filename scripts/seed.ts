@@ -185,7 +185,7 @@ const products = [
         ],
         category: "Men",
         subcategory: "T-Shirts",
-        brand: "BeKaarCool",
+        brand: "Baefikra",
         tags: ["oversized", "cotton", "casual", "streetwear"],
         variations: {
             sizes: ["S", "M", "L", "XL", "XXL"],
@@ -224,7 +224,7 @@ const products = [
         ],
         category: "Women",
         subcategory: "Dresses",
-        brand: "BeKaarCool",
+        brand: "Baefikra",
         tags: ["summer", "floral", "casual"],
         variations: {
             sizes: ["XS", "S", "M", "L", "XL"],
@@ -301,7 +301,7 @@ const products = [
         ],
         category: "Women",
         subcategory: "Jeans",
-        brand: "BeKaarCool",
+        brand: "Baefikra",
         tags: ["jeans", "skinny", "high-waist"],
         variations: {
             sizes: ["26", "28", "30", "32"],
@@ -381,8 +381,8 @@ async function main() {
         let seller = await User.findOne({ role: "admin" })
         if (!seller) {
             seller = await User.create({
-                name: "BeKaarCool Admin",
-                email: "admin@bekaarcool.com",
+                name: "Baefikra Admin",
+                email: "admin@baefikra.com",
                 role: "admin",
                 isVerified: true
             })

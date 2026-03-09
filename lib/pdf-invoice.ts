@@ -7,13 +7,13 @@ export const generateInvoicePDF = (invoice: any) => {
     // Company Header
     doc.setFontSize(20)
     doc.setTextColor(59, 130, 246) // Blue color
-    doc.text('BeKaarCool', 20, 30)
+    doc.text('Baefikra', 20, 30)
     
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
     doc.text('Custom Clothing & Print-on-Demand', 20, 40)
     doc.text('Mumbai, Maharashtra, India', 20, 48)
-    doc.text('Email: support@bekaar-cool.com', 20, 56)
+    doc.text('Email: support@baefikra.com', 20, 56)
     doc.text('Phone: +91 9876543210', 20, 64)
     
     // Invoice Title
@@ -128,8 +128,8 @@ export const generateInvoicePDF = (invoice: any) => {
     // Footer
     doc.setFontSize(8)
     doc.setTextColor(100, 100, 100)
-    doc.text('Thank you for shopping with BeKaarCool!', 20, 280)
-    doc.text('For support, contact us at support@bekaar-cool.com', 20, 288)
+    doc.text('Thank you for shopping with Baefikra!', 20, 280)
+    doc.text('For support, contact us at support@baefikra.com', 20, 288)
     
     // Save PDF
     doc.save(`invoice-${invoice.orderNumber}.pdf`)
@@ -173,10 +173,10 @@ export const generateStyledInvoiceHTML = (invoice: any): string => {
     <body>
       <div class="header">
         <div class="company">
-          <h1>BeKaarCool</h1>
+          <h1>Baefikra</h1>
           <p>Custom Clothing & Print-on-Demand</p>
           <p>Mumbai, Maharashtra, India</p>
-          <p>Email: support@bekaar-cool.com</p>
+          <p>Email: support@baefikra.com</p>
           <p>Phone: +91 9876543210</p>
           <p>GST: 27ABCDE1234F1Z5</p>
         </div>
@@ -241,8 +241,8 @@ export const generateStyledInvoiceHTML = (invoice: any): string => {
       </div>
 
       <div class="footer">
-        <p><strong>Thank you for shopping with BeKaarCool!</strong></p>
-        <p>For support or queries, contact us at support@bekaar-cool.com</p>
+        <p><strong>Thank you for shopping with Baefikra!</strong></p>
+        <p>For support or queries, contact us at support@baefikra.com</p>
         <p>This is a computer-generated invoice and does not require a signature.</p>
       </div>
     </body>

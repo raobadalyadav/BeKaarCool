@@ -86,7 +86,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: "Email",
-      details: ["support@bekaarcool.com", "business@bekaarcool.com"],
+      details: ["support@Baefikra.com", "business@Baefikra.com"],
     },
     {
       icon: Clock,

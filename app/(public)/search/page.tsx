@@ -3,8 +3,8 @@ import SearchClient from "./search-client"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-    title: "Search Products - BeKaarCool",
-    description: "Search for your favorite fashion products on BeKaarCool."
+    title: "Search Products - Baefikra",
+    description: "Search for your favorite fashion products on Baefikra."
 }
 
 export default function SearchPage() {

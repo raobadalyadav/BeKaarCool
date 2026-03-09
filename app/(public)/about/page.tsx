@@ -68,7 +68,7 @@ export default function AboutPage() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">About BeKaarCool</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">About Baefikra</h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
               We're on a mission to make online shopping delightful, accessible, and trustworthy for everyone.
             </p>
@@ -104,7 +104,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
               <div className="space-y-4 text-gray-600">
                 <p>
-                  Founded in 2019, BeKaarCool started as a small idea to revolutionize online shopping in India. Our
+                  Founded in 2019, Baefikra started as a small idea to revolutionize online shopping in India. Our
                   founders, frustrated with the lack of quality products and poor customer service in the e-commerce
                   space, decided to create something different.
                 </p>
@@ -158,7 +158,7 @@ export default function AboutPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              The passionate people behind BeKaarCool who work tirelessly to bring you the best shopping experience.
+              The passionate people behind Baefikra who work tirelessly to bring you the best shopping experience.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

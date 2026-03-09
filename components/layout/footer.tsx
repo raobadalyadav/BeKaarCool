@@ -94,7 +94,7 @@ export function Footer() {
                 <span className="text-black font-bold text-lg">B</span>
               </div>
               <span className="font-bold text-2xl text-yellow-400">
-                BeKaarCool
+                Baefikra
               </span>
             </div>
             <p className="text-gray-400 leading-relaxed">
@@ -176,7 +176,7 @@ export function Footer() {
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-gray-400">
                 <Mail className="h-5 w-5 text-yellow-400" />
-                <span className="text-sm">support@bekaarcool.com</span>
+                <span className="text-sm">support@baefikra.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
                 <Phone className="h-5 w-5 text-yellow-400" />
@@ -235,7 +235,7 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <div className="flex items-center space-x-2 text-gray-500 text-sm">
-              <p>© 2024 BeKaarCool. All rights reserved.</p>
+              <p>© 2024 Baefikra. All rights reserved.</p>
               <span className="hidden md:inline">|</span>
               <div className="hidden md:flex items-center space-x-1">
                 <span>Made with</span>

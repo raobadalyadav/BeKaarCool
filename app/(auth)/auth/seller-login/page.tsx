@@ -95,7 +95,7 @@ export default function SellerLoginPage() {
                     </div>
                     <h1 className="text-4xl font-bold text-white mb-4">Seller Portal</h1>
                     <p className="text-xl text-purple-100 mb-8">
-                        Grow your business with BeKaarCool's marketplace
+                        Grow your business with Baefikra's marketplace
                     </p>
                     <div className="space-y-4 text-left">
                         <div className="flex items-center gap-3 bg-white/10 p-4 rounded-lg">
@@ -222,7 +222,7 @@ export default function SellerLoginPage() {
                         </Button>
 
                         <p className="text-center text-gray-600 mt-6">
-                            Want to sell on BeKaarCool?{" "}
+                            Want to sell on Baefikra?{" "}
                             <Link href="/auth/seller-register" className="text-purple-600 hover:text-purple-700 font-semibold">
                                 Register as Seller
                             </Link>

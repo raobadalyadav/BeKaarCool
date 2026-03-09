@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 
 export const metadata: Metadata = {
-    title: "Sustainability - BeKaarCool",
+    title: "Sustainability - Baefikra",
     description: "Our commitment to sustainable fashion and eco-friendly practices."
 }
 
@@ -74,7 +74,7 @@ export default function SustainabilityPage() {
                     <Leaf className="w-16 h-16 mx-auto mb-4" />
                     <h1 className="text-4xl font-bold mb-4">Fashion for a Better Tomorrow</h1>
                     <p className="text-lg text-green-100 max-w-2xl mx-auto">
-                        At BeKaarCool, we believe style shouldn't cost the Earth.
+                        At Baefikra, we believe style shouldn't cost the Earth.
                         We're committed to sustainable practices that protect our planet.
                     </p>
                 </div>

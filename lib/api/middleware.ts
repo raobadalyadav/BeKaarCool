@@ -9,6 +9,7 @@ import { authOptions } from "@/lib/auth"
 import { ZodSchema, ZodError } from "zod"
 import { IApiResponse } from "@/lib/types/entities"
 import { connectDB } from "@/lib/mongodb"
+import { checkRateLimitRedis, isRedisConnected } from "@/lib/redis"
 
 // ============================================
 // ERROR CLASSES
@@ -272,16 +273,26 @@ export function withErrorHandler(handler: ApiHandler): ApiHandler {
 }
 
 // ============================================
-// RATE LIMITING (Simple in-memory implementation)
+// RATE LIMITING (Redis-backed with in-memory fallback)
 // ============================================
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>()
 
-export function checkRateLimit(
+export async function checkRateLimit(
     identifier: string,
     limit: number = 100,
     windowMs: number = 60000
-): void {
+): Promise<void> {
+    // Use Redis rate limiting if available
+    if (isRedisConnected()) {
+        const result = await checkRateLimitRedis(identifier, limit, Math.ceil(windowMs / 1000))
+        if (!result.allowed) {
+            throw new RateLimitError()
+        }
+        return
+    }
+
+    // Fallback: in-memory rate limiting
     const now = Date.now()
     const record = rateLimitStore.get(identifier)
 

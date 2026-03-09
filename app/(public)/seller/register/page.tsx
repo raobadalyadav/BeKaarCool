@@ -144,7 +144,7 @@ export default function SellerRegisterPage() {
         <div className="container py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Store className="h-6 w-6 text-blue-600" />
-            <span className="text-xl font-bold">BeKaarCool Seller</span>
+            <span className="text-xl font-bold">Baefikra Seller</span>
           </div>
           <div className="text-sm text-gray-500">
             Already a seller? <Link href="/auth/login" className="text-blue-600 hover:underline">Login</Link>
@@ -155,7 +155,7 @@ export default function SellerRegisterPage() {
       <div className="container max-w-4xl py-12 flex-1">
         <div className="mb-8 p-4">
           <h1 className="text-3xl font-bold text-center mb-2">Become a Seller</h1>
-          <p className="text-center text-gray-600">Complete your profile to start selling on BeKaarCool</p>
+          <p className="text-center text-gray-600">Complete your profile to start selling on Baefikra</p>
         </div>
 
         {/* Steps Indicator */}

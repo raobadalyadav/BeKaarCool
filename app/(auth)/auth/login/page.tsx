@@ -127,7 +127,7 @@ function LoginForm() {
           <div className="w-24 h-24 bg-black rounded-2xl flex items-center justify-center mx-auto mb-8">
             <span className="text-yellow-400 font-bold text-4xl">B</span>
           </div>
-          <h1 className="text-4xl font-bold text-black mb-4">BeKaarCool</h1>
+          <h1 className="text-4xl font-bold text-black mb-4">Baefikra</h1>
           <p className="text-xl text-black/80 mb-8">
             India's coolest fashion destination. Login to access exclusive deals, track orders, and more!
           </p>
@@ -160,7 +160,7 @@ function LoginForm() {
             <div className="w-16 h-16 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-black font-bold text-2xl">B</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BeKaarCool</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Baefikra</h1>
           </div>
 
           <div className="text-center mb-8">

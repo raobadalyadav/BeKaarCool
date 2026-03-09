@@ -568,7 +568,7 @@ export default function AdminBlogPage() {
                                                 {formData.seo.metaTitle || formData.title || "Post Title"}
                                             </p>
                                             <p className="text-green-700 text-sm truncate">
-                                                bekaarcool.com/blog/{formData.slug || "post-slug"}
+                                                Baefikra.com/blog/{formData.slug || "post-slug"}
                                             </p>
                                             <p className="text-gray-600 text-sm mt-1 line-clamp-2">
                                                 {formData.seo.metaDescription || formData.excerpt || "Post description will appear here..."}

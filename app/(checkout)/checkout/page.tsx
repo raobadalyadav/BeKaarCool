@@ -151,7 +151,7 @@ export default function CheckoutPage() {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
             amount: Math.round(total * 100),
             currency: "INR",
-            name: "BeKaarCool",
+            name: "Baefikra",
             description: "Order Payment",
             order_id: data.orderId,
             handler: async (response: any) => {

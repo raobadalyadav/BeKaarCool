@@ -8,8 +8,8 @@ import {
 } from "lucide-react"
 
 export const metadata: Metadata = {
-    title: "Careers - BeKaarCool",
-    description: "Join our team at BeKaarCool. Explore exciting career opportunities in fashion, tech, and more."
+    title: "Careers - Baefikra",
+    description: "Join our team at Baefikra. Explore exciting career opportunities in fashion, tech, and more."
 }
 
 const openPositions = [
@@ -110,7 +110,7 @@ export default function CareersPage() {
 
                 {/* Why Join Us */}
                 <div className="mb-12">
-                    <h2 className="text-2xl font-bold text-center mb-8">Why Join BeKaarCool?</h2>
+                    <h2 className="text-2xl font-bold text-center mb-8">Why Join Baefikra?</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {perks.map(perk => (
                             <Card key={perk.title}>

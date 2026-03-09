@@ -83,7 +83,7 @@ const blogPostSchema = new mongoose.Schema({
     },
     authorName: {
         type: String,
-        default: "BeKaarCool Team"
+        default: "Baefikra Team"
     },
     readTime: {
         type: Number,

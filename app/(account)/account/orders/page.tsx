@@ -186,7 +186,7 @@ export default function MyOrdersPage() {
                                                         </Button>
                                                     </Link>
                                                 )}
-                                                <Link href={`/orders/${order._id}`}>
+                                                <Link href={`/account/orders/${order._id}`}>
                                                     <Button variant="outline" size="sm">
                                                         <Eye className="w-4 h-4 mr-1" /> View Details
                                                     </Button>

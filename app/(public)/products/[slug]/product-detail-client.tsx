@@ -212,7 +212,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
                 {/* Right Column: Product Details */}
                 <div className="w-full lg:w-[42%] space-y-6">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brand || "BeKaarCool"}</h3>
+                        <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brand || "Baefikra"}</h3>
                         <h1 className="text-xl md:text-2xl font-normal text-gray-800 leading-snug mb-2">{product.name}</h1>
 
                         {/* Price Section */}
@@ -381,7 +381,7 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
                                 <div className="grid grid-cols-2 gap-4 mt-6 bg-gray-50 p-4 rounded">
                                     <div>
                                         <b className="text-gray-900 block mb-1">Product Details</b>
-                                        <p className="text-xs">{categoryName} | {product.brand || "BeKaarCool"}</p>
+                                        <p className="text-xs">{categoryName} | {product.brand || "Baefikra"}</p>
                                     </div>
                                     <div>
                                         <b className="text-gray-900 block mb-1">Material</b>

@@ -164,7 +164,7 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your BeKaarCool store</p>
+          <p className="text-gray-600">Manage your Baefikra store</p>
         </div>
         <Button onClick={fetchDashboard} variant="outline" disabled={loading}>
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />

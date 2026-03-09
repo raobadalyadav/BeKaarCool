@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/mongodb'
 import { Product } from '@/models/Product'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://bekaarcool.com'
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://baefikra.com'
 
   // Static pages
   const staticPages = [
@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await connectDB()
     const products = await Product.find({ isActive: true })
-      .select('_id updatedAt')
+      .select('slug updatedAt')
       .lean()
 
     productPages = products.map((product) => ({

@@ -86,7 +86,7 @@ export type { IReturnRequest } from "./ReturnRequest"
 // ============================================
 
 export { SupportTicket } from "./SupportTicket"
-export type { ISupportTicket, ITicketMessage, TicketCategory, TicketPriority, TicketStatus } from "./SupportTicket"
+export type { ISupportTicket } from "./SupportTicket"
 
 // ============================================
 // Referral & Loyalty
@@ -94,10 +94,3 @@ export type { ISupportTicket, ITicketMessage, TicketCategory, TicketPriority, Ti
 
 export { Referral } from "./Referral"
 export type { IReferral } from "./Referral"
-
-// ============================================
-// Logging & Audit
-// ============================================
-
-export { ActivityLog } from "./ActivityLog"
-export type { IActivityLog } from "./ActivityLog"

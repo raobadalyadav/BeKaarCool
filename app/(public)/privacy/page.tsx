@@ -151,10 +151,10 @@ export default function PrivacyPage() {
       icon: UserCheck,
       content: [
         "If you have any questions, concerns, or requests regarding this privacy policy or our data practices, please contact us:",
-        "• Email: privacy@bekaarcool.com",
+        "• Email: privacy@Baefikra.com",
         "• Phone: +91 98765 43210",
         "• Address: 123 Business District, Mumbai, Maharashtra 400001, India",
-        "• Data Protection Officer: dpo@bekaarcool.com",
+        "• Data Protection Officer: dpo@Baefikra.com",
         "We will respond to your inquiries within 30 days.",
       ],
     },
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
-              BeKaarCool ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how
+              Baefikra ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how
               we collect, use, disclose, and safeguard your information when you visit our website or use our services.
               Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy,
               please do not access the site or use our services.
@@ -232,8 +232,8 @@ export default function PrivacyPage() {
                   Contact Support
                 </a>
                 <span className="hidden sm:inline text-gray-400">•</span>
-                <a href="mailto:privacy@bekaarcool.com" className="text-blue-600 hover:text-blue-800 font-medium">
-                  privacy@bekaarcool.com
+                <a href="mailto:privacy@Baefikra.com" className="text-blue-600 hover:text-blue-800 font-medium">
+                  privacy@Baefikra.com
                 </a>
               </div>
             </CardContent>

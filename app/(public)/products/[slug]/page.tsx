@@ -66,8 +66,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const categoryName = typeof product.category === 'object' ? product.category.name : product.category
 
     return generateSEOMetadata({
-        title: `${product.name} | BeKaarCool`,
-        description: product.description?.substring(0, 160) || `Shop ${product.name} at BeKaarCool`,
+        title: `${product.name} | Baefikra`,
+        description: product.description?.substring(0, 160) || `Shop ${product.name} at Baefikra`,
         keywords: [categoryName, product.brand, ...(product.tags || [])].filter(Boolean),
         image: product.images?.[0],
         url: `${process.env.NEXTAUTH_URL}/products/${product.slug}`,

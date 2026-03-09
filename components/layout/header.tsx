@@ -144,7 +144,7 @@ export function Header() {
               {/* Logo */}
               <Link href="/" className="flex-shrink-0">
                 <span className="font-bold text-2xl tracking-tight text-yellow-500">
-                  BeKaarCool
+                  Baefikra
                 </span>
               </Link>
 

@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
               <span className="text-black font-bold text-2xl">B</span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">BeKaarCool</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Baefikra</h1>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg p-8">

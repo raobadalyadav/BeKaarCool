@@ -41,7 +41,7 @@ export default function SellerAnalyticsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600">Track your BeKaarCool performance</p>
+          <p className="text-gray-600">Track your Baefikra performance</p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-48">

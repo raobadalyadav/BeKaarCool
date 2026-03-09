@@ -8,25 +8,25 @@ import {
 } from "lucide-react"
 
 export const metadata: Metadata = {
-    title: "Press & Media - BeKaarCool",
-    description: "Press releases, media coverage, and brand assets for BeKaarCool."
+    title: "Press & Media - Baefikra",
+    description: "Press releases, media coverage, and brand assets for Baefikra."
 }
 
 const pressReleases = [
     {
-        title: "BeKaarCool Raises Series B Funding of $50M",
+        title: "Baefikra Raises Series B Funding of $50M",
         date: "2026-01-10",
         summary: "Leading the next wave of fashion e-commerce in India with expansion plans.",
         link: "#"
     },
     {
-        title: "BeKaarCool Launches Sustainable Fashion Line",
+        title: "Baefikra Launches Sustainable Fashion Line",
         date: "2025-11-15",
         summary: "100% recycled materials used in new eco-friendly collection.",
         link: "#"
     },
     {
-        title: "BeKaarCool Partners with Top Designers",
+        title: "Baefikra Partners with Top Designers",
         date: "2025-09-20",
         summary: "Exclusive collaborations bringing high fashion to affordable prices.",
         link: "#"
@@ -34,7 +34,7 @@ const pressReleases = [
 ]
 
 const mediaItems = [
-    { outlet: "Economic Times", title: "The Rise of BeKaarCool", date: "Dec 2025" },
+    { outlet: "Economic Times", title: "The Rise of Baefikra", date: "Dec 2025" },
     { outlet: "Vogue India", title: "Brands Redefining Fast Fashion", date: "Nov 2025" },
     { outlet: "Business Standard", title: "E-commerce Success Stories", date: "Oct 2025" }
 ]
@@ -67,7 +67,7 @@ export default function PressPage() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Press & Media</h1>
-                    <p className="text-gray-600">The latest news and updates from BeKaarCool</p>
+                    <p className="text-gray-600">The latest news and updates from Baefikra</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -137,10 +137,10 @@ export default function PressPage() {
                                     For press inquiries and interview requests:
                                 </p>
                                 <a
-                                    href="mailto:press@bekaarcool.com"
+                                    href="mailto:press@Baefikra.com"
                                     className="flex items-center gap-2 text-yellow-400 hover:underline"
                                 >
-                                    <Mail className="w-4 h-4" /> press@bekaarcool.com
+                                    <Mail className="w-4 h-4" /> press@Baefikra.com
                                 </a>
                             </CardContent>
                         </Card>

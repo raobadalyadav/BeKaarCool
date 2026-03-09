@@ -133,7 +133,7 @@ export default function WishlistPage() {
                             </Link>
 
                             <div className="p-3 space-y-2">
-                                <p className="text-[10px] text-gray-500 font-semibold uppercase">{product.brand || "BeKaarCool"}</p>
+                                <p className="text-[10px] text-gray-500 font-semibold uppercase">{product.brand || "Baefikra"}</p>
                                 <h3 className="text-sm text-gray-800 line-clamp-1">{product.name}</h3>
                                 <div className="flex items-baseline gap-2">
                                     <span className="font-bold text-gray-900">₹{product.price}</span>
