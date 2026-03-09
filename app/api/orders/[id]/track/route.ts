@@ -15,9 +15,10 @@ interface TrackingEvent {
 // GET: Get order tracking info
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -26,7 +27,6 @@ export async function GET(
     await connectDB()
 
     const userId = await resolveUserId(session.user.id, session.user.email)
-    const { id } = await (params as any)
 
     const order = await Order.findOne({ _id: id, user: userId })
       .select("orderNumber status trackingNumber carrier shippingAddress createdAt")

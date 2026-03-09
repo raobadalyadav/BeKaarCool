@@ -228,7 +228,7 @@ export default function CategoriesPageClient() {
         <section className="mt-16 text-center">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 md:p-12 text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Can't find what you're looking for?
+              Can&apos;t find what you&apos;re looking for?
             </h2>
             <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
               Browse all products or use our search to find exactly what you need

@@ -127,7 +127,7 @@ function VerifyEmailContent() {
           </div>
           <CardTitle className="text-2xl font-bold text-red-600">Verification Failed</CardTitle>
           <CardDescription>
-            We couldn't verify your email address.
+            We couldn&apos;t verify your email address.
           </CardDescription>
         </CardHeader>
         <CardContent>

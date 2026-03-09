@@ -123,10 +123,10 @@ export function Footer() {
             <h3 className="font-bold text-lg text-white uppercase tracking-wide">Shop</h3>
             <div className="space-y-3">
               <Link href="/products?category=Men" className="block text-gray-400 hover:text-yellow-400 transition-colors">
-                Men's Fashion
+                Men&apos;s Fashion
               </Link>
               <Link href="/products?category=Women" className="block text-gray-400 hover:text-yellow-400 transition-colors">
-                Women's Fashion
+                Women&apos;s Fashion
               </Link>
               <Link href="/products?category=Accessories" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Accessories

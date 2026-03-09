@@ -74,8 +74,8 @@ export default function SustainabilityPage() {
                     <Leaf className="w-16 h-16 mx-auto mb-4" />
                     <h1 className="text-4xl font-bold mb-4">Fashion for a Better Tomorrow</h1>
                     <p className="text-lg text-green-100 max-w-2xl mx-auto">
-                        At Baefikra, we believe style shouldn't cost the Earth.
-                        We're committed to sustainable practices that protect our planet.
+                        At Baefikra, we believe style shouldn&apos;t cost the Earth.
+                        We&apos;re committed to sustainable practices that protect our planet.
                     </p>
                 </div>
             </div>
@@ -116,7 +116,7 @@ export default function SustainabilityPage() {
                         <h2 className="text-2xl font-bold mb-4">Clothing Recycling Program</h2>
                         <p className="text-green-100 max-w-xl mx-auto mb-6">
                             Send us your old clothes (any brand!) and get ₹200 off your next order.
-                            We'll ensure they're recycled or donated responsibly.
+                            We&apos;ll ensure they&apos;re recycled or donated responsibly.
                         </p>
                         <Button className="bg-white text-green-600 hover:bg-gray-100 font-bold">
                             Learn More

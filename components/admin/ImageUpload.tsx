@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
 
 interface ImageUploadProps {
     images: string[]
@@ -131,10 +131,12 @@ export function ImageUpload({
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                     {images.map((image, index) => (
                         <div key={index} className="relative group aspect-square">
-                            <img
+                            <Image
                                 src={image}
                                 alt={`Product ${index + 1}`}
                                 className="w-full h-full object-cover rounded-lg border"
+                                width={100}
+                                height={100}
                             />
                             <button
                                 type="button"

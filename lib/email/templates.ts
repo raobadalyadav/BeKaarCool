@@ -3,22 +3,22 @@
  * Reusable HTML email templates with consistent Baefikra branding
  */
 
-import { formatCurrency } from "@/lib/utils"
-import { env } from "@/lib/env"
+import { formatCurrency } from "@/lib/utils";
+import { env } from "@/lib/env";
 
-const BASE_URL = env.NEXTAUTH_URL || "https://baefikra.com"
-const BRAND_COLOR = "#FACC15"
-const BRAND_NAME = "Baefikra"
-const LOGO_URL = `${BASE_URL}/logo.png`  // Assuming logo is at public/logo.png
-const COMPANY_NAME = "Baefikra"
-const SUPPORT_EMAIL = env.SUPPORT_EMAIL || "support@baefikra.com"
+const BASE_URL = env.NEXTAUTH_URL || "https://baefikra.com";
+const BRAND_COLOR = "#FACC15";
+const BRAND_NAME = "Baefikra";
+const LOGO_URL = `${BASE_URL}/logo.png`; // Assuming logo is at public/logo.png
+const COMPANY_NAME = "Baefikra";
+const SUPPORT_EMAIL = env.SUPPORT_EMAIL || "support@baefikra.com";
 
 // ============================================
 // SHARED LAYOUT
 // ============================================
 
 function emailLayout(content: string): string {
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,16 +50,16 @@ function emailLayout(content: string): string {
     </div>
   </div>
 </body>
-</html>`
+</html>`;
 }
 
 function primaryButton(text: string, url: string): string {
-    return `
+  return `
     <div style="text-align: center; margin: 28px 0;">
       <a href="${url}" style="background: linear-gradient(135deg, ${BRAND_COLOR} 0%, #eab308 100%); color: #0f172a; padding: 14px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 15px;">
         ${text}
       </a>
-    </div>`
+    </div>`;
 }
 
 // ============================================
@@ -67,30 +67,30 @@ function primaryButton(text: string, url: string): string {
 // ============================================
 
 export interface EmailTemplate {
-    subject: string
-    html: string
+  subject: string;
+  html: string;
 }
 
 // --- Welcome ---
 export function welcomeEmail(name: string): EmailTemplate {
-    return {
-        subject: `Welcome to ${BRAND_NAME}! 🎉`,
-        html: emailLayout(`
+  return {
+    subject: `Welcome to ${BRAND_NAME}! 🎉`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Welcome, ${name}!</h2>
       <p style="color: #475569; line-height: 1.6;">Thank you for joining ${BRAND_NAME}. We're excited to have you on board!</p>
       <p style="color: #475569; line-height: 1.6;">Explore our curated collection of custom-designed products, created just for you.</p>
       ${primaryButton("Start Shopping", `${BASE_URL}/products`)}
       <p style="color: #94a3b8; font-size: 13px;">Need help? Reply to this email or reach out at ${SUPPORT_EMAIL}.</p>
     `),
-    }
+  };
 }
 
 // --- Email Verification ---
 export function verificationEmail(name: string, token: string): EmailTemplate {
-    const verificationUrl = `${BASE_URL}/auth/verify?token=${token}`
-    return {
-        subject: `Verify your ${BRAND_NAME} account`,
-        html: emailLayout(`
+  const verificationUrl = `${BASE_URL}/auth/verify?token=${token}`;
+  return {
+    subject: `Verify your ${BRAND_NAME} account`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Verify your email</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, please click the button below to verify your email address:</p>
       ${primaryButton("Verify Email Address", verificationUrl)}
@@ -98,15 +98,15 @@ export function verificationEmail(name: string, token: string): EmailTemplate {
       <p style="color: #94a3b8; font-size: 13px;">This link expires in 24 hours.</p>
       <p style="color: #94a3b8; font-size: 13px;">If you didn't create this account, you can safely ignore this email.</p>
     `),
-    }
+  };
 }
 
 // --- Password Reset ---
 export function passwordResetEmail(name: string, token: string): EmailTemplate {
-    const resetUrl = `${BASE_URL}/auth/reset-password?token=${token}`
-    return {
-        subject: `Reset your ${BRAND_NAME} password`,
-        html: emailLayout(`
+  const resetUrl = `${BASE_URL}/auth/reset-password?token=${token}`;
+  return {
+    subject: `Reset your ${BRAND_NAME} password`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Password Reset Request</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, we received a request to reset your password. Click the button below:</p>
       ${primaryButton("Reset Password", resetUrl)}
@@ -114,16 +114,19 @@ export function passwordResetEmail(name: string, token: string): EmailTemplate {
       <p style="color: #94a3b8; font-size: 13px;">This link expires in 1 hour.</p>
       <p style="color: #94a3b8; font-size: 13px;">If you didn't request this, you can safely ignore this email.</p>
     `),
-    }
+  };
 }
 
 // --- Order Confirmation ---
-export function orderConfirmationEmail(name: string, order: any): EmailTemplate {
-    const orderUrl = `${BASE_URL}/orders/${order._id}`
+export function orderConfirmationEmail(
+  name: string,
+  order: any,
+): EmailTemplate {
+  const orderUrl = `${BASE_URL}/orders/${order._id}`;
 
-    const itemsHtml = (order.items || [])
-        .map(
-            (item: any) => `
+  const itemsHtml = (order.items || [])
+    .map(
+      (item: any) => `
       <tr>
         <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9; color: #334155;">
           ${item.name || item.product?.name || "Product"}
@@ -132,13 +135,13 @@ export function orderConfirmationEmail(name: string, order: any): EmailTemplate 
         </td>
         <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9; text-align: center; color: #334155;">${item.quantity}</td>
         <td style="padding: 12px 8px; border-bottom: 1px solid #f1f5f9; text-align: right; color: #334155; font-weight: 600;">₹${item.price}</td>
-      </tr>`
-        )
-        .join("")
+      </tr>`,
+    )
+    .join("");
 
-    return {
-        subject: `Order Confirmed — ${order.orderNumber}`,
-        html: emailLayout(`
+  return {
+    subject: `Order Confirmed — ${order.orderNumber}`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Order Confirmed! ✅</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, thank you for your order! Here are the details:</p>
 
@@ -164,29 +167,34 @@ export function orderConfirmationEmail(name: string, order: any): EmailTemplate 
       ${primaryButton("View Order", orderUrl)}
       <p style="color: #94a3b8; font-size: 13px;">We'll send you a shipping notification with tracking information once your order ships.</p>
     `),
-    }
+  };
 }
 
 // --- Order Status Update ---
-export function orderStatusUpdateEmail(name: string, order: any, newStatus: string): EmailTemplate {
-    const orderUrl = `${BASE_URL}/orders/${order._id}`
+export function orderStatusUpdateEmail(
+  name: string,
+  order: any,
+  newStatus: string,
+): EmailTemplate {
+  const orderUrl = `${BASE_URL}/orders/${order._id}`;
 
-    const statusMessages: Record<string, string> = {
-        confirmed: "Your order has been confirmed and is being prepared.",
-        processing: "Your order is currently being processed.",
-        shipped: "Great news! Your order has been shipped. 🚚",
-        out_for_delivery: "Your order is out for delivery! 📦",
-        delivered: "Your order has been delivered successfully. ✅",
-        cancelled: "Your order has been cancelled.",
-        returned: "Your return has been processed.",
-        refunded: "Your refund has been processed.",
-    }
+  const statusMessages: Record<string, string> = {
+    confirmed: "Your order has been confirmed and is being prepared.",
+    processing: "Your order is currently being processed.",
+    shipped: "Great news! Your order has been shipped. 🚚",
+    out_for_delivery: "Your order is out for delivery! 📦",
+    delivered: "Your order has been delivered successfully. ✅",
+    cancelled: "Your order has been cancelled.",
+    returned: "Your return has been processed.",
+    refunded: "Your refund has been processed.",
+  };
 
-    const message = statusMessages[newStatus] || "Your order status has been updated."
+  const message =
+    statusMessages[newStatus] || "Your order status has been updated.";
 
-    return {
-        subject: `Order Update — ${order.orderNumber}`,
-        html: emailLayout(`
+  return {
+    subject: `Order Update — ${order.orderNumber}`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Order Update</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, ${message}</p>
 
@@ -198,19 +206,19 @@ export function orderStatusUpdateEmail(name: string, order: any, newStatus: stri
 
       ${primaryButton("View Order", orderUrl)}
     `),
-    }
+  };
 }
 
 // --- Shipping Notification ---
 export function shippingNotificationEmail(
-    name: string,
-    order: any,
-    trackingNumber: string,
-    trackingUrl: string
+  name: string,
+  order: any,
+  trackingNumber: string,
+  trackingUrl: string,
 ): EmailTemplate {
-    return {
-        subject: `Your order ${order.orderNumber} has shipped! 🚚`,
-        html: emailLayout(`
+  return {
+    subject: `Your order ${order.orderNumber} has shipped! 🚚`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Your order is on its way!</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, great news! Your order has been shipped.</p>
 
@@ -222,14 +230,14 @@ export function shippingNotificationEmail(
 
       ${primaryButton("Track Your Order", trackingUrl)}
     `),
-    }
+  };
 }
 
 // --- Payment Failed ---
 export function paymentFailedEmail(name: string, order: any): EmailTemplate {
-    return {
-        subject: `Payment failed for order ${order.orderNumber}`,
-        html: emailLayout(`
+  return {
+    subject: `Payment failed for order ${order.orderNumber}`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Payment Failed</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, unfortunately, the payment for your order could not be processed.</p>
 
@@ -241,14 +249,18 @@ export function paymentFailedEmail(name: string, order: any): EmailTemplate {
       <p style="color: #475569; line-height: 1.6;">You can try placing the order again with a different payment method.</p>
       ${primaryButton("Retry Payment", `${BASE_URL}/checkout`)}
     `),
-    }
+  };
 }
 
 // --- Refund Processed ---
-export function refundProcessedEmail(name: string, order: any, amount: number): EmailTemplate {
-    return {
-        subject: `Refund processed — ${order.orderNumber}`,
-        html: emailLayout(`
+export function refundProcessedEmail(
+  name: string,
+  order: any,
+  amount: number,
+): EmailTemplate {
+  return {
+    subject: `Refund processed — ${order.orderNumber}`,
+    html: emailLayout(`
       <h2 style="color: #1e293b; margin: 0 0 16px;">Refund Processed ✅</h2>
       <p style="color: #475569; line-height: 1.6;">Hi ${name}, your refund has been processed successfully.</p>
 
@@ -260,30 +272,30 @@ export function refundProcessedEmail(name: string, order: any, amount: number): 
       <p style="color: #475569; line-height: 1.6;">The refund will be credited to your original payment method within 5-7 business days.</p>
       ${primaryButton("View Order", `${BASE_URL}/orders/${order._id}`)}
     `),
-    }
+  };
 }
 
 // --- Support Ticket ---
 export function supportTicketEmail(ticket: any): {
-    customerEmail: EmailTemplate
-    supportEmail: EmailTemplate
+  customerEmail: EmailTemplate;
+  supportEmail: EmailTemplate;
 } {
-    const ticketUrl = `${BASE_URL}/support/tickets/${ticket._id}`
+  const ticketUrl = `${BASE_URL}/support/tickets/${ticket._id}`;
 
-    const categoryLabels: Record<string, string> = {
-        order: "Order Issue",
-        product: "Product Issue",
-        payment: "Payment Issue",
-        shipping: "Shipping Issue",
-        account: "Account Issue",
-        technical: "Technical Issue",
-        other: "Other",
-    }
+  const categoryLabels: Record<string, string> = {
+    order: "Order Issue",
+    product: "Product Issue",
+    payment: "Payment Issue",
+    shipping: "Shipping Issue",
+    account: "Account Issue",
+    technical: "Technical Issue",
+    other: "Other",
+  };
 
-    return {
-        customerEmail: {
-            subject: `Support Ticket Created — ${ticket.ticketNumber}`,
-            html: emailLayout(`
+  return {
+    customerEmail: {
+      subject: `Support Ticket Created — ${ticket.ticketNumber}`,
+      html: emailLayout(`
         <h2 style="color: #1e293b; margin: 0 0 16px;">Support Ticket Created</h2>
         <p style="color: #475569; line-height: 1.6;">Hi ${ticket.user?.name}, we've received your support ticket and our team will review it shortly.</p>
 
@@ -296,10 +308,10 @@ export function supportTicketEmail(ticket: any): {
         ${primaryButton("View Ticket", ticketUrl)}
         <p style="color: #94a3b8; font-size: 13px;">We aim to respond within 24 hours. Keep ticket number <strong>${ticket.ticketNumber}</strong> for reference.</p>
       `),
-        },
-        supportEmail: {
-            subject: `New Support Ticket — ${ticket.ticketNumber}`,
-            html: emailLayout(`
+    },
+    supportEmail: {
+      subject: `New Support Ticket — ${ticket.ticketNumber}`,
+      html: emailLayout(`
         <h2 style="color: #1e293b; margin: 0 0 16px;">New Support Ticket</h2>
         <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <p style="margin: 0 0 8px;"><strong>Ticket:</strong> ${ticket.ticketNumber}</p>
@@ -314,6 +326,6 @@ export function supportTicketEmail(ticket: any): {
         </div>
         ${primaryButton("View Ticket", ticketUrl)}
       `),
-        },
-    }
+    },
+  };
 }

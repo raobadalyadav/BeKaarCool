@@ -110,7 +110,7 @@ export default function ReturnsPage() {
                 <Package className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Free Pickup</h3>
-              <p className="text-gray-600">We'll arrange free pickup from your location - no hassle</p>
+              <p className="text-gray-600">We&apos;ll arrange free pickup from your location - no hassle</p>
             </CardContent>
           </Card>
           <Card className="text-center">

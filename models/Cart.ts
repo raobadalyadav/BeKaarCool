@@ -8,7 +8,7 @@ import mongoose, { Document, Model } from "mongoose";
 export interface ICartItem {
   _id?: mongoose.Types.ObjectId;
   product?: mongoose.Types.ObjectId;
-  // customProduct removed
+
   quantity: number;
   size: string;
   color: string;
@@ -41,7 +41,7 @@ const cartItemSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
     },
-    // customProduct field removed
+
     quantity: {
       type: Number,
       required: [true, "Quantity is required"],

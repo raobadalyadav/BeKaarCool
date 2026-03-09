@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Search, X, Clock, TrendingUp, Filter, Sparkles } from "lucide-react"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 interface SearchResult {
   _id: string
@@ -174,7 +175,7 @@ export function EnhancedSearch({
                       onClick={() => router.push(`/products/${product.slug || product._id}`)}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
                     >
-                      <img
+                      <Image fill
                         src={product.images[0] || "/placeholder.svg"}
                         alt={product.name}
                         className="w-10 h-10 rounded-md object-cover"
@@ -213,7 +214,7 @@ export function EnhancedSearch({
                     onClick={() => handleSearch(query)}
                     className="w-full mt-2 text-primary hover:text-primary"
                   >
-                    View all results for "{query}"
+                    View all results for &ldquo;{query}&rdquo;
                   </Button>
                 )}
               </div>
@@ -348,7 +349,7 @@ export function EnhancedSearch({
             {query.length >= 2 && !loading && results.length === 0 && suggestions.length === 0 && (
               <div className="p-4 text-center">
                 <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No results found for "{query}"</p>
+                <p className="text-sm text-muted-foreground">No results found for &ldquo;{query}&rdquo;</p>
                 <p className="text-xs text-muted-foreground mt-1">Try different keywords or browse categories</p>
                 <div className="mt-3 flex flex-wrap gap-2 justify-center">
                   {["T-shirts", "Hoodies", "Mugs", "Custom"].map((suggestion) => (

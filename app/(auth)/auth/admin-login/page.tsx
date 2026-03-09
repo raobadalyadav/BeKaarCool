@@ -94,7 +94,7 @@ export default function AdminLoginPage() {
                     </div>
                     <h1 className="text-4xl font-bold text-white mb-4">Admin Portal</h1>
                     <p className="text-xl text-gray-300 mb-8">
-                        Secure access to Baefikra's administrative dashboard
+                        Secure access to Baefikra&apos;s administrative dashboard
                     </p>
                     <div className="space-y-4 text-left">
                         <div className="flex items-center gap-3 bg-white/10 p-4 rounded-lg">

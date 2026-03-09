@@ -10,9 +10,10 @@ import { BlogPost } from "@/models/BlogPost"
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session || session.user?.role !== "admin") {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
@@ -20,7 +21,7 @@ export async function GET(
 
         await connectDB()
 
-        const post = await BlogPost.findById(params.id)
+        const post = await BlogPost.findById(id)
             .populate("author", "name email")
 
         if (!post) {
@@ -38,9 +39,10 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session || session.user?.role !== "admin") {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
@@ -49,7 +51,7 @@ export async function PUT(
         await connectDB()
 
         const data = await request.json()
-        const post = await BlogPost.findById(params.id)
+        const post = await BlogPost.findById(id)
 
         if (!post) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 })
@@ -62,7 +64,7 @@ export async function PUT(
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-|-$/g, "")
 
-            const existingPost = await BlogPost.findOne({ slug: newSlug, _id: { $ne: params.id } })
+            const existingPost = await BlogPost.findOne({ slug: newSlug, _id: { $ne: id } })
             if (existingPost) {
                 newSlug = `${newSlug}-${Date.now()}`
             }
@@ -78,7 +80,7 @@ export async function PUT(
         }
 
         const updatedPost = await BlogPost.findByIdAndUpdate(
-            params.id,
+            id,
             { $set: data },
             { new: true, runValidators: true }
         ).populate("author", "name email")
@@ -94,9 +96,10 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session || session.user?.role !== "admin") {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
@@ -104,7 +107,7 @@ export async function DELETE(
 
         await connectDB()
 
-        const post = await BlogPost.findByIdAndDelete(params.id)
+        const post = await BlogPost.findByIdAndDelete(id)
 
         if (!post) {
             return NextResponse.json({ message: "Post not found" }, { status: 404 })

@@ -16,7 +16,6 @@ import {
   Tag,
   Truck,
   FileText,
-  Store,
 } from "lucide-react"
 
 interface AdminSidebarProps {

@@ -9,9 +9,10 @@ import { resolveUserId } from "@/lib/auth-utils"
 // POST: Create return/replace request
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -20,7 +21,6 @@ export async function POST(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const { id } = await (params as any)
         const body = await request.json()
 
         const { type, reason, items, images } = body
@@ -104,9 +104,10 @@ export async function POST(
 // GET: Get return request status
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -115,7 +116,6 @@ export async function GET(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const { id } = await (params as any)
 
         const returnRequest = await ReturnRequest.findOne({ order: id, user: userId })
             .populate("order", "orderNumber total")

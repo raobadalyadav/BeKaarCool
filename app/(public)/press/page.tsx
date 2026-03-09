@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 import Link from "next/link"
-import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {

@@ -11,14 +11,7 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "@/components/ui/select"
-import { Heart, ShoppingCart, Star, X, ExternalLink } from "lucide-react"
+import { Heart, ShoppingCart, Star, ExternalLink } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Product {

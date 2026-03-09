@@ -186,7 +186,7 @@ export default function PrivacyPage() {
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Introduction</h2>
             <p className="text-gray-700 leading-relaxed">
-              Baefikra ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how
+              Baefikra (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how
               we collect, use, disclose, and safeguard your information when you visit our website or use our services.
               Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy,
               please do not access the site or use our services.

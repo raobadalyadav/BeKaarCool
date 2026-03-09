@@ -69,7 +69,7 @@ export default function SizeGuidePage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Shirt className="h-5 w-5" />
-                      Men's T-Shirt Sizes
+                      Men&apos;s T-Shirt Sizes
                       <Badge variant="secondary">All measurements in inches</Badge>
                     </CardTitle>
                   </CardHeader>
@@ -105,7 +105,7 @@ export default function SizeGuidePage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Shirt className="h-5 w-5" />
-                      Women's T-Shirt Sizes
+                      Women&apos;s T-Shirt Sizes
                       <Badge variant="secondary">All measurements in inches</Badge>
                     </CardTitle>
                   </CardHeader>

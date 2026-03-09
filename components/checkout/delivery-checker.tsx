@@ -5,9 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
-    MapPin, Truck, Clock, CheckCircle, Package, Calendar, AlertCircle
+    MapPin, Truck, CheckCircle, Package, Calendar, AlertCircle
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 

@@ -3,18 +3,17 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, CreditCard, Smartphone, Banknote, Shield, Truck, Wallet, Globe } from "lucide-react"
+import { Loader2, CreditCard, Banknote, Shield, Truck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useAppSelector, useAppDispatch } from "@/store"
 import { clearCart, fetchCart, loadFromStorage } from "@/store/slices/cart-slice"
 import Script from "next/script"
+import Image from "next/image"
 
 declare global {
     interface Window {
@@ -442,7 +441,7 @@ export default function CheckoutPage() {
                                     <div key={idx} className="flex gap-3 text-sm">
                                         <div className="w-12 h-12 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                                             {item.image && (
-                                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                <Image fill src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">

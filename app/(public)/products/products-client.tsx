@@ -383,7 +383,7 @@ export default function ProductsPageClient() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">No Products Found</h3>
               <p className="text-gray-500 max-w-sm mb-8">
-                We couldn't find any products matching your filters. Try adjusting your search or clearing filters.
+                We couldn&apos;t find any products matching your filters. Try adjusting your search or clearing filters.
               </p>
               <Button onClick={clearAllFilters}>Clear All Filters</Button>
             </div>

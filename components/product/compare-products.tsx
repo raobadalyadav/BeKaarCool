@@ -1,24 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
 } from "@/components/ui/dialog"
-import { Scale, X, Star, Check, Minus, ShoppingCart } from "lucide-react"
+import { Scale, X, Star, ShoppingCart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Product {
-    _id: string
+    _id: strin
     name: string
     slug: string
     images: string[]

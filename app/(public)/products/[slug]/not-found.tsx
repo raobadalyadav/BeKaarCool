@@ -11,7 +11,7 @@ export default function ProductNotFound() {
           <Package className="h-16 w-16 mx-auto mb-4 text-gray-400" />
           <h1 className="text-2xl font-bold mb-2">Product Not Found</h1>
           <p className="text-gray-600 mb-6">
-            The product you're looking for doesn't exist or has been removed.
+            The product you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <div className="space-y-3">
             <Button asChild className="w-full">

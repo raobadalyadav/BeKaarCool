@@ -200,7 +200,7 @@ export default function TermsPage() {
             <CardContent className="p-6">
               <h3 className="font-semibold text-gray-900 mb-2">Questions about our Terms?</h3>
               <p className="text-gray-600 mb-4">
-                If you have any questions about these Terms of Service, please don't hesitate to contact us.
+                If you have any questions about these Terms of Service, please don&apos;t hesitate to contact us.
               </p>
               <div className="flex flex-col sm:flex-row gap-2 justify-center">
                 <a href="/contact" className="text-blue-600 hover:text-blue-800 font-medium">

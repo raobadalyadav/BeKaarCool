@@ -24,6 +24,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { useAppSelector, useAppDispatch } from "@/store"
 import { fetchCart, updateCartItem, removeFromCart, applyCoupon, removeCoupon } from "@/store/slices/cart-slice"
+import Image from "next/image"
 
 export default function CartPage() {
   const { data: session } = useSession()
@@ -182,7 +183,7 @@ export default function CartPage() {
           <div className="text-center">
             <ShoppingBag className="h-24 w-24 text-gray-400 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
-            <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
+            <p className="text-gray-600 mb-8">Looks like you&apos;haven't added any items to your cart yet.</p>
             <div className="space-y-4">
               <Link href="/products">
                 <Button size="lg" className="w-full sm:w-auto">
@@ -221,7 +222,7 @@ export default function CartPage() {
               <Card key={item.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex space-x-4">
-                    <img
+                    <Image fill
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-lg"

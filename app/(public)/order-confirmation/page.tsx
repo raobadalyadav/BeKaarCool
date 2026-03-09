@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -55,7 +55,6 @@ function OrderConfirmationContent() {
   const [error, setError] = useState("")
   
   const searchParams = useSearchParams()
-  const router = useRouter()
   const orderId = searchParams.get("orderId")
   const orderNumber = searchParams.get("orderNumber")
   const success = searchParams.get("success")
@@ -163,7 +162,7 @@ function OrderConfirmationContent() {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
           <p className="text-gray-600 text-lg">
-            Thank you for your order. We'll send you a confirmation email shortly.
+            Thank you for your order. We&apos;ll send you a confirmation email shortly.
           </p>
         </div>
 
@@ -365,7 +364,7 @@ function OrderConfirmationContent() {
                 </div>
                 <h3 className="font-medium mb-2">Order Confirmation</h3>
                 <p className="text-sm text-gray-600">
-                  You'll receive an email confirmation with your order details.
+                  You&apos;ll receive an email confirmation with your order details.
                 </p>
               </div>
               <div className="text-center">
@@ -374,7 +373,7 @@ function OrderConfirmationContent() {
                 </div>
                 <h3 className="font-medium mb-2">Order Processing</h3>
                 <p className="text-sm text-gray-600">
-                  We'll prepare your order and send you tracking information.
+                  We&apos;ll prepare your order and send you tracking information.
                 </p>
               </div>
               <div className="text-center">

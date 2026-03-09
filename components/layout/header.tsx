@@ -8,7 +8,6 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart/cart-sheet"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
-import { Search, ShoppingCart, User, Menu, Globe, DollarSign, Sun, Moon, Palette, Store } from "lucide-react"
+import { Search, User, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useToast } from "@/hooks/use-toast"
 import { useAppSelector, useAppDispatch } from "@/store"

@@ -127,7 +127,7 @@ function LoginForm() {
           </div>
           <h1 className="text-4xl font-bold text-black mb-4">Baefikra</h1>
           <p className="text-xl text-black/80 mb-8">
-            India's coolest fashion destination. Login to access exclusive deals, track orders, and more!
+            India`&apos;s coolest fashion destination. Login to access exclusive deals, track orders, and more!
           </p>
           <div className="grid grid-cols-2 gap-4 text-left">
             <div className="bg-black/10 p-4 rounded-lg">
@@ -275,7 +275,7 @@ function LoginForm() {
             </Button>
 
             <p className="text-center text-gray-600 mt-6">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/auth/register" className="text-yellow-600 hover:text-yellow-700 font-semibold">
                 Sign up
               </Link>

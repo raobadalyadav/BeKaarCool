@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Package, Search, MapPin, Clock, CheckCircle, Home, AlertCircle, Phone, Mail } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
 
 interface TrackingInfo {
   orderNumber: string
@@ -351,7 +352,8 @@ export default function TrackOrderPage() {
                   <div className="space-y-4">
                     {trackingInfo.orderDetails.items.map((item, index) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <img
+                        <Image
+                        fill
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           className="w-12 h-12 object-cover rounded"
@@ -429,21 +431,21 @@ export default function TrackOrderPage() {
                   <h3 className="font-semibold mb-2">Where to find your order number:</h3>
                   <ul className="space-y-1 text-sm text-gray-600">
                     <li>• Check your order confirmation email</li>
-                    <li>• Look in your account under "My Orders"</li>
+                    <li>• Look in your account under &ldquo;My Orders&ldquo;</li>
                     <li>• Find it on your receipt or invoice</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-2">Order number format:</h3>
                   <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• Usually starts with "DR" followed by numbers</li>
+                    <li>• Usually starts with &ldquo;DR&ldquo; followed by numbers</li>
                     <li>• Example: DR123456789</li>
                     <li>• Case insensitive</li>
                   </ul>
                 </div>
                 <Separator />
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-4">Still can't find your order? Contact our support team.</p>
+                  <p className="text-sm text-gray-600 mb-4">Still can&apos;t find your order? Contact our support team.</p>
                   <Button variant="outline">Contact Support</Button>
                 </div>
               </div>

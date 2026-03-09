@@ -8,9 +8,10 @@ import { resolveUserId } from "@/lib/auth-utils"
 // GET: Get single ticket details
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -19,7 +20,6 @@ export async function GET(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const { id } = await (params as any)
 
         const ticket = await SupportTicket.findOne({ _id: id, user: userId })
             .populate("orderId", "orderNumber total status")
@@ -39,9 +39,10 @@ export async function GET(
 // POST: Add message to ticket
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -50,7 +51,6 @@ export async function POST(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const { id } = await (params as any)
         const { message, attachments } = await request.json()
 
         if (!message) {
@@ -98,9 +98,10 @@ export async function POST(
 // PUT: Close ticket
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -109,7 +110,6 @@ export async function PUT(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const { id } = await (params as any)
         const { action } = await request.json()
 
         const ticket = await SupportTicket.findOne({ _id: id, user: userId })

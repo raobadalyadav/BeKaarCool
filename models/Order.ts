@@ -34,7 +34,7 @@ export type PaymentMethod =
 
 export interface IOrderItem {
   product?: mongoose.Types.ObjectId;
-  // customProduct removed
+
   name: string; // Snapshot of product name at time of order
   image: string; // Snapshot of product image
   quantity: number;
@@ -140,7 +140,7 @@ const orderItemSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
     },
-    // customProduct field removed
+
     name: { type: String, required: true },
     image: { type: String, required: true },
     quantity: {

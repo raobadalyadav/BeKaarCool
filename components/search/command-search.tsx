@@ -12,7 +12,8 @@ import {
   CommandSeparator,
 } from "@/components/ui/command"
 import { Badge } from "@/components/ui/badge"
-import { Search, Package, Tag, User, Sparkles, TrendingUp } from "lucide-react"
+import { Search, Package, Tag, Sparkles, TrendingUp } from "lucide-react"
+import Image from "next/image"
 
 interface CommandSearchProps {
   open: boolean
@@ -103,7 +104,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
                 onSelect={() => handleSelect(product._id, "product")}
                 className="flex items-center gap-3 p-3"
               >
-                <img
+                <Image fill
                   src={product.images[0] || "/placeholder.svg"}
                   alt={product.name}
                   className="w-10 h-10 rounded-md object-cover"
@@ -203,7 +204,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
                 className="flex items-center gap-3"
               >
                 <Search className="h-4 w-4" />
-                <span>Search for "{query}"</span>
+                <span>Search for &ldquo;{query}&rdquo;</span>
               </CommandItem>
             </CommandGroup>
           </>

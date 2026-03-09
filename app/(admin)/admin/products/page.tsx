@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,17 +11,17 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Package, Plus, Search, Filter, MoreHorizontal, Edit, Trash2, Eye, Star,
-  TrendingUp, ChevronDown, AlertTriangle, X, Upload, ArrowUpDown
+  Package, Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Star, ChevronDown, AlertTriangle, ArrowUpDown
 } from "lucide-react"
 import { getStatusColor } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 import { ImageUpload } from "@/components/admin/ImageUpload"
+import Image from "next/image"
 
 interface Product {
   _id: string
@@ -786,7 +786,8 @@ export default function AdminProductsPage() {
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
                           {product.images.length > 0 ? (
-                            <img
+                            <Image
+                              fill
                               src={product.images[0] || "/placeholder.svg"}
                               alt={product.name}
                               className="w-full h-full object-cover"

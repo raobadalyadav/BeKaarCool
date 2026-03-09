@@ -3,10 +3,10 @@ import { ShippingProvider, trackShipment } from "@/lib/shipping"
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { awb: string } }
+    { params }: { params: Promise<{ awb: string }> }
 ) {
     try {
-        const awb = params.awb
+        const { awb } = await params
         const { searchParams } = new URL(request.url)
         const provider = (searchParams.get("provider") || "shiprocket") as ShippingProvider
 

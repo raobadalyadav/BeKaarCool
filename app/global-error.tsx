@@ -1,6 +1,5 @@
 'use client';
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Home, AlertTriangle } from "lucide-react"
 
 export default function GlobalError({
@@ -35,13 +34,13 @@ export default function GlobalError({
                             >
                                 Try Again
                             </button>
-                            <a
+                            <Link
                                 href="/"
                                 className="border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg inline-flex items-center justify-center"
                             >
                                 <Home className="w-4 h-4 mr-2" />
                                 Go Home
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>

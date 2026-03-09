@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import {
-    Search, Calendar, User, ChevronRight, ChevronLeft, Home, BookOpen
+    Search, Calendar, ChevronRight, ChevronLeft, Home, BookOpen
 } from "lucide-react"
 
 interface BlogPost {

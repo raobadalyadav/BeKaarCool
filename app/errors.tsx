@@ -1,5 +1,4 @@
-import { AlertCircle, RefreshCcw, Home, RefreshCw, AlertTriangle } from "lucide-react"
-import { env } from "@/lib/env"
+import {  Home, RefreshCw, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"

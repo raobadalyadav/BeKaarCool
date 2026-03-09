@@ -5,12 +5,12 @@ import { BlogPost } from "@/models/BlogPost"
 // GET: Get single blog post by slug
 export async function GET(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
         await connectDB()
 
-        const { slug } = await (params as any)
+        const { slug } = await params
 
         const post = await BlogPost.findOne({ slug, status: "published" })
             .populate("author", "name avatar")
@@ -46,12 +46,12 @@ export async function GET(
 // PUT: Update blog post
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
         await connectDB()
 
-        const { slug } = await (params as any)
+        const { slug } = await params
         const body = await request.json()
 
         const post = await BlogPost.findOneAndUpdate(
@@ -74,12 +74,12 @@ export async function PUT(
 // DELETE: Delete blog post
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { slug: string } }
+    { params }: { params: Promise<{ slug: string }> }
 ) {
     try {
         await connectDB()
 
-        const { slug } = await (params as any)
+        const { slug } = await params
 
         const post = await BlogPost.findOneAndDelete({ slug })
 

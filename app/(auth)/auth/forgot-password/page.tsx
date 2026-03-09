@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>
             <p className="text-gray-600 mt-2">
-              No worries! Enter your email and we'll send you reset instructions.
+              No worries! Enter your email and we&apos;ll send you reset instructions.
             </p>
           </div>
 
@@ -150,7 +150,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <p className="text-center text-gray-500 text-sm mt-6">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/auth/register" className="text-yellow-600 hover:text-yellow-700 font-semibold">
             Sign up
           </Link>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -179,7 +179,7 @@ export default function SearchClient() {
                         {initialQuery && (
                             <>
                                 <ChevronRight className="w-4 h-4" />
-                                <span className="text-gray-900">"{initialQuery}"</span>
+                                <span className="text-gray-900">&ldquo;{initialQuery}&ldquo;</span>
                             </>
                         )}
                     </nav>
@@ -319,7 +319,7 @@ export default function SearchClient() {
                 ) : products.length > 0 ? (
                     <>
                         <p className="text-gray-600 mb-4">
-                            Found {totalPages > 1 ? `${(page - 1) * 20 + 1}-${Math.min(page * 20, products.length)} results` : `${products.length} results`} for "{initialQuery}"
+                            Found {totalPages > 1 ? `${(page - 1) * 20 + 1}-${Math.min(page * 20, products.length)} results` : `${products.length} results`} for &ldquo;{initialQuery}&ldquo;
                         </p>
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

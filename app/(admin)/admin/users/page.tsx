@@ -20,7 +20,6 @@ import {
   Filter,
   MoreHorizontal,
   Eye,
-  Edit,
   Trash2,
   UserPlus,
   Download,
@@ -38,7 +37,6 @@ import {
   Briefcase,
   Crown,
   Coins,
-  ShoppingBag,
 } from "lucide-react"
 import { formatDate, getStatusColor } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"

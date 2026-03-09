@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, Target, Award, Globe, Heart, Truck, Shield, Star, ArrowRight } from "lucide-react"
+import Image from "next/image"
 
 export default function AboutPage() {
   const stats = [
@@ -70,7 +71,7 @@ export default function AboutPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">About Baefikra</h1>
             <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              We're on a mission to make online shopping delightful, accessible, and trustworthy for everyone.
+              We&apos;re on a mission to make online shopping delightful, accessible, and trustworthy for everyone.
             </p>
             <Badge variant="secondary" className="text-lg px-6 py-2">
               Established 2019
@@ -110,17 +111,17 @@ export default function AboutPage() {
                 </p>
                 <p>
                   What began as a small team of passionate individuals has grown into a thriving marketplace serving
-                  thousands of customers across the country. We've built our reputation on trust, quality, and
+                  thousands of customers across the country. We&apos;ve built our reputation on trust, quality, and
                   exceptional customer service.
                 </p>
                 <p>
-                  Today, we're proud to be one of India's fastest-growing e-commerce platforms, offering everything from
+                  Today, we&apos;re proud to be one of India&apos;s fastest-growing e-commerce platforms, offering everything from
                   fashion and electronics to home decor and lifestyle products.
                 </p>
               </div>
             </div>
             <div className="relative">
-              <img src="/placeholder.jpg?height=400&width=600" alt="Our Story" className="rounded-lg shadow-lg" />
+              <Image fill src="/placeholder.jpg?height=400&width=600" alt="Our Story" className="rounded-lg shadow-lg" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
             </div>
           </div>
@@ -165,7 +166,7 @@ export default function AboutPage() {
             {team.map((member, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <img
+                  <Image fill
                     src={member.image || "/placeholder.svg"}
                     alt={member.name}
                     className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
@@ -202,7 +203,7 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Have questions about our company or want to partner with us? We'd love to hear from you.
+            Have questions about our company or want to partner with us? We&apos;d love to hear from you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg">Contact Us</Button>
