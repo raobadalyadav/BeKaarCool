@@ -121,7 +121,7 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="relative">
-              <Image fill src="/placeholder.jpg?height=400&width=600" alt="Our Story" className="rounded-lg shadow-lg" />
+              <Image fill src="/placeholder.jpg" alt="Our Story" className="rounded-lg shadow-lg" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
             </div>
           </div>

@@ -14,7 +14,7 @@ import { Scale, X, Star, ShoppingCart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Product {
-    _id: strin
+    _id: string
     name: string
     slug: string
     images: string[]

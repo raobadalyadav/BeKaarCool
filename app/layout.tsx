@@ -4,7 +4,6 @@ import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { env } from "@/lib/env";
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
@@ -93,7 +92,6 @@ export default function RootLayout({
               })
             }}
           />
-          <Toaster />
           <SonnerToaster />
         </Providers>
       </body>
