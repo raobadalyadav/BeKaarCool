@@ -23,9 +23,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Baefikra ",
-  description: " fast delivery across India.",
-  keywords: ["custom printing", "print on demand", "t-shirt design", "custom merchandise", "personalized gifts", "online marketplace"]
+  title: "Baefikra",
+  description: "Express your vibe with Baefikra. Premium oversized t-shirts, hoodies, and lifestyle accessories.",
+  keywords: ["oversized t-shirts", "streetwear", "urban fashion", "unisex apparel", "graphic tees", "lifestyle brand", "india fashion"]
 });
 
 export default function RootLayout({
@@ -58,7 +58,7 @@ export default function RootLayout({
                 "name": "Baefikra",
                 "url": env.NEXTAUTH_URL || "https://baefikra.com",
                 "logo": `${env.NEXTAUTH_URL || "https://baefikra.com"}/logo.png`,
-                "description": "Premium custom print-on-demand marketplace in India",
+                "description": "Premium lifestyle and fashion brand specialized in unconventional streetwear and accessories.",
                 "sameAs": [
                   "https://instagram.com/baefikra",
                   "https://twitter.com/baefikra"

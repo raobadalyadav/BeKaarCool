@@ -20,6 +20,11 @@ export async function GET(
     const userId = await resolveUserId(session.user.id, session.user.email);
     const { id } = await params;
 
+    // Validate the ID before passing to Mongoose to prevent CastError
+    if (!id || id === 'null' || id === 'undefined') {
+        return NextResponse.json({ message: "Invalid order ID" }, { status: 400 });
+    }
+
     const order = await Order.findById(id)
       .populate("items.product", "name images")
       .populate("user", "name email");
@@ -34,9 +39,12 @@ export async function GET(
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
-    // Generate invoice data
+    // Generate invoice data. order.orderNumber is "ORDXXXXXXX" (10 chars).
+    // Invoice number will be "INVXXXXXXX" (10 chars)
+    const shortInvoiceNumber = order.orderNumber.replace('ORD', 'INV');
+    
     const invoice = {
-      invoiceNumber: `INV-${order.orderNumber}`,
+      invoiceNumber: shortInvoiceNumber,
       orderNumber: order.orderNumber,
       date: order.createdAt,
       dueDate: order.estimatedDelivery,

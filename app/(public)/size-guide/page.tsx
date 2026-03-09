@@ -2,6 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Ruler, Shirt, Users, Info } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Size Guide | Baefikra",
+  description: "Find your perfect fit with Baefikra's comprehensive size guide for men's, women's, and kids' streetwear apparel.",
+}
 
 export default function SizeGuidePage() {
   const menSizes = [

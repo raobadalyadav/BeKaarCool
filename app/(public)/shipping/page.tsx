@@ -2,6 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Truck, Clock, MapPin, Package, Shield, CreditCard, AlertCircle, CheckCircle, Plane, Home } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Shipping Information | Baefikra",
+  description: "Learn about Baefikra's fast, reliable, and secure delivery options across India. Free shipping on orders above ₹999.",
+}
 
 export default function ShippingPage() {
   const shippingMethods = [

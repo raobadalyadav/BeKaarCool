@@ -2,6 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { FileText, Calendar, AlertCircle } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Terms of Service | Baefikra",
+  description: "Read Baefikra's terms of service. Understand our policies regarding orders, shipping, returns, and intellectual property.",
+}
 
 export default function TermsPage() {
   const lastUpdated = "January 15, 2024"

@@ -3,9 +3,9 @@ import { generateMetadata as generateSEOMetadata } from "@/lib/seo"
 import ProductsPageClient from "./products-client"
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Products - Custom Print-on-Demand Marketplace",
-  description: "Browse thousands of custom products including t-shirts, hoodies, mugs, phone cases and more. Filter by category, price, and brand.",
-  keywords: ["custom products", "print on demand", "t-shirts", "hoodies", "mugs", "phone cases", "personalized gifts"]
+  title: "Shop All Collections",
+  description: "Browse the latest in urban fashion and streetwear. From oversized t-shirts to trendy accessories, find your perfect vibe at Baefikra.",
+  keywords: ["streetwear", "oversized t-shirts", "graphic hoodies", "urban fashion", "casual wear", "lifestyle accessories"]
 })
 
 export default function ProductsPage() {

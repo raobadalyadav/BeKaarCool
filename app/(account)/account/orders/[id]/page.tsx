@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import Script from "next/script"
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -73,20 +75,35 @@ const statusConfig: Record<string, { color: string; icon: any; label: string }> 
     refunded: { color: "bg-gray-100 text-gray-700", icon: RotateCcw, label: "Refunded" }
 }
 
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
 const timelineSteps = ["confirmed", "processing", "shipped", "delivered"]
 
 export default function OrderDetailPage() {
     const params = useParams()
     const router = useRouter()
     const { toast } = useToast()
+    const { data: session } = useSession()
 
     const [order, setOrder] = useState<Order | null>(null)
     const [loading, setLoading] = useState(true)
     const [cancelling, setCancelling] = useState(false)
+    const [paymentProcessing, setPaymentProcessing] = useState(false)
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false)
 
     useEffect(() => {
         fetchOrder()
     }, [params.id])
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.Razorpay) {
+            setRazorpayLoaded(true)
+        }
+    }, [])
 
     const fetchOrder = async () => {
         try {
@@ -128,21 +145,99 @@ export default function OrderDetailPage() {
     }
 
     const handleDownloadInvoice = async () => {
+        if (!order?._id) {
+            toast({ title: "Order details not available", variant: "destructive" })
+            return
+        }
         try {
-            const res = await fetch(`/api/orders/${params.id}/invoice`)
-            if (res.ok) {
-                const blob = await res.blob()
-                const url = window.URL.createObjectURL(blob)
-                const a = document.createElement("a")
+            const response = await fetch(`/api/orders/${order._id}/invoice`)
+            if (response.ok) {
+                const invoice = await response.json()
+                const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
+                const htmlContent = generateStyledInvoiceHTML(invoice)
+                
+                // Create and download HTML file that can be printed as PDF
+                const blob = new Blob([htmlContent], { type: 'text/html' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
                 a.href = url
-                a.download = `invoice-${order?.orderNumber}.pdf`
+                a.download = `invoice-${invoice.orderNumber}.html`
                 a.click()
-                window.URL.revokeObjectURL(url)
+                URL.revokeObjectURL(url)
+                
+                toast({ title: "Invoice downloaded successfully" })
             } else {
                 toast({ title: "Failed to download invoice", variant: "destructive" })
             }
         } catch (error) {
             toast({ title: "Failed to download invoice", variant: "destructive" })
+        }
+    }
+
+    const handlePayNow = async () => {
+        if (!order) return
+        const isReady = razorpayLoaded || (typeof window !== "undefined" && !!window.Razorpay)
+        if (!isReady) {
+            toast({ title: "Payment system loading", description: "Please try again in a moment.", variant: "destructive" })
+            return
+        }
+
+        setPaymentProcessing(true)
+
+        try {
+            // 1. Initiate
+            const initRes = await fetch(`/api/orders/${order._id}/pay/initiate`, { method: "POST" })
+            const initData = await initRes.json()
+
+            if (!initRes.ok) throw new Error(initData.error || "Failed to initiate payment")
+
+            // 2. Open Razorpay
+            const options = {
+                key: initData.key,
+                amount: initData.amount,
+                currency: initData.currency,
+                name: "Baefikra",
+                description: `Payment for Order #${order.orderNumber}`,
+                order_id: initData.razorpayOrderId,
+                handler: async (response: any) => {
+                    // 3. Verify
+                    try {
+                        const verifyRes = await fetch(`/api/orders/${order._id}/pay/verify`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpayOrderId: response.razorpay_order_id,
+                                paymentId: response.razorpay_payment_id,
+                                signature: response.razorpay_signature
+                            })
+                        })
+
+                        const verifyData = await verifyRes.json()
+
+                        if (verifyRes.ok && verifyData.verified) {
+                            toast({ title: "Payment successful!" })
+                            fetchOrder() // Refresh UI
+                        } else {
+                            throw new Error(verifyData.message || "Payment verification failed")
+                        }
+                    } catch (err: any) {
+                        toast({ title: err.message || "Payment verification failed", variant: "destructive" })
+                    }
+                },
+                prefill: {
+                    email: session?.user?.email || "",
+                    contact: order.shippingAddress.phone || ""
+                },
+                theme: { color: "#FACC15" },
+                modal: { ondismiss: () => setPaymentProcessing(false) }
+            }
+
+            const razorpay = new window.Razorpay(options)
+            razorpay.open()
+
+        } catch (error: any) {
+            toast({ title: error.message || "Failed to start payment", variant: "destructive" })
+            setPaymentProcessing(false)
         }
     }
 
@@ -182,6 +277,11 @@ export default function OrderDetailPage() {
     const currentStepIndex = timelineSteps.indexOf(order.status)
 
     return (
+        <>
+        <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            onLoad={() => setRazorpayLoaded(true)}
+        />
         <div className="space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -364,6 +464,16 @@ export default function OrderDetailPage() {
             <Card>
                 <CardContent className="py-4">
                     <div className="flex flex-wrap gap-3">
+                        {order.paymentMethod === 'cod' && order.paymentStatus !== 'paid' && !["cancelled", "refunded", "delivered"].includes(order.status.toLowerCase()) && (
+                            <Button
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={handlePayNow}
+                                disabled={paymentProcessing}
+                            >
+                                <CreditCard className="w-4 h-4 mr-2" />
+                                {paymentProcessing ? "Processing..." : "Pay Now Online"}
+                            </Button>
+                        )}
                         <Button variant="outline" onClick={handleDownloadInvoice}>
                             <FileText className="w-4 h-4 mr-2" /> Download Invoice
                         </Button>
@@ -446,5 +556,6 @@ export default function OrderDetailPage() {
                 </CardContent>
             </Card>
         </div>
+        </>
     )
 }

@@ -1,6 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Calendar, Lock, Eye, Database, UserCheck } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Privacy Policy | Baefikra",
+  description: "Learn how Baefikra protects your privacy, personal information, and data collected on our streetwear and lifestyle platform.",
+}
 
 export default function PrivacyPage() {
   const lastUpdated = "January 15, 2024"

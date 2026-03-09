@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
 
     const orders = await Order.find(filter)
-      .populate("items.product", "name images price category description")
+      .populate("items.product", "name slug images price category description")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -124,10 +124,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create order
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+    // Generate a 10 character order number: ORD + 7 random uppercase alphanumeric chars
+    const randomChars = Math.random().toString(36).substring(2, 9).toUpperCase();
+    const orderNumber = `ORD${randomChars}`;
 
-    // Determine status
     const initialPaymentStatus = paymentStatus || (paymentMethod === "cod" ? "pending" : "pending")
     // If online payment is initialized, status is pending. If explicitly "completed" (e.g. from verify), use that.
 

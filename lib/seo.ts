@@ -12,15 +12,17 @@ export interface SEOConfig {
 }
 
 const defaultSEO = {
-  title: "Baefikra - Custom Print-on-Demand & Design Marketplace",
+  title: "Baefikra - Premium Lifestyle & Fashion for the Unconventional",
   description:
-    "Create and sell on t-shirts, hoodies, mugs, and more. Premium quality printing with fast delivery across India.",
+    "Discover high-quality oversized t-shirts, hoodies, streetwear, and accessories at Baefikra. Premium quality, urban style, and fast delivery across India.",
   keywords: [
-    "custom printing",
-    "print on demand",
-    "t-shirt design",
-    "custom merchandise",
-    "personalized gifts",
+    "oversized t-shirts",
+    "streetwear india",
+    "urban fashion",
+    "graphic hoodies",
+    "unisex apparel",
+    "premium lifestyle brand",
+    "baefikra fashion",
   ],
   image: "/og-image.jpg",
   url: env.NEXTAUTH_URL || "https://baefikra.com",

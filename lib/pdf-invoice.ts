@@ -11,7 +11,7 @@ export const generateInvoicePDF = (invoice: any) => {
     
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
-    doc.text('Custom Clothing & Print-on-Demand', 20, 40)
+    doc.text('Premium Lifestyle & Fashion', 20, 40)
     doc.text('Mumbai, Maharashtra, India', 20, 48)
     doc.text('Email: support@baefikra.com', 20, 56)
     doc.text('Phone: +91 9876543210', 20, 64)
@@ -174,7 +174,7 @@ export const generateStyledInvoiceHTML = (invoice: any): string => {
       <div class="header">
         <div class="company">
           <h1>Baefikra</h1>
-          <p>Custom Clothing & Print-on-Demand</p>
+          <p>Premium Lifestyle & Fashion</p>
           <p>Mumbai, Maharashtra, India</p>
           <p>Email: support@baefikra.com</p>
           <p>Phone: +91 9876543210</p>

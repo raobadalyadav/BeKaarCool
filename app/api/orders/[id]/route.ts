@@ -24,11 +24,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Validate ObjectId format or check if it's an orderNumber
     if (id && /^[0-9a-fA-F]{24}$/.test(id)) {
       order = await Order.findById(id)
-        .populate("items.product", "name images price category description")
+        .populate("items.product", "name slug images price category description")
         .populate("user", "name email")
-    } else if (id && id.startsWith('ORD-')) {
+    } else if (id && id.startsWith('ORD')) {
       order = await Order.findOne({ orderNumber: id })
-        .populate("items.product", "name images price category description")
+        .populate("items.product", "name slug images price category description")
         .populate("user", "name email")
     } else {
       return NextResponse.json({ message: "Invalid order ID or Number" }, { status: 400 })

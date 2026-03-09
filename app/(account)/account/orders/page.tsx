@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import Script from "next/script"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Package, ChevronLeft, ChevronRight, Eye, Search, Download, X, AlertTriangle, RefreshCw, Truck, CheckCircle, XCircle } from "lucide-react"
+import { Package, ChevronLeft, ChevronRight, Eye, Search, Download, X, AlertTriangle, RefreshCw, Truck, CheckCircle, XCircle, CreditCard } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
@@ -35,6 +36,7 @@ interface Order {
     orderNumber: string
     status: string
     paymentStatus: string
+    paymentMethod?: string
     total: number
     totalAmount?: number
     items: OrderItem[]
@@ -60,6 +62,12 @@ const statusColors: Record<string, string> = {
     refunded: "bg-gray-100 text-gray-700"
 }
 
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
 export default function MyOrdersPage() {
     const { data: session } = useSession()
     const [orders, setOrders] = useState<Order[]>([])
@@ -74,12 +82,20 @@ export default function MyOrdersPage() {
     })
     const [cancelReason, setCancelReason] = useState("")
     const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
+    const [paymentProcessingId, setPaymentProcessingId] = useState<string | null>(null)
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false)
 
     useEffect(() => {
         if (session) {
             fetchOrders()
         }
     }, [session, pagination.page, statusFilter])
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.Razorpay) {
+            setRazorpayLoaded(true)
+        }
+    }, [])
 
     const fetchOrders = async () => {
         setLoading(true)
@@ -139,7 +155,84 @@ export default function MyOrdersPage() {
         }
     }
 
+    const handlePayNow = async (order: Order) => {
+        // Fallback check in case state hasn't updated but script is there
+        const isReady = razorpayLoaded || (typeof window !== "undefined" && !!window.Razorpay)
+        if (!isReady) {
+            toast.error("Payment system is loading. Please try again in a few seconds.")
+            return
+        }
+
+        setPaymentProcessingId(order._id)
+
+        try {
+            // 1. Initiate Razorpay Order
+            const initRes = await fetch(`/api/orders/${order._id}/pay/initiate`, {
+                method: "POST"
+            })
+            const initData = await initRes.json()
+
+            if (!initRes.ok) throw new Error(initData.error || "Failed to initiate payment")
+
+            // 2. Open Razorpay Checkout
+            const options = {
+                key: initData.key,
+                amount: initData.amount,
+                currency: initData.currency,
+                name: "Baefikra",
+                description: `Payment for Order #${order.orderNumber}`,
+                order_id: initData.razorpayOrderId,
+                handler: async (response: any) => {
+                    // 3. Verify Payment
+                    try {
+                        const verifyRes = await fetch(`/api/orders/${order._id}/pay/verify`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpayOrderId: response.razorpay_order_id,
+                                paymentId: response.razorpay_payment_id,
+                                signature: response.razorpay_signature
+                            })
+                        })
+
+                        const verifyData = await verifyRes.json()
+
+                        if (verifyRes.ok && verifyData.verified) {
+                            toast.success("Payment successful!")
+                            fetchOrders() // Refresh orders
+                        } else {
+                            throw new Error(verifyData.message || "Payment verification failed")
+                        }
+                    } catch (err: any) {
+                        toast.error(err.message || "Payment verification failed")
+                    }
+                },
+                prefill: {
+                    email: session?.user?.email || "",
+                    contact: order.items[0]?.product ? "9999999999" : "" // We don't have phone readily here unless added to order model returned
+                },
+                theme: {
+                    color: "#FACC15"
+                },
+                modal: {
+                    ondismiss: () => setPaymentProcessingId(null)
+                }
+            }
+
+            const razorpay = new window.Razorpay(options)
+            razorpay.open()
+
+        } catch (error: any) {
+            toast.error(error.message || "Failed to start payment")
+            setPaymentProcessingId(null)
+        }
+    }
+
     const handleDownloadInvoice = async (orderId: string) => {
+        if (!orderId || orderId === "undefined" || orderId === "null") {
+            toast.error("Invalid order ID for invoice generation")
+            return
+        }
         try {
             const response = await fetch(`/api/orders/${orderId}/invoice`)
             if (response.ok) {
@@ -182,6 +275,11 @@ export default function MyOrdersPage() {
     }
 
     return (
+        <>
+        <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            onLoad={() => setRazorpayLoaded(true)}
+        />
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
@@ -302,6 +400,12 @@ export default function MyOrdersPage() {
                                                 <Link href={`/account/orders/${order._id}`}>
                                                     <Button variant="outline" size="sm"><Eye className="w-4 h-4 mr-1" /> Details</Button>
                                                 </Link>
+                                                {order.paymentMethod === 'cod' && order.paymentStatus !== 'paid' && !["cancelled", "refunded", "delivered"].includes(order.status.toLowerCase()) && (
+                                                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-white" disabled={paymentProcessingId === order._id} onClick={() => handlePayNow(order)}>
+                                                        <CreditCard className="w-4 h-4 mr-1" /> 
+                                                        {paymentProcessingId === order._id ? "Processing..." : "Pay Now"}
+                                                    </Button>
+                                                )}
                                                 <Button variant="outline" size="sm" onClick={() => handleDownloadInvoice(order._id)}>
                                                     <Download className="w-4 h-4 mr-1" /> Invoice
                                                 </Button>
@@ -385,5 +489,6 @@ export default function MyOrdersPage() {
                 </TabsContent>
             </Tabs>
         </div>
+        </>
     )
 }

@@ -3,6 +3,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, Target, Award, Globe, Heart, Truck, Shield, Star, ArrowRight } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "About Us | Baefikra",
+  description: "Learn more about Baefikra, India's premium lifestyle and streetwear fashion brand.",
+}
 
 export default function AboutPage() {
   const stats = [

@@ -88,8 +88,14 @@ function OrderConfirmationContent() {
   }
 
   const handleDownloadInvoice = async () => {
+    const finalOrderId = order?._id || orderId
+    if (!finalOrderId || finalOrderId === "null" || finalOrderId === "undefined") {
+      toast.error("Invalid order ID for invoice generation")
+      return
+    }
+
     try {
-      const response = await fetch(`/api/orders/${orderId}/invoice`)
+      const response = await fetch(`/api/orders/${finalOrderId}/invoice`)
       if (response.ok) {
         const invoice = await response.json()
         
@@ -324,7 +330,7 @@ function OrderConfirmationContent() {
             {/* Actions */}
             <Card>
               <CardContent className="p-4 space-y-3">
-                <Link href={`/orders/${order._id}`}>
+                <Link href={`/account/orders/${order._id}`}>
                   <Button className="w-full" variant="outline">
                     <Eye className="mr-2 h-4 w-4" />
                     View Order Details

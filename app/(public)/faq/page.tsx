@@ -2,6 +2,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { HelpCircle, MessageCircle, Mail, Phone } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Frequently Asked Questions | Baefikra",
+  description: "Find answers to common questions about Baefikra's products, shipping, returns, and more. Get help quickly with our comprehensive FAQ.",
+}
 
 export default function FAQPage() {
   const faqs = [

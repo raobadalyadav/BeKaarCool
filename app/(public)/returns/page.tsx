@@ -14,6 +14,12 @@ import {
   ArrowRight,
   Shield,
 } from "lucide-react"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Returns & Refunds | Baefikra",
+  description: "Learn about Baefikra's hassle-free 30-day return and refund policy. Easy returns for your premium streetwear and fashion apparel.",
+}
 
 export default function ReturnsPage() {
   const returnReasons = [
