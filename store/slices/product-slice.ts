@@ -26,7 +26,6 @@ interface Product {
     description: string
     keywords: string[]
   }
-  customizable: boolean
   qrCode?: string
 }
 

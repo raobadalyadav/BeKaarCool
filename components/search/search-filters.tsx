@@ -10,28 +10,36 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, Filter, Star } from "lucide-react"
 
 interface SearchFiltersProps {
+  categories: Array<{ name: string; count: number }>
   selectedCategories: string[]
   setSelectedCategories: (categories: string[]) => void
+  sizes: string[]
   selectedSizes: string[]
   setSelectedSizes: (sizes: string[]) => void
-  priceRange: number[]
-  setPriceRange: (range: number[]) => void
+  brands: string[]
   selectedBrands?: string[]
   setSelectedBrands?: (brands: string[]) => void
+  priceRange: number[]
+  setPriceRange: (range: number[]) => void
+  priceRangeLimit: { min: number; max: number }
   selectedRating?: number
   setSelectedRating?: (rating: number) => void
   className?: string
 }
 
 export function SearchFilters({
+  categories,
   selectedCategories,
   setSelectedCategories,
+  sizes,
   selectedSizes,
   setSelectedSizes,
-  priceRange,
-  setPriceRange,
+  brands,
   selectedBrands = [],
   setSelectedBrands,
+  priceRange,
+  setPriceRange,
+  priceRangeLimit,
   selectedRating,
   setSelectedRating,
   className
@@ -44,17 +52,6 @@ export function SearchFilters({
     rating: false
   })
 
-  // Dummy data - ideally from API
-  const categories = [
-    { name: "T-Shirts", count: 245 },
-    { name: "Hoodies", count: 128 },
-    { name: "Accessories", count: 89 },
-    { name: "Mugs", count: 156 },
-    { name: "Phone Cases", count: 67 },
-  ]
-
-  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"]
-  const brands = ["Nike", "Adidas", "Puma", "Baefikra", "Zara", "H&M"]
   const ratings = [4, 3, 2, 1]
 
   const toggleSection = (section: keyof typeof openSections) => {
@@ -64,15 +61,15 @@ export function SearchFilters({
   const clearAllFilters = () => {
     setSelectedCategories([])
     setSelectedSizes([])
-    setPriceRange([0, 5000])
+    setPriceRange([priceRangeLimit.min, priceRangeLimit.max])
     if (setSelectedBrands) setSelectedBrands([])
     if (setSelectedRating) setSelectedRating(0)
   }
 
   const hasActiveFilters = selectedCategories.length > 0 ||
     selectedSizes.length > 0 ||
-    priceRange[0] > 0 ||
-    priceRange[1] < 5000 ||
+    priceRange[0] > priceRangeLimit.min ||
+    priceRange[1] < priceRangeLimit.max ||
     selectedBrands.length > 0 ||
     (selectedRating && selectedRating > 0)
 
@@ -132,9 +129,9 @@ export function SearchFilters({
             <Slider
               value={priceRange}
               onValueChange={setPriceRange}
-              max={5000}
-              min={0}
-              step={100}
+              max={priceRangeLimit.max}
+              min={priceRangeLimit.min}
+              step={10}
               className="w-full"
             />
             <div className="flex justify-between items-center text-xs text-gray-500 font-medium">

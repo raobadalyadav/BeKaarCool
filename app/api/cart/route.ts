@@ -36,9 +36,9 @@ export async function GET(request: NextRequest) {
       await cart.save()
     }
 
-    // Filter out inactive products (keep custom products)
+    // Filter out inactive products
     cart.items = cart.items.filter((item: any) => 
-      item.customProduct || (item.product && item.product.isActive)
+      item.product && item.product.isActive
     )
 
     // Recalculate totals
@@ -72,78 +72,64 @@ export async function POST(request: NextRequest) {
     // Resolve user ID to ensure it's a valid MongoDB ObjectId
     const userId = await resolveUserId(session.user.id, session.user.email)
 
-    const { productId, quantity, size, color, customization, productType, productName, basePrice } = await request.json()
+    const { productId, quantity, size, color } = await request.json()
+
+    if (!productId || !quantity || quantity < 1) {
+      return NextResponse.json({ message: "Invalid product or quantity" }, { status: 400 })
+    }
+
+    const product = await Product.findById(productId)
+    if (!product || !product.isActive) {
+      return NextResponse.json({ message: "Product not found or inactive" }, { status: 404 })
+    }
+
+    if (product.stock < quantity) {
+      return NextResponse.json({ message: "Insufficient stock" }, { status: 400 })
+    }
 
     let cart = await Cart.findOne({ user: userId })
     if (!cart) {
       cart = new Cart({ user: userId, items: [], total: 0 })
     }
 
-    // Handle custom design products
-    if (productType && productName && basePrice && customization) {
-      // This is a custom design product
-      const customItem = {
-        quantity: quantity || 1,
+    // Check if item already exists in cart with same product, size, and color
+    const existingItemIndex = cart.items.findIndex(
+      (item: any) => 
+        item.product?.toString() === productId && 
+        item.size === size && 
+        item.color === color
+    )
+
+    if (existingItemIndex > -1) {
+      const newQuantity = cart.items[existingItemIndex].quantity + quantity
+      if (newQuantity > product.stock) {
+        return NextResponse.json({ message: "Cannot add more items than available stock" }, { status: 400 })
+      }
+      cart.items[existingItemIndex].quantity = newQuantity
+    } else {
+      cart.items.push({
+        product: productId,
+        quantity,
         size: size || "M",
         color: color || "Default",
-        customization,
-        price: basePrice,
-        customProduct: {
-          type: productType,
-          name: productName,
-          basePrice,
-        },
-      }
-      cart.items.push(customItem)
-    } else {
-      // Handle regular products
-      if (!productId || !quantity || quantity < 1) {
-        return NextResponse.json({ message: "Invalid product or quantity" }, { status: 400 })
-      }
-
-      const product = await Product.findById(productId)
-      if (!product || !product.isActive) {
-        return NextResponse.json({ message: "Product not found or inactive" }, { status: 404 })
-      }
-
-      if (product.stock < quantity) {
-        return NextResponse.json({ message: "Insufficient stock" }, { status: 400 })
-      }
-
-      // Check if item already exists in cart
-      const existingItemIndex = cart.items.findIndex(
-        (item: any) => item.product?.toString() === productId && item.size === size && item.color === color,
-      )
-
-      if (existingItemIndex > -1) {
-        const newQuantity = cart.items[existingItemIndex].quantity + quantity
-        if (newQuantity > product.stock) {
-          return NextResponse.json({ message: "Cannot add more items than available stock" }, { status: 400 })
-        }
-        cart.items[existingItemIndex].quantity = newQuantity
-      } else {
-        cart.items.push({
-          product: productId,
-          quantity,
-          size: size || "M",
-          color: color || "Default",
-          customization: customization || null,
-          price: product.price,
-        })
-      }
+        price: product.price,
+      })
     }
 
-    // Recalculate totals
+    // Populate products for totals calculation
     await cart.populate({
       path: "items.product",
       select: "name price originalPrice images stock",
     })
 
+    // Recalculate totals
     cart.subtotal = cart.items.reduce((sum: number, item: any) => {
       const price = item.product?.price || item.price || 0
       return sum + price * item.quantity
     }, 0)
-    cart.tax = cart.subtotal * 0.18
+    
+    // Using simple logic for totals as per standard requirements
+    cart.tax = cart.subtotal * 0.18 // 18% GST (already included usually, but keeping consistency)
     cart.shipping = cart.subtotal > 999 ? 0 : 99
     cart.total = cart.subtotal + cart.tax + cart.shipping - (cart.discount || 0)
 

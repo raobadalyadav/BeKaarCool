@@ -53,6 +53,17 @@ export default function ProductsPageClient() {
   })
   const [initialized, setInitialized] = useState(false)
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
+  const [filterOptions, setFilterOptions] = useState<{
+    categories: Array<{ name: string; count: number }>
+    brands: string[]
+    sizes: string[]
+    priceRange: { min: number; max: number }
+  }>({
+    categories: [],
+    brands: [],
+    sizes: [],
+    priceRange: { min: 0, max: 10000 }
+  })
 
   const searchParams = useSearchParams()
   const debouncedSearch = useDebounce(searchQuery, 500)
@@ -121,6 +132,23 @@ export default function ProductsPageClient() {
       setLoading(false)
     }
   }, [pagination.page, pagination.limit, sortBy, debouncedSearch, selectedCategories, selectedSizes, selectedBrands, selectedRating, priceRange])
+
+  const fetchFilterOptions = async () => {
+    try {
+      const response = await fetch("/api/products/filters")
+      if (response.ok) {
+        const data = await response.json()
+        setFilterOptions(data)
+        setPriceRange([data.priceRange.min, data.priceRange.max])
+      }
+    } catch (err) {
+      console.error("Error fetching filter options:", err)
+    }
+  }
+
+  useEffect(() => {
+    fetchFilterOptions()
+  }, [])
 
   useEffect(() => {
     if (!initialized) return
@@ -216,12 +244,16 @@ export default function ProductsPageClient() {
                 </div>
                 <div className="p-4">
                   <SearchFilters
+                    categories={filterOptions.categories}
                     selectedCategories={selectedCategories}
                     setSelectedCategories={setSelectedCategories}
+                    sizes={filterOptions.sizes}
                     selectedSizes={selectedSizes}
                     setSelectedSizes={setSelectedSizes}
                     priceRange={priceRange}
                     setPriceRange={setPriceRange}
+                    priceRangeLimit={filterOptions.priceRange}
+                    brands={filterOptions.brands}
                     selectedBrands={selectedBrands}
                     setSelectedBrands={setSelectedBrands}
                     selectedRating={selectedRating}
@@ -253,12 +285,16 @@ export default function ProductsPageClient() {
               )}
             </div>
             <SearchFilters
+              categories={filterOptions.categories}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
+              sizes={filterOptions.sizes}
               selectedSizes={selectedSizes}
               setSelectedSizes={setSelectedSizes}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
+              priceRangeLimit={filterOptions.priceRange}
+              brands={filterOptions.brands}
               selectedBrands={selectedBrands}
               setSelectedBrands={setSelectedBrands}
               selectedRating={selectedRating}

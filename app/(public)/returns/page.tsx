@@ -284,7 +284,6 @@ export default function ReturnsPage() {
             <ul className="space-y-2 text-orange-800 text-sm">
               <li>• Items must be returned in original condition with all tags and packaging</li>
               <li>• Return window starts from the date of delivery, not the order date</li>
-              <li>• Custom or personalized items cannot be returned unless defective</li>
               <li>• Return shipping is free for defective or wrong items, customer pays for other returns</li>
               <li>• Refunds will be processed only after quality inspection is completed</li>
               <li>• Items purchased during sale periods follow the same return policy</li>

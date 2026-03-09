@@ -65,12 +65,6 @@ interface OrderItem {
     name: string
     images: string[]
   }
-  customProduct?: {
-    name: string
-    type: string
-    basePrice: number
-    design?: string
-  }
   name: string
   image: string
   quantity: number
@@ -79,14 +73,6 @@ interface OrderItem {
   size?: string
   color?: string
   sku?: string
-  customization?: {
-    design?: string
-    text?: string
-    position?: { x: number; y: number }
-    font?: string
-    textColor?: string
-    preview?: string
-  }
   status: string
 }
 
@@ -880,33 +866,6 @@ export default function AdminOrdersPage() {
                                 ₹{(item.price * item.quantity).toLocaleString()}
                               </span>
                             </div>
-                            {item.customization && (
-                              <div className="mt-3 border-t pt-3">
-                                <p className="text-xs font-medium text-gray-600 mb-2">Customization:</p>
-                                <div className="flex gap-4">
-                                  {item.customization.preview && (
-                                    <img
-                                      src={item.customization.preview}
-                                      alt="Customization preview"
-                                      className="w-16 h-16 rounded border"
-                                    />
-                                  )}
-                                  <div className="text-xs space-y-1">
-                                    {item.customization.text && <p>Text: {item.customization.text}</p>}
-                                    {item.customization.font && <p>Font: {item.customization.font}</p>}
-                                    {item.customization.textColor && (
-                                      <p className="flex items-center gap-1">
-                                        Color:{" "}
-                                        <span
-                                          className="w-3 h-3 rounded border"
-                                          style={{ backgroundColor: item.customization.textColor }}
-                                        ></span>
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                         </div>
                       </CardContent>

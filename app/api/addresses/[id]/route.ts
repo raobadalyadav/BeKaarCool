@@ -8,9 +8,10 @@ import { resolveUserId } from "@/lib/auth-utils"
 // GET: Fetch single address
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -19,7 +20,7 @@ export async function GET(
         await connectDB()
 
         const userId = await resolveUserId(session.user.id, session.user.email)
-        const address = await Address.findOne({ _id: params.id, user: userId }).lean()
+        const address = await Address.findOne({ _id: id, user: userId }).lean()
 
         if (!address) {
             return NextResponse.json({ error: "Address not found" }, { status: 404 })
@@ -35,9 +36,10 @@ export async function GET(
 // PUT: Update address
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -50,7 +52,7 @@ export async function PUT(
         const userId = await resolveUserId(session.user.id, session.user.email)
 
         // Verify address belongs to user
-        const address = await Address.findOne({ _id: params.id, user: userId })
+        const address = await Address.findOne({ _id: id, user: userId })
         if (!address) {
             return NextResponse.json({ error: "Address not found" }, { status: 404 })
         }
@@ -58,14 +60,14 @@ export async function PUT(
         // If setting as default, unset other defaults first
         if (data.isDefault) {
             await Address.updateMany(
-                { user: userId, _id: { $ne: params.id } },
+                { user: userId, _id: { $ne: id } },
                 { isDefault: false }
             )
         }
 
         // Update address
         const updated = await Address.findByIdAndUpdate(
-            params.id,
+            id,
             {
                 name: data.name,
                 phone: data.phone,
@@ -97,9 +99,10 @@ export async function PUT(
 // DELETE: Remove address
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params
         const session = await getServerSession(authOptions)
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -110,12 +113,12 @@ export async function DELETE(
         const userId = await resolveUserId(session.user.id, session.user.email)
 
         // Verify address belongs to user
-        const address = await Address.findOne({ _id: params.id, user: userId })
+        const address = await Address.findOne({ _id: id, user: userId })
         if (!address) {
             return NextResponse.json({ error: "Address not found" }, { status: 404 })
         }
 
-        await Address.findByIdAndDelete(params.id)
+        await Address.findByIdAndDelete(id)
 
         // If deleted address was default, make another one default
         if (address.isDefault) {

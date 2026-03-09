@@ -12,17 +12,6 @@ interface CartItem {
   size: string
   color: string
   stock: number
-  customization?: {
-    design?: string
-    text?: string
-    position?: { x: number; y: number }
-    elements?: any[]
-  }
-  customProduct?: {
-    type: string
-    name: string
-    basePrice: number
-  }
 }
 
 interface CartState {
@@ -51,16 +40,14 @@ const initialState: CartState = {
 const transformCartItem = (item: any): CartItem => ({
   id: item._id,
   productId: item.product?._id || null,
-  name: item.product?.name || item.customProduct?.name || 'Custom Product',
+  name: item.product?.name || 'Product',
   price: item.product?.price || item.price,
   originalPrice: item.product?.originalPrice,
   image: item.product?.images?.[0] || "/placeholder.svg",
   quantity: item.quantity,
   size: item.size,
   color: item.color,
-  customization: item.customization,
   stock: item.product?.stock || 999,
-  customProduct: item.customProduct,
 })
 
 export const fetchCart = createAsyncThunk("cart/fetchCart", async () => {
@@ -81,10 +68,6 @@ export const addToCart = createAsyncThunk(
     quantity: number
     size: string
     color: string
-    customization?: any
-    productType?: string
-    productName?: string
-    basePrice?: number
   }) => {
     const response = await fetch("/api/cart", {
       method: "POST",

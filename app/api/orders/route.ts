@@ -91,12 +91,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
     }
 
-    // Filter out items with invalid Product IDs (legacy data cleanup)
+    // Keep items with VALID ObjectId
     const items = rawItems.filter((item: any) => {
       const pid = item.product || item.productId
-      // Keep items without product (custom?) or with VALID ObjectId
-      // If item has product ID but it's invalid, skip it.
-      if ((item.product || item.productId) && !mongoose.isValidObjectId(pid)) {
+      if (!mongoose.isValidObjectId(pid)) {
         return false;
       }
       return true;
@@ -106,20 +104,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "No valid items in order (Please clear your cart)" }, { status: 400 })
     }
 
-    // Validate stock availability (only for items with product)
+    // Validate stock availability
     for (const item of items) {
-      if (item.product || item.productId) {
-        const productId = item.product || item.productId
-
-        // Skip invalid IDs (e.g. from dummy data in old carts)
-        if (!mongoose.isValidObjectId(productId)) {
-          continue;
-        }
-
-        const product = await Product.findById(productId)
-        if (!product || product.stock < item.quantity) {
-          return NextResponse.json({ message: `Insufficient stock for ${product?.name || "product"}` }, { status: 400 })
-        }
+      const productId = item.product || item.productId
+      const product = await Product.findById(productId)
+      if (!product || product.stock < item.quantity) {
+        return NextResponse.json({ message: `Insufficient stock for ${product?.name || "product"}` }, { status: 400 })
       }
     }
 
@@ -157,19 +147,13 @@ export async function POST(request: NextRequest) {
       }
 
       return {
-        product: productId || null,
-        customProduct: item.customProduct ? {
-          name: item.customProduct.name,
-          type: item.customProduct.type,
-          basePrice: item.customProduct.basePrice,
-        } : null,
+        product: productId,
         name: productName,
         image: productImage,
         quantity: item.quantity,
         price: item.price,
         size: item.size,
         color: item.color,
-        customization: item.customization,
         status: "pending" as const
       }
     }))

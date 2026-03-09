@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useSession } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +12,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { MapPin, Phone, Mail, Clock, Send, MessageCircle, Headphones, FileText } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import Link from "next/link"
 
 export default function ContactPage() {
+  const { data: session } = useSession()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -130,6 +134,20 @@ export default function ContactPage() {
             possible.
           </p>
         </div>
+
+        {session && (
+          <Alert className="mb-8 border-yellow-200 bg-yellow-50">
+            <MessageCircle className="h-4 w-4 text-yellow-600" />
+            <AlertTitle className="text-yellow-700">Have an account?</AlertTitle>
+            <AlertDescription className="text-yellow-600">
+              For better tracking of your inquiries, please use our{" "}
+              <Link href="/account/support" className="font-bold underline hover:text-yellow-800">
+                Support Ticket Portal
+              </Link>{" "}
+              in your account section.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Form */}

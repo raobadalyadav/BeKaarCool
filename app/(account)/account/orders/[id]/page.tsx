@@ -13,6 +13,8 @@ import {
     Package, Truck, CheckCircle, XCircle, RotateCcw, FileText,
     ChevronRight, MapPin, CreditCard, Clock, Phone
 } from "lucide-react"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 
 interface OrderItem {
@@ -379,11 +381,62 @@ export default function OrderDetailPage() {
                         )}
 
                         {canReturn && (
-                            <Link href={`/account/orders/${order._id}/return`}>
-                                <Button variant="outline">
-                                    <RotateCcw className="w-4 h-4 mr-2" /> Return / Replace
-                                </Button>
-                            </Link>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="outline" className="text-orange-600 border-orange-200 hover:bg-orange-50">
+                                        <RotateCcw className="w-4 h-4 mr-2" /> Return / Replace
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle className="flex items-center gap-2">
+                                            <RotateCcw className="w-5 h-5 text-orange-600" /> Return Order
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>Would you like to initiate a return for this order?</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <div className="my-4">
+                                        <label className="text-sm font-medium mb-2 block">Reason for return:</label>
+                                        <Textarea placeholder="Please describe the reason for return..." id="return-reason-detail" />
+                                    </div>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            className="bg-orange-600 hover:bg-orange-700"
+                                            onClick={async () => {
+                                                const reason = (document.getElementById("return-reason-detail") as HTMLTextAreaElement)?.value || "No reason provided"
+                                                try {
+                                                    const res = await fetch("/api/returns", {
+                                                        method: "POST",
+                                                        headers: { "Content-Type": "application/json" },
+                                                        body: JSON.stringify({
+                                                            orderId: order._id,
+                                                            type: "return",
+                                                            reason,
+                                                            pickupAddress: order.shippingAddress,
+                                                            items: order.items.map(i => ({
+                                                                product: i.product?._id,
+                                                                quantity: i.quantity,
+                                                                reason,
+                                                                condition: "unopened"
+                                                            }))
+                                                        })
+                                                    })
+                                                    if (res.ok) {
+                                                        toast({ title: "Return request submitted successfully" })
+                                                        fetchOrder()
+                                                    } else {
+                                                        toast({ title: "Failed to submit return request", variant: "destructive" })
+                                                    }
+                                                } catch (e) {
+                                                    toast({ title: "An error occurred", variant: "destructive" })
+                                                }
+                                            }}
+                                        >
+                                            Submit Request
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         )}
 
                         <Link href="/contact">

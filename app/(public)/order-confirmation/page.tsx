@@ -57,21 +57,24 @@ function OrderConfirmationContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const orderId = searchParams.get("orderId")
+  const orderNumber = searchParams.get("orderNumber")
   const success = searchParams.get("success")
 
   useEffect(() => {
-    if (!orderId || success !== "true") {
+    // Basic validation: must have either orderId or orderNumber
+    if (!orderId && !orderNumber) {
       setError("Invalid order confirmation link")
       setLoading(false)
       return
     }
 
     fetchOrderDetails()
-  }, [orderId, success])
+  }, [orderId, orderNumber, success])
 
   const fetchOrderDetails = async () => {
     try {
-      const response = await fetch(`/api/orders/${orderId}`)
+      const identifier = orderId || orderNumber;
+      const response = await fetch(`/api/orders/${identifier}`)
       if (response.ok) {
         const orderData = await response.json()
         setOrder(orderData)

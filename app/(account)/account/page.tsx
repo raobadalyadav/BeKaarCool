@@ -68,7 +68,7 @@ export default function AccountOverviewPage() {
                     icon={HelpCircle}
                     title="Help & Support"
                     description="Reach out to us"
-                    href="/contact"
+                    href="/account/support"
                 />
             </div>
         </div>

@@ -197,10 +197,10 @@ export function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 mt-2">
                       <DropdownMenuItem asChild>
-                        <Link href="/profile">Profile</Link>
+                        <Link href="/account/profile">Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href="/orders">Orders</Link>
+                        <Link href="/account/orders">Orders</Link>
                       </DropdownMenuItem>
 
                       {session.user?.role === "admin" && (

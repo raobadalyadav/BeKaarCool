@@ -20,22 +20,29 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Await params before using
     const { id } = await params
 
-    // Validate ObjectId format
-    if (!id || id === 'undefined' || id === 'null' || !/^[0-9a-fA-F]{24}$/.test(id)) {
-      return NextResponse.json({ message: "Invalid order ID" }, { status: 400 })
+    let order;
+    // Validate ObjectId format or check if it's an orderNumber
+    if (id && /^[0-9a-fA-F]{24}$/.test(id)) {
+      order = await Order.findById(id)
+        .populate("items.product", "name images price category description")
+        .populate("user", "name email")
+    } else if (id && id.startsWith('ORD-')) {
+      order = await Order.findOne({ orderNumber: id })
+        .populate("items.product", "name images price category description")
+        .populate("user", "name email")
+    } else {
+      return NextResponse.json({ message: "Invalid order ID or Number" }, { status: 400 })
     }
-
-    const order = await Order.findById(id)
-      .populate("items.product", "name images price category description")
-      .populate("user", "name email")
 
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 })
     }
 
     // Check if user owns the order or is admin
+    const orderUserId = order.user?._id?.toString() || order.user?.toString();
+    
     if (
-      order.user._id.toString() !== userId &&
+      orderUserId !== userId &&
       session.user.role !== "admin"
     ) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 })

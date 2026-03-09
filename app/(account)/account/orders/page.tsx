@@ -3,11 +3,19 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Card, CardContent } from "@/components/ui/card"
+import { useSession } from "next-auth/react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Package, ChevronLeft, ChevronRight, Eye } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Package, ChevronLeft, ChevronRight, Eye, Search, Download, X, AlertTriangle, RefreshCw, Truck, CheckCircle, XCircle } from "lucide-react"
+import { formatDate } from "@/lib/utils"
+import { toast } from "sonner"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Textarea } from "@/components/ui/textarea"
 
 interface OrderItem {
     product: {
@@ -28,9 +36,11 @@ interface Order {
     status: string
     paymentStatus: string
     total: number
+    totalAmount?: number
     items: OrderItem[]
     createdAt: string
     trackingNumber?: string
+    estimatedDelivery?: string
 }
 
 interface Pagination {
@@ -51,23 +61,39 @@ const statusColors: Record<string, string> = {
 }
 
 export default function MyOrdersPage() {
+    const { data: session } = useSession()
     const [orders, setOrders] = useState<Order[]>([])
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [statusFilter, setStatusFilter] = useState("all")
     const [pagination, setPagination] = useState<Pagination>({
         page: 1,
         limit: 10,
         total: 0,
         pages: 0
     })
+    const [cancelReason, setCancelReason] = useState("")
+    const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
 
     useEffect(() => {
-        fetchOrders()
-    }, [pagination.page])
+        if (session) {
+            fetchOrders()
+        }
+    }, [session, pagination.page, statusFilter])
 
     const fetchOrders = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/orders?page=${pagination.page}&limit=${pagination.limit}`)
+            const params = new URLSearchParams({
+                page: pagination.page.toString(),
+                limit: pagination.limit.toString(),
+            })
+
+            if (statusFilter !== "all") {
+                params.append("status", statusFilter)
+            }
+
+            const res = await fetch(`/api/orders?${params}`)
             if (res.ok) {
                 const data = await res.json()
                 setOrders(data.orders || [])
@@ -84,120 +110,232 @@ export default function MyOrdersPage() {
         }
     }
 
-    const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        })
+    const handleCancelOrder = async (orderId: string) => {
+        if (!cancelReason.trim()) {
+            toast.error("Please provide a reason for cancellation")
+            return
+        }
+
+        setCancellingOrderId(orderId)
+        try {
+            const response = await fetch(`/api/orders/${orderId}/cancel`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reason: cancelReason }),
+            })
+
+            if (response.ok) {
+                toast.success("Order cancelled successfully")
+                fetchOrders()
+                setCancelReason("")
+            } else {
+                const data = await response.json()
+                toast.error(data.message || "Failed to cancel order")
+            }
+        } catch (error) {
+            toast.error("Failed to cancel order")
+        } finally {
+            setCancellingOrderId(null)
+        }
+    }
+
+    const handleDownloadInvoice = async (orderId: string) => {
+        try {
+            const response = await fetch(`/api/orders/${orderId}/invoice`)
+            if (response.ok) {
+                const invoice = await response.json()
+                const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
+                const htmlContent = generateStyledInvoiceHTML(invoice)
+                const blob = new Blob([htmlContent], { type: 'text/html' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `invoice-${invoice.orderNumber}.html`
+                a.click()
+                URL.revokeObjectURL(url)
+                toast.success("Invoice downloaded")
+            } else {
+                toast.error("Failed to download invoice")
+            }
+        } catch (error) {
+            toast.error("Failed to download invoice")
+        }
+    }
+
+    const filteredOrders = orders.filter(
+        (order) =>
+            order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.items.some((item) => item.product?.name?.toLowerCase().includes(searchQuery.toLowerCase())),
+    )
+
+    const getStatusIcon = (status: string) => {
+        switch (status.toLowerCase()) {
+            case "pending": return <RefreshCw className="h-4 w-4" />
+            case "confirmed":
+            case "processing": return <Package className="h-4 w-4" />
+            case "shipped": return <Truck className="h-4 w-4" />
+            case "delivered": return <CheckCircle className="h-4 w-4" />
+            case "cancelled":
+            case "refunded": return <XCircle className="h-4 w-4" />
+            default: return <Package className="h-4 w-4" />
+        }
     }
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
-                <span className="text-sm text-gray-500">{pagination.total} orders</span>
+                <p className="text-sm text-gray-500">Track and manage your orders</p>
             </div>
 
-            {loading ? (
-                <div className="space-y-4">
-                    {[1, 2, 3].map(i => (
-                        <Card key={i}>
-                            <CardContent className="p-6">
-                                <Skeleton className="h-24 w-full" />
+            {/* Search and Filters */}
+            <Card>
+                <CardContent className="p-4">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex-1">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    placeholder="Search orders..."
+                                    className="pl-10"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-48">
+                                <SelectValue placeholder="Filter by status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Orders</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="confirmed">Confirmed</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="shipped">Shipped</SelectItem>
+                                <SelectItem value="delivered">Delivered</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Tabs defaultValue="all" className="space-y-6">
+                <TabsList>
+                    <TabsTrigger value="all">All Orders ({pagination.total})</TabsTrigger>
+                    <TabsTrigger value="active">
+                        Active ({orders.filter((o) => !["delivered", "cancelled", "refunded"].includes(o.status.toLowerCase())).length})
+                    </TabsTrigger>
+                    <TabsTrigger value="completed">
+                        Completed ({orders.filter((o) => o.status.toLowerCase() === "delivered").length})
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="space-y-4">
+                    {loading ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3].map(i => (
+                                <Card key={i}><CardContent className="p-6"><Skeleton className="h-24 w-full" /></CardContent></Card>
+                            ))}
+                        </div>
+                    ) : filteredOrders.length === 0 ? (
+                        <Card className="border-dashed border-2">
+                            <CardContent className="py-12 text-center">
+                                <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold text-gray-700">No orders found</h3>
+                                <p className="text-gray-500 mt-2">Try adjusting your filters or start shopping</p>
+                                <Link href="/products">
+                                    <Button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">Browse Products</Button>
+                                </Link>
                             </CardContent>
                         </Card>
-                    ))}
-                </div>
-            ) : orders.length === 0 ? (
-                <Card>
-                    <CardContent className="py-12 text-center">
-                        <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-700">No orders yet</h3>
-                        <p className="text-gray-500 mt-2">Start shopping to see your orders here</p>
-                        <Link href="/products">
-                            <Button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
-                                Browse Products
-                            </Button>
-                        </Link>
-                    </CardContent>
-                </Card>
-            ) : (
-                <>
-                    <div className="space-y-4">
-                        {orders.map(order => (
-                            <Card key={order._id} className="overflow-hidden">
-                                <CardContent className="p-0">
-                                    {/* Order Header */}
+                    ) : (
+                        <div className="space-y-4">
+                            {filteredOrders.map(order => (
+                                <Card key={order._id} className="overflow-hidden hover:shadow-md transition-shadow">
                                     <div className="bg-gray-50 px-6 py-3 border-b flex flex-wrap items-center justify-between gap-2">
                                         <div className="flex items-center gap-4 text-sm">
-                                            <span className="font-medium">Order #{order.orderNumber}</span>
+                                            <span className="font-semibold text-gray-900 border-r pr-4">Order #{order.orderNumber}</span>
                                             <span className="text-gray-500">{formatDate(order.createdAt)}</span>
                                         </div>
-                                        <Badge className={statusColors[order.status] || "bg-gray-100"}>
-                                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                        <Badge className={statusColors[order.status.toLowerCase()] || "bg-gray-100"}>
+                                            <div className="flex items-center gap-1">
+                                                {getStatusIcon(order.status)}
+                                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                            </div>
                                         </Badge>
                                     </div>
 
-                                    {/* Order Items */}
                                     <div className="p-6">
-                                        <div className="flex flex-wrap gap-4">
-                                            {order.items.slice(0, 3).map((item, idx) => (
-                                                <div key={idx} className="flex gap-3">
-                                                    <div className="w-16 h-20 relative bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                                        <div className="space-y-4">
+                                            {order.items.map((item, idx) => (
+                                                <div key={idx} className="flex gap-4">
+                                                    <div className="w-16 h-20 relative bg-gray-100 rounded overflow-hidden flex-shrink-0 border">
                                                         {item.product?.images?.[0] ? (
-                                                            <Image
-                                                                src={item.product.images[0]}
-                                                                alt={item.product.name || "Product"}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
+                                                            <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover" />
                                                         ) : (
-                                                            <div className="w-full h-full flex items-center justify-center">
-                                                                <Package className="w-6 h-6 text-gray-400" />
-                                                            </div>
+                                                            <div className="w-full h-full flex items-center justify-center"><Package className="w-6 h-6 text-gray-400" /></div>
                                                         )}
                                                     </div>
-                                                    <div className="text-sm">
-                                                        <p className="font-medium line-clamp-1">{item.product?.name || "Product"}</p>
-                                                        {item.size && <p className="text-gray-500">Size: {item.size}</p>}
-                                                        <p className="text-gray-500">Qty: {item.quantity}</p>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-medium text-gray-900 truncate">{item.product?.name || "Product"}</h4>
+                                                        <div className="mt-1 flex flex-wrap gap-2">
+                                                            {item.size && <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">Size: {item.size}</Badge>}
+                                                            {item.color && <Badge variant="outline" className="text-[10px] px-2 py-0 h-5">{item.color}</Badge>}
+                                                            <Badge variant="secondary" className="text-[10px] px-2 py-0 h-5">Qty: {item.quantity}</Badge>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-semibold">₹{Math.round(item.price)}</p>
                                                     </div>
                                                 </div>
                                             ))}
-                                            {order.items.length > 3 && (
-                                                <div className="flex items-center text-sm text-gray-500">
-                                                    +{order.items.length - 3} more items
-                                                </div>
-                                            )}
                                         </div>
 
-                                        {/* Order Footer */}
-                                        <div className="flex flex-wrap items-center justify-between mt-4 pt-4 border-t gap-4">
+                                        <div className="flex flex-wrap items-center justify-between mt-6 pt-4 border-t gap-4">
                                             <div>
-                                                <span className="text-sm text-gray-500">Total: </span>
-                                                <span className="font-bold text-lg">₹{order.total.toLocaleString("en-IN")}</span>
+                                                <p className="text-xs text-gray-500">Order Total</p>
+                                                <p className="font-bold text-lg text-yellow-600">₹{(order.total || order.totalAmount || 0).toLocaleString("en-IN")}</p>
                                             </div>
-                                            <div className="flex gap-2">
-                                                {order.trackingNumber && (
-                                                    <Link href={`/track-order?awb=${order.trackingNumber}`}>
-                                                        <Button variant="outline" size="sm">
-                                                            Track Order
-                                                        </Button>
-                                                    </Link>
-                                                )}
+                                            <div className="flex flex-wrap gap-2">
                                                 <Link href={`/account/orders/${order._id}`}>
-                                                    <Button variant="outline" size="sm">
-                                                        <Eye className="w-4 h-4 mr-1" /> View Details
-                                                    </Button>
+                                                    <Button variant="outline" size="sm"><Eye className="w-4 h-4 mr-1" /> Details</Button>
                                                 </Link>
+                                                <Button variant="outline" size="sm" onClick={() => handleDownloadInvoice(order._id)}>
+                                                    <Download className="w-4 h-4 mr-1" /> Invoice
+                                                </Button>
+                                                {["pending", "confirmed"].includes(order.status.toLowerCase()) && (
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="outline" size="sm" className="text-red-500 hover:text-red-600"><X className="w-4 h-4 mr-1" /> Cancel</Button>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle className="flex items-center gap-2">
+                                                                    <AlertTriangle className="w-5 h-5 text-red-500" /> Cancel Order
+                                                                </AlertDialogTitle>
+                                                                <AlertDialogDescription>Are you sure you want to cancel order #{order.orderNumber}?</AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <div className="my-4">
+                                                                <Textarea placeholder="Reason for cancellation..." value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} />
+                                                            </div>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel onClick={() => setCancelReason("")}>Keep Order</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleCancelOrder(order._id)} className="bg-red-500" disabled={cancellingOrderId === order._id || !cancelReason.trim()}>
+                                                                    {cancellingOrderId === order._id ? "Cancelling..." : "Confirm Cancel"}
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Pagination */}
                     {pagination.pages > 1 && (
@@ -209,9 +347,7 @@ export default function MyOrdersPage() {
                             >
                                 <ChevronLeft className="w-4 h-4 mr-1" /> Previous
                             </Button>
-                            <span className="text-sm text-gray-600">
-                                Page {pagination.page} of {pagination.pages}
-                            </span>
+                            <span className="text-sm font-medium">Page {pagination.page} of {pagination.pages}</span>
                             <Button
                                 variant="outline"
                                 disabled={pagination.page === pagination.pages}
@@ -221,8 +357,33 @@ export default function MyOrdersPage() {
                             </Button>
                         </div>
                     )}
-                </>
-            )}
+                </TabsContent>
+
+                <TabsContent value="active">
+                    <div className="space-y-4">
+                        {filteredOrders.filter(o => !["delivered", "cancelled", "refunded"].includes(o.status.toLowerCase())).length === 0 ? (
+                             <Card className="py-12 text-center text-gray-500">No active orders</Card>
+                        ) : (
+                            filteredOrders.filter(o => !["delivered", "cancelled", "refunded"].includes(o.status.toLowerCase())).map(order => (
+                                <Card key={order._id}>{/* Simplified card or reuse a sub-component */}</Card>
+                            ))
+                        )}
+                        <p className="text-center text-sm text-gray-500 italic">Filter results based on current page. Use search for all orders.</p>
+                    </div>
+                </TabsContent>
+                
+                <TabsContent value="completed">
+                     <div className="space-y-4">
+                        {filteredOrders.filter(o => o.status.toLowerCase() === "delivered").length === 0 ? (
+                             <Card className="py-12 text-center text-gray-500">No completed orders</Card>
+                        ) : (
+                            filteredOrders.filter(o => o.status.toLowerCase() === "delivered").map(order => (
+                                <Card key={order._id}>{/* Simplified card or reuse a sub-component */}</Card>
+                            ))
+                        )}
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

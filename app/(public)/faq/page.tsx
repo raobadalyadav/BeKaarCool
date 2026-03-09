@@ -23,23 +23,6 @@ export default function FAQPage() {
       ]
     },
     {
-      category: "Custom Design",
-      questions: [
-        {
-          q: "What file formats do you accept for custom designs?",
-          a: "We accept PNG, JPG, SVG, and PDF files. For best quality, use high-resolution images (300 DPI minimum)."
-        },
-        {
-          q: "Can I edit my design after placing an order?",
-          a: "Design changes can be made within 2 hours of placing your order. After production begins, changes aren't possible."
-        },
-        {
-          q: "Do you offer design services?",
-          a: "Yes! Our design team can create custom artwork for an additional fee. Contact us for a quote."
-        }
-      ]
-    },
-    {
       category: "Payments & Pricing",
       questions: [
         {

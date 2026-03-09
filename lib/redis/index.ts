@@ -1,12 +1,7 @@
-/**
- * Redis Client Configuration
- * For caching, sessions, and rate limiting
- */
-
-import { Redis } from "ioredis"
+import { createClient, RedisClientType } from "redis"
 import { env } from "@/lib/env"
 
-let redisClient: Redis | null = null
+let redisClient: RedisClientType | null = null
 let isConnected = false
 
 const REDIS_URL = env.REDIS_URL || "redis://localhost:6379"
@@ -19,35 +14,24 @@ export async function getRedisClient(): Promise<RedisClientType> {
         return redisClient
     }
 
-    redisClient = createClient({
-        url: REDIS_URL,
-        socket: {
-            reconnectStrategy: (retries) => {
-                if (retries > 10) {
-                    console.error("Redis: Max reconnection attempts reached")
-                    return new Error("Max retries reached")
-                }
-                return Math.min(retries * 100, 3000)
-            }
-        }
-    })
+    if (!redisClient) {
+        redisClient = createClient({
+            url: REDIS_URL,
+        })
 
-    redisClient.on("error", (err) => {
-        console.error("Redis Client Error:", err)
-        isConnected = false
-    })
+        redisClient.on("error", (err) => {
+            console.error("Redis Client Error:", err)
+            isConnected = false
+        })
 
-    redisClient.on("connect", () => {
-        console.log("Redis: Connected")
-        isConnected = true
-    })
+        redisClient.on("connect", () => {
+            console.log("Redis: Connected")
+            isConnected = true
+        })
 
-    redisClient.on("disconnect", () => {
-        console.log("Redis: Disconnected")
-        isConnected = false
-    })
+        await redisClient.connect()
+    }
 
-    await redisClient.connect()
     return redisClient
 }
 

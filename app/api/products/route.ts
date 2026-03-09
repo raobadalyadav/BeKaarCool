@@ -88,6 +88,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Brand filter
+    const brands = searchParams.get("brands")
+    if (brands) {
+      const brandArray = brands.split(",").map(b => b.trim()).filter(b => b)
+      if (brandArray.length > 0) {
+        filter.brand = { $in: brandArray }
+      }
+    }
+
+    // Rating filter
+    const rating = searchParams.get("rating")
+    if (rating) {
+      filter.rating = { $gte: Number.parseFloat(rating) }
+    }
+
     // Build sort object
     let sortObj: any = {}
     switch (sort) {

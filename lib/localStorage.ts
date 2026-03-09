@@ -13,8 +13,6 @@ export interface CartItem {
   size?: string;
   color?: string;
   stock?: number;
-  customization?: any;
-  customProduct?: any;
 }
 
 export interface StoredCart {

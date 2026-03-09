@@ -232,7 +232,7 @@ export default function CheckoutPage() {
             dispatch(clearCart())
             if (redirect) {
                 toast({ title: "Order Placed!", description: "Redirecting to confirmation..." })
-                router.push(`/order-confirmation?orderNumber=${data.orderNumber}`)
+                router.push(`/order-confirmation?orderNumber=${data.orderNumber}&success=true`)
             }
             return data
         } else {

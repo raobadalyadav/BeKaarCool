@@ -160,19 +160,11 @@ export const productFiltersSchema = z.object({
 // ============================================
 
 export const addToCartSchema = z.object({
-    productId: objectIdSchema.optional(),
+    productId: objectIdSchema,
     quantity: z.coerce.number().min(1).max(10).default(1),
     size: z.string().min(1, "Size is required"),
     color: z.string().min(1, "Color is required"),
-    customization: z.any().optional(),
-    // For custom products
-    productType: z.string().optional(),
-    productName: z.string().optional(),
-    basePrice: z.coerce.number().min(0).optional()
-}).refine(
-    (data) => data.productId || (data.productType && data.productName && data.basePrice),
-    { message: "Either productId or custom product details are required" }
-)
+})
 
 export const updateCartItemSchema = z.object({
     quantity: z.coerce.number().min(1).max(10)
@@ -183,12 +175,11 @@ export const updateCartItemSchema = z.object({
 // ============================================
 
 export const orderItemSchema = z.object({
-    productId: objectIdSchema.optional(),
+    productId: objectIdSchema,
     quantity: z.coerce.number().min(1),
     price: z.coerce.number().min(0),
     size: z.string().optional(),
     color: z.string().optional(),
-    customization: z.any().optional()
 })
 
 export const createOrderSchema = z.object({

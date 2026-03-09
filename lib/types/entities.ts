@@ -127,7 +127,6 @@ export interface IProduct extends IBaseEntity {
     isActive: boolean
     sku?: string
     views: number
-    customizable: boolean
     qrCode?: string
     seo: IProductSEO
 }
@@ -176,23 +175,10 @@ export type PaymentMethod = "razorpay" | "cod" | "upi" | "card" | "netbanking" |
 
 export interface IOrderItem {
     product?: Types.ObjectId | IProduct
-    customProduct?: {
-        name: string
-        type: string
-        basePrice: number
-    }
     quantity: number
     price: number
     size?: string
     color?: string
-    customization?: {
-        design?: string
-        text?: string
-        position?: { x: number; y: number }
-        font?: string
-        textColor?: string
-        elements?: any[]
-    }
 }
 
 export interface IShippingAddress {
@@ -242,7 +228,6 @@ export interface IOrderCreateDTO {
         price: number
         size?: string
         color?: string
-        customization?: any
     }>
     shippingAddress: IShippingAddress
     paymentMethod: PaymentMethod
@@ -255,15 +240,10 @@ export interface IOrderCreateDTO {
 
 export interface ICartItem {
     product?: Types.ObjectId | IProduct
-    customProduct?: {
-        name: string
-        type: string
-        basePrice: number
-    }
     quantity: number
+    price: number
     size: string
     color: string
-    customization?: any
     addedAt: Date
 }
 

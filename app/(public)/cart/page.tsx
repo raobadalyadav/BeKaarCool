@@ -244,17 +244,6 @@ export default function CartPage() {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-
-                      {item.customization && (
-                        <div className="mb-2 p-2 bg-blue-50 rounded text-sm">
-                          <p className="text-blue-800 font-medium">Custom Design</p>
-                          {item.customization.text && <p className="text-blue-600">Text: {item.customization.text}</p>}
-                          {item.customization.design && (
-                            <p className="text-blue-600">Design: Custom</p>
-                          )}
-                        </div>
-                      )}
-
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <Button

@@ -21,7 +21,7 @@ const navItems = [
     { id: "referral", label: "Refer & Earn", icon: Users, href: "/account/referral" },
     { id: "addresses", label: "My Addresses", icon: MapPin, href: "/account/addresses" },
     { id: "profile", label: "My Profile", icon: Settings, href: "/account/profile" },
-    { id: "help", label: "Help & Support", icon: HelpCircle, href: "/contact" },
+    { id: "help", label: "Help & Support", icon: HelpCircle, href: "/account/support" },
 ]
 
 // Breadcrumb mapping
