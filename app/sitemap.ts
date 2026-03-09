@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next'
 import { connectDB } from '@/lib/mongodb'
 import { Product } from '@/models/Product'
+import { env } from "@/lib/env"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXTAUTH_URL || 'https://baefikra.com'
+  const baseUrl = env.NEXTAUTH_URL || 'https://baefikra.com'
 
   // Static pages
   const staticPages = [

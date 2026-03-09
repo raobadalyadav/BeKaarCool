@@ -3,10 +3,15 @@
  * Reusable HTML email templates with consistent Baefikra branding
  */
 
-const BASE_URL = process.env.NEXTAUTH_URL || "https://baefikra.com"
+import { formatCurrency } from "@/lib/utils"
+import { env } from "@/lib/env"
+
+const BASE_URL = env.NEXTAUTH_URL || "https://baefikra.com"
 const BRAND_COLOR = "#FACC15"
 const BRAND_NAME = "Baefikra"
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || "support@baefikra.com"
+const LOGO_URL = `${BASE_URL}/logo.png`  // Assuming logo is at public/logo.png
+const COMPANY_NAME = "Baefikra"
+const SUPPORT_EMAIL = env.SUPPORT_EMAIL || "support@baefikra.com"
 
 // ============================================
 // SHARED LAYOUT

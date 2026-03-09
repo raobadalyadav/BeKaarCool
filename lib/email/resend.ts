@@ -4,15 +4,16 @@
  */
 
 import { Resend } from "resend"
+import { env } from "@/lib/env"
 
 // ============================================
 // CONFIGURATION
 // ============================================
 
-const resend = new Resend(process.env.RESEND_API_KEY || "")
+const resend = new Resend(env.RESEND_API_KEY || "")
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || process.env.EMAIL_FROM || "noreply@baefikra.com"
-const REPLY_TO = process.env.SUPPORT_EMAIL || "support@baefikra.com"
+const FROM_EMAIL = env.RESEND_FROM_EMAIL || env.EMAIL_FROM || "noreply@baefikra.com"
+const REPLY_TO = env.SUPPORT_EMAIL || "support@baefikra.com"
 
 // ============================================
 // TYPES
@@ -38,7 +39,7 @@ export interface EmailResult {
 
 export async function sendEmail(payload: EmailPayload): Promise<EmailResult> {
     try {
-        if (!process.env.RESEND_API_KEY) {
+        if (!env.RESEND_API_KEY) {
             console.warn("[Email] RESEND_API_KEY not configured, skipping email send")
             return { success: false, error: "RESEND_API_KEY not configured" }
         }
@@ -72,7 +73,7 @@ export async function sendBatchEmails(
     emails: EmailPayload[]
 ): Promise<{ success: boolean; results: EmailResult[] }> {
     try {
-        if (!process.env.RESEND_API_KEY) {
+        if (!env.RESEND_API_KEY) {
             console.warn("[Email] RESEND_API_KEY not configured")
             return {
                 success: false,

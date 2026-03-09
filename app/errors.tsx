@@ -1,9 +1,8 @@
-"use client"
-
-import { useEffect } from "react"
+import { AlertCircle, RefreshCcw, Home, RefreshCw, AlertTriangle } from "lucide-react"
+import { env } from "@/lib/env"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Home, RefreshCw, AlertTriangle } from "lucide-react"
+import { useEffect } from "react"
 
 export default function Error({
     error,

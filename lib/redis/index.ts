@@ -3,12 +3,13 @@
  * For caching, sessions, and rate limiting
  */
 
-import { createClient, RedisClientType } from "redis"
+import { Redis } from "ioredis"
+import { env } from "@/lib/env"
 
-let redisClient: RedisClientType | null = null
+let redisClient: Redis | null = null
 let isConnected = false
 
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379"
+const REDIS_URL = env.REDIS_URL || "redis://localhost:6379"
 
 /**
  * Get Redis client instance (singleton)

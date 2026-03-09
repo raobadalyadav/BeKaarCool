@@ -5,17 +5,18 @@
 
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import { env } from "@/lib/env";
 
 // ============================================
 // CONFIGURATION
 // ============================================
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "",
+  key_id: env.RAZORPAY_KEY_ID || "",
+  key_secret: env.RAZORPAY_KEY_SECRET || "",
 });
 
-export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || "";
+export const RAZORPAY_KEY_ID = env.RAZORPAY_KEY_ID || "";
 
 // ============================================
 // TYPES
@@ -62,7 +63,7 @@ export async function createOrder(
   input: RazorpayOrderInput,
 ): Promise<RazorpayOrderResult> {
   try {
-    if (!RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    if (!RAZORPAY_KEY_ID || !env.RAZORPAY_KEY_SECRET) {
       throw new Error("Razorpay credentials not configured");
     }
 
@@ -102,7 +103,7 @@ export async function createOrder(
 
 export function verifyPayment(input: RazorpayVerifyInput): boolean {
   try {
-    const secret = process.env.RAZORPAY_KEY_SECRET || "";
+    const secret = env.RAZORPAY_KEY_SECRET || "";
     const body = input.razorpayOrderId + "|" + input.razorpayPaymentId;
 
     const expectedSignature = crypto
@@ -192,7 +193,7 @@ export function verifyWebhookSignature(
   secret?: string,
 ): boolean {
   try {
-    const webhookSecret = secret || process.env.RAZORPAY_WEBHOOK_SECRET || "";
+    const webhookSecret = secret || env.RAZORPAY_WEBHOOK_SECRET || "";
 
     const expectedSignature = crypto
       .createHmac("sha256", webhookSecret)

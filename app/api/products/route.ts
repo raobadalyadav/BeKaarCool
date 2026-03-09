@@ -5,6 +5,7 @@ import { Category } from "@/models/Category"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { generateQRCode } from "@/lib/qr-code"
+import { env } from "@/lib/env"
 
 export async function GET(request: NextRequest) {
   try {
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-]/g, "")
 
     // Generate QR code for product
-    const productUrl = `${process.env.NEXTAUTH_URL}/products/${slug}`
+    const productUrl = `${env.NEXTAUTH_URL}/products/${slug}`
     const qrCodeData = await generateQRCode(productUrl)
 
     const product = new Product({

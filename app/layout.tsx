@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { env } from "@/lib/env";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import Script from "next/script";
@@ -56,8 +57,8 @@ export default function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "Organization",
                 "name": "Baefikra",
-                "url": process.env.NEXTAUTH_URL || "https://baefikra.com",
-                "logo": `${process.env.NEXTAUTH_URL || "https://baefikra.com"}/logo.png`,
+                "url": env.NEXTAUTH_URL || "https://baefikra.com",
+                "logo": `${env.NEXTAUTH_URL || "https://baefikra.com"}/logo.png`,
                 "description": "Premium custom print-on-demand marketplace in India",
                 "sameAs": [
                   "https://instagram.com/baefikra",
@@ -80,12 +81,12 @@ export default function RootLayout({
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "name": "Baefikra",
-                "url": process.env.NEXTAUTH_URL || "https://baefikra.com",
+                "url": env.NEXTAUTH_URL || "https://baefikra.com",
                 "potentialAction": {
                   "@type": "SearchAction",
                   "target": {
                     "@type": "EntryPoint",
-                    "urlTemplate": `${process.env.NEXTAUTH_URL || "https://baefikra.com"}/products?search={search_term_string}`
+                    "urlTemplate": `${env.NEXTAUTH_URL || "https://baefikra.com"}/products?search={search_term_string}`
                   },
                   "query-input": "required name=search_term_string"
                 }

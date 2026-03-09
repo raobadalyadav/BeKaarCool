@@ -1,16 +1,14 @@
-/**
- * Delhivery Shipping Integration - Production Ready
- * Single courier partner for Baefikra
- */
+import crypto from "crypto";
+import { env } from "@/lib/env";
 
 // ============================================
 // CONFIGURATION
 // ============================================
 
-const DELHIVERY_API_KEY = process.env.DELHIVERY_API_KEY || ""
-const DELHIVERY_API_URL = process.env.DELHIVERY_API_URL || "https://track.delhivery.com/api"
-const DELHIVERY_CLIENT_NAME = process.env.DELHIVERY_CLIENT_NAME || "Baefikra"
-const DELHIVERY_PICKUP_LOCATION = process.env.DELHIVERY_PICKUP_LOCATION || "Baefikra Warehouse"
+const DELHIVERY_API_KEY = env.DELHIVERY_API_KEY || ""
+const DELHIVERY_API_URL = env.DELHIVERY_API_URL || "https://track.delhivery.com/api"
+const DELHIVERY_CLIENT_NAME = env.DELHIVERY_CLIENT_NAME || "Baefikra"
+const DELHIVERY_PICKUP_LOCATION = env.DELHIVERY_PICKUP_LOCATION || "Baefikra Warehouse"
 
 // ============================================
 // TYPES
@@ -120,7 +118,7 @@ export async function createShipment(
                 return_pin: "400001",
                 return_state: "Maharashtra",
                 return_country: "India",
-                return_phone: process.env.DELHIVERY_RETURN_PHONE || "9999999999"
+                return_phone: env.DELHIVERY_RETURN_PHONE || "9999999999"
             }],
             pickup_location: {
                 name: DELHIVERY_PICKUP_LOCATION

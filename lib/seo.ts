@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { env } from "@/lib/env"
 
 export interface SEOConfig {
   title?: string
@@ -15,7 +16,7 @@ const defaultSEO = {
   description: "Create and sell custom designs on t-shirts, hoodies, mugs, and more. Premium quality printing with fast delivery across India.",
   keywords: ["custom printing", "print on demand", "t-shirt design", "custom merchandise", "personalized gifts"],
   image: "/og-image.jpg",
-  url: process.env.NEXTAUTH_URL || "https://baefikra.com"
+  url: env.NEXTAUTH_URL || "https://baefikra.com"
 }
 
 export function generateMetadata(config: SEOConfig = {}): Metadata {
@@ -26,7 +27,7 @@ export function generateMetadata(config: SEOConfig = {}): Metadata {
   const url = config.url || defaultSEO.url
 
   return {
-    metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
+    metadataBase: new URL(env.NEXTAUTH_URL || 'http://localhost:3000'),
     title,
     description,
     keywords: keywords.join(", "),

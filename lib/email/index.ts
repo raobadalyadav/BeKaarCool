@@ -7,6 +7,7 @@
 
 import { sendEmail } from "./resend"
 import { enqueueEmail } from "./queue"
+import { env } from "@/lib/env"
 import {
     verificationEmail,
     passwordResetEmail,
@@ -165,9 +166,9 @@ export async function sendSupportTicketEmail(ticket: any) {
             : Promise.resolve({ success: false, error: "No customer email" }),
 
         // Support team notification
-        process.env.SUPPORT_EMAIL
+        env.SUPPORT_EMAIL
             ? send(
-                  process.env.SUPPORT_EMAIL,
+                  env.SUPPORT_EMAIL,
                   templates.supportEmail,
                   "support_ticket_team",
                   { ticketNumber: ticket.ticketNumber }

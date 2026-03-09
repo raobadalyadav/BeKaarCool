@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server"
+import { env } from "@/lib/env"
 import { getToken } from "next-auth/jwt"
 
 // ============================================
@@ -29,7 +30,7 @@ export async function middleware(request: NextRequest) {
     // Get JWT token (works at the edge)
     const token = await getToken({
         req: request,
-        secret: process.env.NEXTAUTH_SECRET,
+        secret: env.NEXTAUTH_SECRET,
     })
 
     const isAuthenticated = !!token
