@@ -1,74 +1,35 @@
-import { type NextRequest, NextResponse } from "next/server"
-import bcrypt from "bcryptjs"
-import { connectDB } from "@/lib/mongodb"
-import { User } from "@/models/User"
-import { sendVerificationEmail } from "@/lib/email"
-import crypto from "crypto"
+import { NextResponse } from "next/server";
+import { registerWithEmail } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    await connectDB()
+    const body = (await req.json()) as {
+      email: string;
+      password: string;
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+    };
+    // Backwards-compat: allow `name` to map to firstName.
+    const firstName =
+      body.firstName ?? (body.name ? body.name.split(" ")[0] : undefined);
+    const lastName =
+      body.lastName ??
+      (body.name ? body.name.split(" ").slice(1).join(" ") || undefined : undefined);
 
-    const { name, email, password, phone, role } = await request.json()
-
-    // Validate required fields
-    if (!name || !email || !password) {
-      return NextResponse.json({ message: "Name, email, and password are required" }, { status: 400 })
+    const r = await registerWithEmail({
+      email: body.email,
+      password: body.password,
+      firstName,
+      lastName,
+    });
+    return NextResponse.json({ user: r.user, success: true });
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
     }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() })
-    if (existingUser) {
-      return NextResponse.json({ message: "User with this email already exists" }, { status: 400 })
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12)
-
-    // Generate verification token
-    const verificationToken = crypto.randomBytes(32).toString("hex")
-
-    // Generate affiliate code for users
-    const affiliateCode = `${name.substring(0, 3).toUpperCase()}${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-
-    // Create user
-    const user = new User({
-      name,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      phone: phone || "",
-      role: role || "customer",
-      verificationToken,
-      affiliateCode,
-      isVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-
-    await user.save()
-
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, name, verificationToken)
-    } catch (emailError) {
-      console.error("Failed to send verification email:", emailError)
-      // Don't fail registration if email fails
-    }
-
-    return NextResponse.json(
-      {
-        message: "User registered successfully. Please check your email to verify your account.",
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      },
-      { status: 201 },
-    )
-  } catch (error) {
-    console.error("Registration error:", error)
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 })
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

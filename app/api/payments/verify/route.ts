@@ -1,52 +1,20 @@
-import { type NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { connectDB } from "@/lib/mongodb";
-import { Order } from "@/models/Order";
-import { Cart } from "@/models/Cart";
-import { Product } from "@/models/Product";
-import { User } from "@/models/User";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { resolveUserId } from "@/lib/auth-utils";
-import { sendOrderConfirmationEmail } from "@/lib/email";
-import { env } from "@/lib/env";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+/**
+ * Razorpay payment verification is now performed server-to-server by the
+ * backend's HMAC-checked /webhooks/razorpay. The frontend only needs to know
+ * the order succeeded — it can poll the backend's order(number) query for the
+ * `paid` state. This route is kept for backwards compatibility and just
+ * returns success so existing client code doesn't break.
+ */
+export async function POST(req: Request) {
   try {
-    const { orderId, paymentId, signature } = await request.json();
-
-    if (!orderId || !paymentId || !signature) {
-      return NextResponse.json(
-        { verified: false, message: "Missing required fields" },
-        { status: 400 },
-      );
-    }
-
-    // Verify payment signature
-    const body = orderId + "|" + paymentId;
-    const expectedSignature = crypto
-      .createHmac("sha256", env.RAZORPAY_KEY_SECRET)
-      .update(body.toString())
-      .digest("hex");
-
-    const isAuthentic = expectedSignature === signature;
-
-    if (!isAuthentic) {
-      return NextResponse.json(
-        { verified: false, message: "Invalid signature" },
-        { status: 400 },
-      );
-    }
-
+    const body = (await req.json()) as { orderNumber?: string };
     return NextResponse.json({
-      verified: true,
-      paymentId,
+      success: true,
+      orderNumber: body.orderNumber ?? null,
     });
-  } catch (error) {
-    console.error("Payment verification error:", error);
-    return NextResponse.json(
-      { error: "Payment verification failed" },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ success: false }, { status: 400 });
   }
 }

@@ -1,11 +1,21 @@
-import type { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { env } from "@/lib/env"
-import GoogleProvider from "next-auth/providers/google"
-import { connectDB } from "./mongodb"
-import { User } from "@/models/User"
-import bcrypt from "bcryptjs"
-import { sendLoginAlertEmail } from "@/lib/email"
+/**
+ * NextAuth configuration — delegates all credential checks and Google OAuth
+ * to the NestJS backend. Mongo + bcrypt no longer live here.
+ *
+ * Flow:
+ *   Credentials → POST loginWithEmail mutation → JWT/refresh stored in cookies
+ *                 + NextAuth session populated for SessionProvider
+ *   Google      → user clicks "sign in with Google" on the frontend, we redirect
+ *                 to BACKEND/auth/google which finishes OAuth and 302's back to
+ *                 WEB_URL with tokens in URL hash (handled by /auth/callback page)
+ */
+
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { env } from "@/lib/env";
+import { gql, ApiError } from "@/lib/api/client";
+import { setServerTokens } from "@/lib/api/tokens";
+import type { AuthPayload } from "@/lib/api/auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,102 +24,75 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        totpCode: { label: "2FA code", type: "text" },
       },
-      async authorize(credentials, req) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
-
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
         try {
-          await connectDB()
+          const data = await gql<{ loginWithEmail: AuthPayload }>({
+            query: `
+              mutation Login($input: LoginInputDto!) {
+                loginWithEmail(input: $input) {
+                  accessToken refreshToken expiresIn
+                  user { id email firstName lastName role emailVerified }
+                }
+              }
+            `,
+            variables: {
+              input: {
+                email: credentials.email,
+                password: credentials.password,
+                totpCode: credentials.totpCode || undefined,
+              },
+            },
+            // No bearer token expected — anonymous mutation.
+            token: null,
+          });
 
-          const user = await User.findOne({ email: credentials.email }).select("+password")
-          if (!user) {
-            return null
-          }
+          // Persist backend JWTs in HttpOnly cookies for server-side calls.
+          await setServerTokens(data.loginWithEmail);
 
-          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
-          if (!isPasswordValid) {
-            return null
-          }
-          
-          // Dispatch security login alert
-          try {
-            const userAgent = req?.headers?.['user-agent'] || 'Unknown Device'
-            const ip = req?.headers?.['x-forwarded-for'] || 'Direct Connection'
-            const time = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
-            sendLoginAlertEmail(user.email, user.name, userAgent, ip, time).catch(console.error)
-          } catch (e) {
-             console.error("Failed to parse login alert data", e)
-          }
-
+          const u = data.loginWithEmail.user;
           return {
-            id: user._id.toString(),
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            avatar: user.avatar,
+            id: u.id,
+            email: u.email,
+            name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+            role: u.role,
+            emailVerified: u.emailVerified,
+          };
+        } catch (err) {
+          if (err instanceof ApiError) {
+            console.warn("Login failed:", err.message);
+          } else {
+            console.error("Login error:", err);
           }
-        } catch (error) {
-          console.error("Auth error:", error)
-          return null
+          return null;
         }
       },
-    }),
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID!,
-      clientSecret: env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === "google") {
-        try {
-          await connectDB()
-
-          let existingUser = await User.findOne({ email: user.email })
-          if (!existingUser) {
-            existingUser = await User.create({
-              name: user.name,
-              email: user.email,
-              avatar: user.image,
-              role: "customer",
-              isVerified: true,
-              preferences: {
-                language: "en",
-                currency: "INR",
-                newsletter: true,
-                notifications: true,
-                theme: "light",
-              },
-            })
-          }
-          
-          // Set the MongoDB ObjectId as the user ID
-          user.id = existingUser._id.toString()
-          user.role = existingUser.role
-          
-          return true
-        } catch (error) {
-          console.error("Google sign in error:", error)
-          return false
-        }
-      }
-      return true
-    },
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role
-        token.id = user.id
+        const u = user as {
+          id?: string;
+          role?: string;
+          emailVerified?: boolean;
+        };
+        if (u.id) token.id = u.id;
+        if (u.role) token.role = u.role;
+        if (u.emailVerified !== undefined) token.emailVerified = u.emailVerified;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+      if (token && session.user) {
+        (session.user as { id?: string }).id = token.id as string;
+        (session.user as { role?: string }).role = token.role as string;
+        (session.user as { emailVerified?: boolean }).emailVerified =
+          token.emailVerified as boolean;
       }
-      return session
+      return session;
     },
   },
   pages: {
@@ -118,6 +101,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
   secret: env.NEXTAUTH_SECRET,
-}
+};

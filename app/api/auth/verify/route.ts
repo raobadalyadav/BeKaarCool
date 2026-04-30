@@ -1,45 +1,17 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { User } from "@/models/User"
-import { sendWelcomeEmail } from "@/lib/email"
+import { NextResponse } from "next/server";
+import { verifyEmail } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    await connectDB()
-
-    const { token } = await request.json()
-
-    if (!token) {
-      return NextResponse.json({ message: "Verification token is required" }, { status: 400 })
+    const { token } = (await req.json()) as { token: string };
+    await verifyEmail(token);
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
     }
-
-    // Find user with valid verification token
-    const user = await User.findOne({
-      verificationToken: token,
-    })
-
-    if (!user) {
-      return NextResponse.json({ message: "Invalid or expired verification token" }, { status: 400 })
-    }
-
-    // Update user as verified and clear verification token
-    await User.findByIdAndUpdate(user._id, {
-      isVerified: true,
-      verificationToken: undefined,
-      verificationTokenExpiry: undefined,
-      updatedAt: new Date(),
-    })
-    
-    // Send Welcome Email asynchronously
-    sendWelcomeEmail(user.email, user.name).catch((err) => {
-      console.error("Failed to send welcome email:", err)
-    })
-
-    return NextResponse.json({
-      message: "Email verified successfully",
-    })
-  } catch (error) {
-    console.error("Email verification error:", error)
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 })
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

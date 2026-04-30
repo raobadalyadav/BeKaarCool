@@ -1,60 +1,20 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { Product } from "@/models/Product"
-import { Category } from "@/models/Category"
+import { NextResponse } from "next/server";
+import * as productsApi from "@/lib/api/products";
+import { ApiError } from "@/lib/api/client";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    await connectDB()
-
-    // Get all active products to extract available filter options
-    const products = await Product.find({ isActive: true })
-      .select("category brand variations.sizes price rating")
-      .populate("category", "name")
-      .lean()
-
-    // Extract unique categories with counts
-    const categoryMap = new Map<string, number>()
-    products.forEach(p => {
-      const catName = (p.category as any)?.name
-      if (catName) {
-        categoryMap.set(catName, (categoryMap.get(catName) || 0) + 1)
-      }
-    })
-    const categories = Array.from(categoryMap.entries()).map(([name, count]) => ({ name, count }))
-
-    // Extract unique brands
-    const brands = Array.from(new Set(products.map(p => p.brand).filter(Boolean))) as string[]
-
-    // Extract unique sizes
-    const sizesSet = new Set<string>()
-    products.forEach(p => {
-      p.variations?.sizes?.forEach((s: string) => sizesSet.add(s))
-    })
-    const sizes = Array.from(sizesSet).sort()
-
-    // Calculate price range
-    let minPrice = Infinity
-    let maxPrice = -Infinity
-    products.forEach(p => {
-      if (p.price < minPrice) minPrice = p.price
-      if (p.price > maxPrice) maxPrice = p.price
-    })
-
-    if (minPrice === Infinity) minPrice = 0
-    if (maxPrice === -Infinity) maxPrice = 10000
-
-    return NextResponse.json({
-      categories,
-      brands: brands.sort(),
-      sizes,
-      priceRange: {
-        min: Math.floor(minPrice),
-        max: Math.ceil(maxPrice)
-      }
-    })
-  } catch (error) {
-    console.error("Error fetching filters:", error)
-    return NextResponse.json({ message: "Failed to fetch filters" }, { status: 500 })
+    const [categories, brands, collections] = await Promise.all([
+      productsApi.listCategories(),
+      productsApi.listBrands(),
+      productsApi.listCollections(),
+    ]);
+    return NextResponse.json({ categories, brands, collections });
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
+    }
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

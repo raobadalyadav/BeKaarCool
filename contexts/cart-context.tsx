@@ -1,153 +1,139 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useSession } from "next-auth/react";
+import { clientFetch } from "@/lib/api/client";
+import type { CartDto } from "@/lib/api/types";
+import { minorToRupees } from "@/lib/api/config";
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
-
-interface CartItem {
-  _id: string
-  product: {
-    _id: string
-    name: string
-    price: number
-    images: string[]
-  }
-  quantity: number
-  size: string
-  color: string
-  price: number
+export interface CartItem {
+  id: string;
+  variantId: string;
+  quantity: number;
+  /** rupees, derived from priceMinor */
+  price: number;
+  /** raw paise as string (for accurate checkout math) */
+  priceMinor: string;
 }
 
 interface CartContextType {
-  items: CartItem[]
-  total: number
-  itemCount: number
-  addToCart: (item: { productId: string; quantity: number; size: string; color: string }) => Promise<void>
-  removeFromCart: (itemId: string) => Promise<void>
-  updateQuantity: (itemId: string, quantity: number) => Promise<void>
-  clearCart: () => Promise<void>
-  loading: boolean
+  items: CartItem[];
+  total: number;
+  itemCount: number;
+  addToCart: (input: {
+    variantId: string;
+    quantity: number;
+  }) => Promise<void>;
+  removeFromCart: (id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  refresh: () => Promise<void>;
+  loading: boolean;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined)
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+const dtoToItems = (cart: CartDto): CartItem[] =>
+  cart.items.map((it) => ({
+    id: it.id,
+    variantId: it.variantId,
+    quantity: it.quantity,
+    priceMinor: it.priceMinor,
+    price: minorToRupees(it.priceMinor),
+  }));
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession()
-  const [items, setItems] = useState<CartItem[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const { data: session, status } = useSession();
+  const [cart, setCart] = useState<CartDto | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  const items = useMemo<CartItem[]>(
+    () => (cart ? dtoToItems(cart) : []),
+    [cart]
+  );
+  const total = useMemo(
+    () => (cart ? minorToRupees(cart.subtotalMinor) : 0),
+    [cart]
+  );
+  const itemCount = items.reduce((sum, it) => sum + it.quantity, 0);
 
-  const fetchCart = async () => {
-    if (!session?.user?.id) return
-
-    try {
-      const response = await fetch("/api/cart")
-      const data = await response.json()
-      setItems(data.items || [])
-      setTotal(data.total || 0)
-    } catch (error) {
-      console.error("Error fetching cart:", error)
+  const refresh = useCallback(async () => {
+    if (status !== "authenticated") {
+      setCart(null);
+      return;
     }
-  }
-
-  const addToCart = async (item: { productId: string; quantity: number; size: string; color: string }) => {
-    if (!session?.user?.id) {
-      // Redirect to login or show login modal
-      window.location.href = "/auth/login"
-      return
-    }
-
-    setLoading(true)
     try {
-      const response = await fetch("/api/cart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(item),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setItems(data.items || [])
-        setTotal(data.total || 0)
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      throw error
+      setLoading(true);
+      const next = await clientFetch<CartDto>("/api/cart");
+      setCart(next);
+    } catch (err) {
+      console.error("Failed to load cart:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const removeFromCart = async (itemId: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/cart/${itemId}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setItems(data.items || [])
-        setTotal(data.total || 0)
-      }
-    } catch (error) {
-      console.error("Error removing from cart:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateQuantity = async (itemId: string, quantity: number) => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/cart/${itemId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ quantity }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setItems(data.items || [])
-        setTotal(data.total || 0)
-      }
-    } catch (error) {
-      console.error("Error updating quantity:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const clearCart = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/cart", {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        setItems([])
-        setTotal(0)
-      }
-    } catch (error) {
-      console.error("Error clearing cart:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [status]);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      fetchCart()
+    refresh();
+  }, [refresh]);
+
+  const addToCart = useCallback(
+    async (input: { variantId: string; quantity: number }) => {
+      if (status !== "authenticated") {
+        window.location.href = "/auth/login";
+        return;
+      }
+      setLoading(true);
+      try {
+        const next = await clientFetch<CartDto>("/api/cart", {
+          method: "POST",
+          body: JSON.stringify(input),
+        });
+        setCart(next);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [status]
+  );
+
+  const updateQuantity = useCallback(async (id: string, quantity: number) => {
+    setLoading(true);
+    try {
+      const next = await clientFetch<CartDto>(`/api/cart/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ quantity }),
+      });
+      setCart(next);
+    } finally {
+      setLoading(false);
     }
-  }, [session?.user?.id])
+  }, []);
+
+  const removeFromCart = useCallback(async (id: string) => {
+    setLoading(true);
+    try {
+      const next = await clientFetch<CartDto>(`/api/cart/${id}`, {
+        method: "DELETE",
+      });
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const clearCart = useCallback(async () => {
+    if (!cart) return;
+    await Promise.all(cart.items.map((it) => removeFromCart(it.id)));
+  }, [cart, removeFromCart]);
 
   return (
     <CartContext.Provider
@@ -159,18 +145,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        refresh,
         loading,
       }}
     >
       {children}
     </CartContext.Provider>
-  )
+  );
 }
 
 export function useCart() {
-  const context = useContext(CartContext)
-  if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider")
-  }
-  return context
+  const ctx = useContext(CartContext);
+  if (!ctx) throw new Error("useCart must be used within CartProvider");
+  return ctx;
 }

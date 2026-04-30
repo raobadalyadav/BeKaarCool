@@ -1,46 +1,21 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { Product } from "@/models/Product"
-import { User } from "@/models/User"
-import { Category } from "@/models/Category"
+import { NextResponse } from "next/server";
+import * as productsApi from "@/lib/api/products";
+import { ApiError } from "@/lib/api/client";
 
-// Ensure models are registered before populate
-void User
-void Category
-interface RouteParams {
-    params: Promise<{ slug: string }>
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
-    try {
-        const { slug } = await params
-
-        if (!slug || slug === 'undefined' || slug === 'null') {
-            return NextResponse.json(
-                { error: "Invalid slug" },
-                { status: 400 }
-            )
-        }
-
-        await connectDB()
-
-        const product = await Product.findOne({ slug, isActive: true })
-            .populate("category", "name slug")
-            .lean()
-
-        if (!product) {
-            return NextResponse.json(
-                { error: "Product not found" },
-                { status: 404 }
-            )
-        }
-
-        return NextResponse.json({ product })
-    } catch (error) {
-        console.error("Error fetching product by slug:", error)
-        return NextResponse.json(
-            { error: "Failed to fetch product" },
-            { status: 500 }
-        )
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const { slug } = await params;
+    const p = await productsApi.getProductBySlug(slug);
+    if (!p) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(p);
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
     }
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
 }

@@ -1,30 +1,98 @@
-# Next.js e commerce
+# Baefikra — Frontend (Next.js 16)
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+Customer storefront. After backend integration this repo is a **pure consumer** of the NestJS backend at `../baefikra-backend` — no MongoDB, no Razorpay/S3/Algolia/Delhivery/Resend SDK, no business logic. All data flows through GraphQL/REST proxies in `lib/api/`.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/baefikra-5120s-projects/v0-next-js-e-commerce)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/goLE8PBWSiF)
+## Architecture
 
-## Overview
+```
+┌─────────── Next.js (this repo) ─────────────┐
+│  app/                                       │
+│   ├─ (public)/(account)/(checkout)/(admin)/(auth) — pages
+│   └─ api/* — thin Next.js routes that proxy → backend
+│  lib/api/                                   │
+│   ├─ client.ts   — fetch + GraphQL helper, auto refresh on 401
+│   ├─ tokens.ts   — HttpOnly cookie management
+│   ├─ auth.ts | products.ts | cart.ts | checkout.ts |
+│       orders.ts | users.ts | wishlist.ts | reviews.ts |
+│       content.ts | media.ts
+│   └─ types.ts    — DTOs mirroring backend's @ObjectType
+│  contexts/       — cart-context (typed against CartDto)
+│  lib/auth.ts     — NextAuth (Credentials → backend loginWithEmail mutation)
+└─────────────────────────────────────────────┘
+                         ▼
+┌──────── NestJS backend (../baefikra-backend) ───────┐
+│  /graphql, /webhooks/*, /auth/google, /uploads/presign │
+└────────────────────────────────────────────────────────┘
+```
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## Setup
 
-## Deployment
+```bash
+# 1. Start the backend first
+cd ../baefikra-backend
+pnpm infra:up
+pnpm db:migrate
+pnpm db:seed
+pnpm dev          # api on :4000, worker connected to Kafka
 
-Your project is live at:
+# 2. Then the frontend
+cd ../baefikra-frontent
+cp env.template .env.local
+# fill NEXTAUTH_SECRET (32+ bytes random) + NEXT_PUBLIC_RAZORPAY_KEY_ID
+pnpm install
+pnpm dev          # next.js on :3000
+```
 
-**[https://vercel.com/baefikra-5120s-projects/v0-next-js-e-commerce](https://vercel.com/baefikra-5120s-projects/v0-next-js-e-commerce)**
+## Auth flow
 
-## Build your app
+| Method | Path |
+| --- | --- |
+| Email/password | NextAuth `signIn("credentials")` → backend `loginWithEmail` mutation → JWT cookies + NextAuth session |
+| Google OAuth | `/api/auth/google` → backend `/auth/google` → backend callback → 302 to `/auth/callback#tokens` → cookies set |
+| Register | `POST /api/auth/register` → `registerWithEmail` |
+| Forgot password | `POST /api/auth/forgot-password` → `requestPasswordReset` |
+| Reset | `POST /api/auth/reset-password` → `resetPassword` |
+| Verify email | `POST /api/auth/verify` → `verifyEmail` |
 
-Continue building your app on:
+## Data flow examples
 
-**[https://v0.dev/chat/projects/goLE8PBWSiF](https://v0.dev/chat/projects/goLE8PBWSiF)**
+```ts
+// Server component
+import { productsApi } from "@/lib/api";
+const product = await productsApi.getProductBySlug(params.slug);
 
-## How It Works
+// Client component (uses Next.js proxy → backend)
+import { clientFetch } from "@/lib/api/client";
+import type { CartDto } from "@/lib/api/types";
+const cart = await clientFetch<CartDto>("/api/cart");
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+// Checkout
+import { checkoutApi } from "@/lib/api";
+const session = await checkoutApi.startCheckout();
+await checkoutApi.setCheckoutAddress(session.sessionId, addressId);
+await checkoutApi.setCheckoutShipping(session.sessionId, "delhivery_surface");
+const intent = await checkoutApi.initiatePayment(session.sessionId);
+// → open Razorpay widget with intent.providerOrderId / publicKey
+```
+
+## Money / IDs
+
+- **IDs** are UUIDv7 strings, not Mongo ObjectIds. Use `id`, not `_id`.
+- **Money** is `priceMinor: string` (paise as string, bigint-safe). Use `minorToRupees()` / `formatINR()` from `lib/api/config.ts` for display.
+
+## What's removed
+
+Backend owns these now and they are no longer in the frontend:
+- Mongoose models, MongoDB connection, bcrypt
+- Razorpay SDK + webhook verification
+- AWS S3 SDK + presign logic
+- Algolia search SDK
+- Delhivery SDK + custom shipping logic
+- Resend email SDK + templates
+- PDF invoice / QR code generation
+- All cron routes (`app/api/cron/*`), inventory, marketing, banners, blog, offers, testimonials, support, wallet, rewards, referral, analytics — these are in the backend now
+
+## Tooling notes
+
+- ESLint: `pnpm lint`
+- Build: `pnpm build` (requires backend running for getStaticProps SSG fallbacks)

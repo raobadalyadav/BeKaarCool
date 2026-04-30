@@ -1,21 +1,18 @@
-import { NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { Product } from "@/models/Product"
+import { NextResponse } from "next/server";
+import * as productsApi from "@/lib/api/products";
+import { ApiError } from "@/lib/api/client";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    await connectDB()
-
-    const products = await Product.find({
-      isActive: true,
-      featured: true,
-    })
-      .limit(6)
-      .sort({ createdAt: -1 })
-
-    return NextResponse.json(products)
-  } catch (error) {
-    console.error("Error fetching featured products:", error)
-    return NextResponse.json({ error: "Failed to fetch featured products" }, { status: 500 })
+    const url = new URL(req.url);
+    const first = Number(url.searchParams.get("limit") ?? 8);
+    const conn = await productsApi.listProducts({ first, status: "published" });
+    return NextResponse.json(conn.edges.map((e) => e.node));
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
+    }
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

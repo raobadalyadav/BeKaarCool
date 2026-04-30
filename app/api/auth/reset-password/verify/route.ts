@@ -1,34 +1,20 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectDB } from "@/lib/mongodb"
-import { User } from "@/models/User"
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+/**
+ * Backend doesn't expose a separate "verify reset token" endpoint —
+ * the token is verified atomically when resetPassword is called.
+ * We accept the token here and short-circuit to "valid" so the existing
+ * frontend flow keeps working; the actual verification still happens
+ * server-side at reset time.
+ */
+export async function POST(req: Request) {
   try {
-    await connectDB()
-
-    const { token } = await request.json()
-
-    if (!token) {
-      return NextResponse.json({ message: "Token is required" }, { status: 400 })
+    const { token } = (await req.json()) as { token: string };
+    if (!token || token.length < 20) {
+      return NextResponse.json({ valid: false }, { status: 400 });
     }
-
-    // Find user with valid reset token
-    const user = await User.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: new Date() },
-    })
-
-    if (!user) {
-      return NextResponse.json({ message: "Invalid or expired reset token" }, { status: 400 })
-    }
-
-    return NextResponse.json({
-      message: "Token is valid",
-      valid: true,
-      email: user.email,
-    })
-  } catch (error) {
-    console.error("Token verification error:", error)
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ valid: true });
+  } catch {
+    return NextResponse.json({ valid: false }, { status: 400 });
   }
 }

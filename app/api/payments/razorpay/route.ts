@@ -1,57 +1,20 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import Razorpay from "razorpay";
-import { env } from "@/lib/env";
+import { NextResponse } from "next/server";
+import * as checkoutApi from "@/lib/api/checkout";
+import { ApiError } from "@/lib/api/client";
 
-const razorpay = new Razorpay({
-  key_id: env.RAZORPAY_KEY_ID,
-  key_secret: env.RAZORPAY_KEY_SECRET,
-});
-
-export async function POST(request: NextRequest) {
+/**
+ * Body: { sessionId } — checkout session id from startCheckout.
+ * Returns the Razorpay PaymentIntent the frontend feeds to its checkout widget.
+ */
+export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { sessionId } = (await req.json()) as { sessionId: string };
+    return NextResponse.json(await checkoutApi.initiatePayment(sessionId));
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return NextResponse.json({ error: e.message }, { status: e.status });
     }
-
-    const { amount, currency = "INR" } = await request.json();
-
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-    }
-
-    const receipt = `rcpt_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-
-    const options: any = {
-      amount: Math.round(amount), // Amount should already be in paise from frontend
-      currency,
-      receipt,
-      payment_capture: true,
-      notes: {
-        email: session.user.email || "",
-        userId: session.user.id,
-      },
-    };
-
-    const order: any = await razorpay.orders.create(options);
-
-    return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-    });
-  } catch (error: any) {
-    console.error("Razorpay order creation error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message || "Failed to create payment order",
-      },
-      { status: 500 },
-    );
+    console.error(e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
