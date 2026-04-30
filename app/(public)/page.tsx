@@ -139,7 +139,7 @@ export default function HomePage() {
           description: e.node.descriptionHtml ?? "",
           price: v ? minorToRupees(v.priceMinor) : 0,
           originalPrice: v?.compareAtMinor ? minorToRupees(v.compareAtMinor) : undefined,
-          images: [],
+          images: e.node.images ?? [],
           category: e.node.categoryId ?? "",
           rating: e.node.ratingAvg ?? 0,
           sold: 0,

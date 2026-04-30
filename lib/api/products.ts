@@ -11,6 +11,7 @@ import type {
 const PRODUCT_FIELDS = `
   id slug title descriptionHtml status
   ratingAvg ratingCount brandId categoryId
+  images
   createdAt
   variants { id sku priceMinor compareAtMinor weightGrams optionsJson inStock }
 `;

@@ -32,6 +32,7 @@ export interface ProductDto {
   ratingCount: number;
   brandId?: string;
   categoryId?: string;
+  images: string[];
   variants: VariantDto[];
   createdAt: string;
 }
