@@ -13,9 +13,12 @@ import {
 } from "@/components/ui/dialog"
 import { Heart, ShoppingCart, Star, ExternalLink } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/hooks/use-wishlist"
 
 interface Product {
-    _id: string
+    _id?: string
+    id?: string
     name: string
     slug: string
     images: string[]
@@ -29,6 +32,8 @@ interface Product {
         sizes?: string[]
         colors?: Array<{ name: string; code: string }>
     }
+    variants?: Array<{ id: string }>
+    defaultVariantId?: string
     stock?: number
     description?: string
 }
@@ -41,6 +46,8 @@ interface QuickViewProps {
 
 export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
     const { toast } = useToast()
+    const cart = useCart()
+    const wishlist = useWishlist()
     const [selectedSize, setSelectedSize] = useState<string>("")
     const [selectedColor, setSelectedColor] = useState<string>("")
     const [currentImage, setCurrentImage] = useState(0)
@@ -48,33 +55,25 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
 
     if (!product) return null
 
+    const productId = product.id ?? product._id ?? ""
+    const variantId = product.variants?.[0]?.id ?? product.defaultVariantId
+
     const addToCart = async () => {
-        if (product.variations?.sizes?.length && !selectedSize) {
-            toast({ title: "Please select a size", variant: "destructive" })
+        if (!variantId) {
+            toast({ title: "No variant available", variant: "destructive" })
             return
         }
-
         setAdding(true)
         try {
-            const res = await fetch("/api/cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    productId: product._id,
-                    quantity: 1,
-                    size: selectedSize || undefined,
-                    color: selectedColor || undefined
-                })
-            })
-
-            if (res.ok) {
-                toast({ title: "Added to cart!" })
-                onClose()
-            } else {
-                toast({ title: "Failed to add to cart", variant: "destructive" })
-            }
+            await cart.addToCart({ variantId, quantity: 1 })
+            toast({ title: "Added to cart!" })
+            onClose()
         } catch (error) {
-            toast({ title: "Failed to add to cart", variant: "destructive" })
+            toast({
+                title: "Failed to add to cart",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
+            })
         } finally {
             setAdding(false)
         }
@@ -82,17 +81,14 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
 
     const addToWishlist = async () => {
         try {
-            const res = await fetch("/api/wishlist", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId: product._id })
-            })
-
-            if (res.ok) {
-                toast({ title: "Added to wishlist!" })
-            }
+            await wishlist.add(productId)
+            toast({ title: "Added to wishlist!" })
         } catch (error) {
-            toast({ title: "Failed to add to wishlist", variant: "destructive" })
+            toast({
+                title: "Failed to add to wishlist",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
+            })
         }
     }
 

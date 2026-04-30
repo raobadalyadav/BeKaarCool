@@ -49,26 +49,10 @@ export default function OffersClient() {
     }, [])
 
     const fetchOffers = async () => {
-        try {
-            const [couponsRes, offersRes] = await Promise.all([
-                fetch("/api/coupons/public"),
-                fetch("/api/offers")
-            ])
-
-            if (couponsRes.ok) {
-                const data = await couponsRes.json()
-                setCoupons(data.coupons || [])
-            }
-
-            if (offersRes.ok) {
-                const data = await offersRes.json()
-                setOffers(data.offers || [])
-            }
-        } catch (error) {
-            console.error("Failed to fetch offers:", error)
-        } finally {
-            setLoading(false)
-        }
+        // Public coupons + offers feed isn't backed by the new API yet.
+        setCoupons([])
+        setOffers([])
+        setLoading(false)
     }
 
     const copyCode = (code: string) => {

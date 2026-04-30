@@ -15,6 +15,7 @@ import {
   Package,
   AlertCircle
 } from "lucide-react"
+import * as productsApi from "@/lib/api/products"
 
 interface Category {
   _id: string
@@ -42,14 +43,15 @@ export default function CategoriesPageClient() {
     setError(null)
 
     try {
-      const response = await fetch("/api/categories?withCount=true")
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories")
-      }
-
-      const data = await response.json()
-      setCategories(data.categories || [])
+      const list = await productsApi.listCategories()
+      setCategories(
+        list.map((c) => ({
+          _id: c.id,
+          name: c.name,
+          slug: c.slug,
+          description: c.descriptionHtml ?? undefined,
+        }))
+      )
     } catch (err) {
       console.error("Error fetching categories:", err)
       setError("Failed to load categories. Please try again.")

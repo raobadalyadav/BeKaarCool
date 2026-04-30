@@ -12,6 +12,7 @@ import { Star, ThumbsUp, User } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
+import * as reviewsApi from "@/lib/api/reviews"
 
 interface ReviewSectionProps {
   productId: string
@@ -47,44 +48,24 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
 
     setSubmitting(true)
     try {
-      const response = await fetch("/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          productId,
-          rating,
-          title: title.trim(),
-          comment: comment.trim(),
-        }),
+      await reviewsApi.createReview({
+        productId,
+        rating,
+        title: title.trim(),
+        body: comment.trim(),
       })
-
-      if (response.ok) {
-        toast({
-          title: "Review submitted successfully!",
-          description: "Thank you for your feedback.",
-        })
-
-        // Reset form
-        setRating(0)
-        setTitle("")
-        setComment("")
-
-        // Refresh page to show new review
-        window.location.reload()
-      } else {
-        const error = await response.json()
-        toast({
-          title: "Error submitting review",
-          description: error.message || "Please try again later",
-          variant: "destructive",
-        })
-      }
+      toast({
+        title: "Review submitted successfully!",
+        description: "Thank you for your feedback.",
+      })
+      setRating(0)
+      setTitle("")
+      setComment("")
+      window.location.reload()
     } catch (error) {
       toast({
         title: "Error submitting review",
-        description: "Please try again later",
+        description: error instanceof Error ? error.message : "Please try again later",
         variant: "destructive",
       })
     } finally {

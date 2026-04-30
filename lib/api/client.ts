@@ -1,13 +1,15 @@
 /**
  * Typed fetch + GraphQL client for the NestJS backend.
  *
- * Server components / route handlers: pass tokens explicitly (or rely on cookies()).
- * Client components: tokens are read from cookie via the /api/session bridge.
- *
- * On 401, attempts a single refresh-then-retry.
+ * - On the server: calls backend directly at API_URL, attaches Authorization
+ *   header from HttpOnly cookies, retries once on 401 via refresh token.
+ * - On the browser: calls a same-origin `/bff/*` Next.js rewrite that forwards
+ *   to the backend. Browser sends bf_access cookie automatically (same-origin),
+ *   the rewrite preserves it as a Cookie header, and the backend's JWT strategy
+ *   extracts the access token from the cookie.
  */
 
-import { API_URL, GRAPHQL_URL } from "./config";
+import { API_URL } from "./config";
 import {
   getServerAccessToken,
   getServerRefreshToken,
@@ -43,10 +45,13 @@ interface RequestOpts {
 
 const isServer = typeof window === "undefined";
 
+const restBase = () => (isServer ? API_URL : "/bff");
+const gqlUrl = () => (isServer ? `${API_URL}/graphql` : "/bff/graphql");
+
 async function refreshAccessTokenServer(): Promise<AuthTokens | null> {
   const refreshToken = await getServerRefreshToken();
   if (!refreshToken) return null;
-  const res = await fetch(GRAPHQL_URL, {
+  const res = await fetch(`${API_URL}/graphql`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -67,7 +72,7 @@ async function refreshAccessTokenServer(): Promise<AuthTokens | null> {
 }
 
 async function rawRequest<T>(opts: RequestOpts): Promise<T> {
-  const url = `${API_URL}${opts.path}`;
+  const url = `${restBase()}${opts.path}`;
   const headers: Record<string, string> = {
     "content-type": "application/json",
     accept: "application/json",
@@ -86,6 +91,7 @@ async function rawRequest<T>(opts: RequestOpts): Promise<T> {
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
     cache: opts.cache,
     next: opts.next,
+    credentials: isServer ? undefined : "same-origin",
   });
 
   if (!res.ok) {
@@ -102,6 +108,7 @@ async function rawRequest<T>(opts: RequestOpts): Promise<T> {
       errBody
     );
   }
+  if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }
 
@@ -143,12 +150,13 @@ export async function gql<T>(args: {
       if (t) headers.authorization = `Bearer ${t}`;
     }
 
-    const res = await fetch(GRAPHQL_URL, {
+    const res = await fetch(gqlUrl(), {
       method: "POST",
       headers,
       body: JSON.stringify({ query: args.query, variables: args.variables }),
       cache: args.cache,
       next: args.next,
+      credentials: isServer ? undefined : "same-origin",
     });
 
     if (!res.ok) {
@@ -182,9 +190,23 @@ export async function gql<T>(args: {
   }
 }
 
-/** Helper for client components to talk to the backend via the /api proxy. */
-export async function clientFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
+/**
+ * Browser-side helper: thin wrapper over fetch() that decodes JSON and throws
+ * ApiError on non-2xx responses. Pass a backend path (e.g. "/cart") and it
+ * goes via the same-origin `/bff/*` rewrite. For absolute URLs (or our own
+ * Next.js routes like `/api/auth/...`), passes through unchanged.
+ */
+export async function clientFetch<T>(
+  path: string,
+  init?: RequestInit
+): Promise<T> {
+  const url =
+    path.startsWith("http") || path.startsWith("/api/") || path.startsWith("/bff/")
+      ? path
+      : `/bff${path.startsWith("/") ? path : `/${path}`}`;
+
+  const res = await fetch(url, {
+    credentials: "same-origin",
     ...init,
     headers: {
       "content-type": "application/json",
@@ -206,5 +228,37 @@ export async function clientFetch<T>(path: string, init?: RequestInit): Promise<
       errBody
     );
   }
+  if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
+}
+
+/**
+ * Run a GraphQL query/mutation from the browser via the same-origin BFF.
+ * Auth flows automatically via the bf_access HttpOnly cookie that browsers
+ * attach to same-origin requests.
+ */
+export async function gqlClient<T>(args: {
+  query: string;
+  variables?: Record<string, unknown>;
+}): Promise<T> {
+  const res = await fetch("/bff/graphql", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify({ query: args.query, variables: args.variables }),
+  });
+  if (!res.ok) throw new ApiError(`GraphQL HTTP ${res.status}`, res.status);
+  const json = (await res.json()) as GqlResponse<T>;
+  if (json.errors?.length) {
+    const first = json.errors[0]!;
+    const code = first.extensions?.code;
+    const status =
+      code === "UNAUTHENTICATED" ? 401 : code === "FORBIDDEN" ? 403 : 400;
+    throw new ApiError(first.message, status, code, json.errors);
+  }
+  if (json.data === undefined) throw new ApiError("Empty GraphQL data", 500);
+  return json.data;
 }

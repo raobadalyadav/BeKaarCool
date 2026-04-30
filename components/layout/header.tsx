@@ -22,39 +22,19 @@ import { useCurrency } from "@/contexts/currency-context"
 import { Search, User, Menu } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useToast } from "@/hooks/use-toast"
-import { useAppSelector, useAppDispatch } from "@/store"
-import { fetchCart, loadFromStorage } from "@/store/slices/cart-slice"
-import { EnhancedSearch } from "@/components/search/enhanced-search"
+import { useCart } from "@/contexts/cart-context"
 import { CommandSearch } from "@/components/search/command-search"
 
 export function Header() {
   const { data: session } = useSession()
   const router = useRouter()
   const { toast } = useToast()
-  const dispatch = useAppDispatch()
   const { language, setLanguage, t } = useLanguage()
   const { currency, setCurrency } = useCurrency()
   const { theme, setTheme } = useTheme()
   const [commandOpen, setCommandOpen] = useState(false)
 
-
-  const { items } = useAppSelector((state) => state.cart)
-  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
-
-  const currencies = [
-    { code: "INR", symbol: "₹", rate: 1 },
-    { code: "USD", symbol: "$", rate: 0.012 },
-    { code: "EUR", symbol: "€", rate: 0.011 },
-    { code: "GBP", symbol: "£", rate: 0.0095 },
-  ]
-
-  useEffect(() => {
-    if (session) {
-      dispatch(fetchCart())
-    } else {
-      dispatch(loadFromStorage())
-    }
-  }, [session, dispatch])
+  const { itemCount: cartCount } = useCart()
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {

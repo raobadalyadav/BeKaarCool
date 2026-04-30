@@ -10,18 +10,16 @@ import { Separator } from "@/components/ui/separator"
 import { Search, X, Clock, TrendingUp, Filter, Sparkles } from "lucide-react"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
+import * as productsApi from "@/lib/api/products"
+import { minorToRupees } from "@/lib/api/config"
 
 interface SearchResult {
-  _id: string
-  name: string
+  id: string
+  title: string
   slug: string
-  category: string
-  brand?: string
-  price: number
-  images: string[]
-  rating: number
-  featured: boolean
+  priceMinor: string
+  ratingAvg?: number | null
+  inStock?: boolean
 }
 
 interface EnhancedSearchProps {
@@ -79,10 +77,9 @@ export function EnhancedSearch({
   const fetchSearchResults = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/products/search?q=${encodeURIComponent(debouncedQuery)}&limit=6`)
-      const data = await response.json()
-      setResults(data.products || [])
-      setSuggestions(data.suggestions || [])
+      const data = await productsApi.search({ q: debouncedQuery, first: 6 })
+      setResults(data.hits as SearchResult[])
+      setSuggestions([])
     } catch (error) {
       console.error("Search error:", error)
     } finally {
@@ -171,38 +168,21 @@ export function EnhancedSearch({
                 <div className="space-y-2">
                   {results.map((product) => (
                     <div
-                      key={product._id}
-                      onClick={() => router.push(`/products/${product.slug || product._id}`)}
+                      key={product.id}
+                      onClick={() => router.push(`/products/${product.slug || product.id}`)}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
                     >
-                      <Image fill
-                        src={product.images[0] || "/placeholder.svg"}
-                        alt={product.name}
-                        className="w-10 h-10 rounded-md object-cover"
-                      />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium truncate">{product.name}</p>
-                          {product.featured && (
-                            <Sparkles className="h-3 w-3 text-yellow-500" />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{product.category}</span>
-                          {product.brand && (
-                            <>
-                              <span>•</span>
-                              <span>{product.brand}</span>
-                            </>
-                          )}
-                        </div>
+                        <p className="text-sm font-medium truncate">{product.title}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold">₹{product.price}</p>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs text-muted-foreground">★</span>
-                          <span className="text-xs text-muted-foreground">{product.rating.toFixed(1)}</span>
-                        </div>
+                        <p className="text-sm font-semibold">₹{minorToRupees(product.priceMinor).toLocaleString()}</p>
+                        {product.ratingAvg != null && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground">★</span>
+                            <span className="text-xs text-muted-foreground">{Number(product.ratingAvg).toFixed(1)}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

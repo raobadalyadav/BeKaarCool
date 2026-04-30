@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/dialog"
 import { Scale, X, Star, ShoppingCart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useCart } from "@/contexts/cart-context"
 
 interface Product {
-    _id: string
+    _id?: string
+    id?: string
     name: string
     slug: string
     images: string[]
@@ -27,6 +29,8 @@ interface Product {
         sizes?: string[]
         colors?: Array<{ name: string; code: string }>
     }
+    variants?: Array<{ id: string }>
+    defaultVariantId?: string
     description?: string
 }
 
@@ -39,19 +43,23 @@ interface CompareProductsProps {
 
 export function CompareProducts({ products, onRemove, isOpen, onClose }: CompareProductsProps) {
     const { toast } = useToast()
+    const cart = useCart()
 
     const addToCart = async (product: Product) => {
+        const variantId = product.variants?.[0]?.id ?? product.defaultVariantId
+        if (!variantId) {
+            toast({ title: "Open the product to pick a variant" })
+            return
+        }
         try {
-            const res = await fetch("/api/cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId: product._id, quantity: 1 })
-            })
-            if (res.ok) {
-                toast({ title: `${product.name} added to cart!` })
-            }
+            await cart.addToCart({ variantId, quantity: 1 })
+            toast({ title: `${product.name} added to cart!` })
         } catch (error) {
-            toast({ title: "Failed to add to cart", variant: "destructive" })
+            toast({
+                title: "Failed to add to cart",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
+            })
         }
     }
 
@@ -115,10 +123,10 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
                                 <tr>
                                     <th className="text-left p-3 bg-gray-50 w-32"></th>
                                     {products.map(product => (
-                                        <th key={product._id} className="p-3 bg-gray-50 min-w-[200px]">
+                                        <th key={(product.id ?? product._id ?? "")} className="p-3 bg-gray-50 min-w-[200px]">
                                             <div className="relative">
                                                 <button
-                                                    onClick={() => onRemove(product._id)}
+                                                    onClick={() => onRemove((product.id ?? product._id ?? ""))}
                                                     className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1"
                                                 >
                                                     <X className="w-3 h-3" />
@@ -148,7 +156,7 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
                                             {field.label}
                                         </td>
                                         {products.map(product => (
-                                            <td key={product._id} className="p-3 text-center">
+                                            <td key={(product.id ?? product._id ?? "")} className="p-3 text-center">
                                                 {field.render(product)}
                                             </td>
                                         ))}
@@ -157,7 +165,7 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
                                 <tr>
                                     <td className="p-3"></td>
                                     {products.map(product => (
-                                        <td key={product._id} className="p-3 text-center">
+                                        <td key={(product.id ?? product._id ?? "")} className="p-3 text-center">
                                             <Button
                                                 size="sm"
                                                 onClick={() => addToCart(product)}
@@ -183,7 +191,7 @@ export function useCompareProducts(maxProducts = 4) {
     const { toast } = useToast()
 
     const addToCompare = (product: Product) => {
-        if (compareList.find(p => p._id === product._id)) {
+        if (compareList.find(p => (p.id ?? p._id) === (product.id ?? product._id ?? ""))) {
             toast({ title: "Already in compare list" })
             return
         }
@@ -196,7 +204,7 @@ export function useCompareProducts(maxProducts = 4) {
     }
 
     const removeFromCompare = (productId: string) => {
-        setCompareList(prev => prev.filter(p => p._id !== productId))
+        setCompareList(prev => prev.filter(p => (p.id ?? p._id) !== productId))
     }
 
     const clearCompare = () => {
@@ -204,7 +212,7 @@ export function useCompareProducts(maxProducts = 4) {
     }
 
     const isInCompare = (productId: string) => {
-        return compareList.some(p => p._id === productId)
+        return compareList.some(p => (p.id ?? p._id) === productId)
     }
 
     return {

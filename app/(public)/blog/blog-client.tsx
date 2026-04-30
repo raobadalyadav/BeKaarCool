@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import {
     Search, Calendar, ChevronRight, ChevronLeft, Home, BookOpen
 } from "lucide-react"
+import * as contentApi from "@/lib/api/content"
 
 interface BlogPost {
     _id: string
@@ -54,18 +55,23 @@ export default function BlogClient() {
     const fetchPosts = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`/api/blog?page=${pagination.page}&limit=${pagination.limit}`)
-            if (res.ok) {
-                const data = await res.json()
-                setPosts(data.posts || [])
-                setPagination(prev => ({
-                    ...prev,
-                    total: data.pagination?.total || 0,
-                    pages: data.pagination?.pages || 0
+            const list = await contentApi.blogPosts()
+            setPosts(
+                list.map((p) => ({
+                    _id: p.id,
+                    title: p.title,
+                    slug: p.slug,
+                    excerpt: p.excerpt ?? "",
+                    content: p.bodyHtml ?? "",
+                    coverImage: "/placeholder.svg",
+                    category: "Article",
+                    author: { name: "Baefikra" },
+                    readTime: 5,
+                    createdAt: new Date().toISOString(),
+                    tags: [],
                 }))
-            } else {
-                setPosts([])
-            }
+            )
+            setPagination(prev => ({ ...prev, total: list.length, pages: 1 }))
         } catch (error) {
             console.error("Failed to fetch posts:", error)
             setPosts([])

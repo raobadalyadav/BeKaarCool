@@ -9,6 +9,7 @@ import {
     MapPin, Truck, CheckCircle, Package, Calendar, AlertCircle
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import * as checkoutApi from "@/lib/api/checkout"
 
 interface DeliverySlot {
     label: string
@@ -53,12 +54,16 @@ export function DeliveryChecker({ onSlotSelect, cartTotal = 0 }: DeliveryChecker
 
         setChecking(true)
         try {
-            const res = await fetch(`/api/pincode?pincode=${pincode}`)
-            const data = await res.json()
-            setDeliveryInfo(data)
+            const data = await checkoutApi.checkPincode(pincode)
+            setDeliveryInfo({
+                isServiceable: data.serviceable,
+                city: data.city,
+                state: data.state,
+                codAvailable: data.cod,
+            })
             setSelectedSlot(null)
 
-            if (!data.isServiceable) {
+            if (!data.serviceable) {
                 toast({ title: "Delivery not available for this pincode", variant: "destructive" })
             }
         } catch (error) {

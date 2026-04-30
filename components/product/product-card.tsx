@@ -10,6 +10,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { useWishlist } from "@/hooks/use-wishlist"
+import { useCart } from "@/contexts/cart-context"
 
 interface ProductCardProps {
   product: any
@@ -22,48 +23,35 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const { isInWishlist, toggleWishlist } = useWishlist()
+  const { addToCart } = useCart()
 
-  const isWishlisted = isInWishlist(product._id)
+  const productId = product.id ?? product._id
+  const defaultVariantId = product.variants?.[0]?.id ?? product.defaultVariantId
+  const isWishlisted = isInWishlist(productId)
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (product.stock === 0 || product.stock <= 0) {
+    if (!defaultVariantId) {
       toast({
-        title: "Out of Stock",
-        description: "This product is currently out of stock.",
-        variant: "destructive",
+        title: "Pick options",
+        description: "Open the product to select size/color.",
       })
       return
     }
 
     setIsLoading(true)
     try {
-      const response = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: product._id,
-          quantity: 1,
-          size: product.variations?.sizes?.[0] || "M",
-          color: product.variations?.colors?.[0] || "Black",
-        }),
+      await addToCart({ variantId: defaultVariantId, quantity: 1 })
+      toast({
+        title: "Added to cart!",
+        description: `${product.name ?? product.title ?? "Item"} added to your bag.`,
       })
-
-      if (response.ok) {
-        toast({
-          title: "Added to cart! 🛍️",
-          description: `${product.name} has been added to your cart.`,
-        })
-      } else {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to add to cart")
-      }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Please login to add items to cart.",
+        description: error instanceof Error ? error.message : "Please login to add items to cart.",
         variant: "destructive",
       })
     } finally {
@@ -74,7 +62,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
   const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    await toggleWishlist(product._id)
+    await toggleWishlist(productId)
   }
 
   const discountPercentage = product.originalPrice && product.originalPrice > product.price
@@ -85,7 +73,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
   const isLowStock = product.stock > 0 && product.stock <= 5
 
   return (
-    <Link href={`/products/${product.slug || product._id}`} className="block h-full">
+    <Link href={`/products/${product.slug || productId}`} className="block h-full">
       <Card
         className={`group h-full flex flex-col hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border-0 shadow-none hover:shadow-xl ${viewMode === "list" ? "flex-row" : ""
           } ${isOutOfStock ? "opacity-75" : ""}`}
@@ -170,9 +158,9 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
             <Button
               onClick={handleAddToCart}
               className="mt-3 w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-8 text-xs"
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || isLoading}
             >
-              {isOutOfStock ? "Out of Stock" : "ADD TO BAG"}
+              {isOutOfStock ? "Out of Stock" : isLoading ? "Adding..." : "ADD TO BAG"}
             </Button>
           )}
         </CardContent>

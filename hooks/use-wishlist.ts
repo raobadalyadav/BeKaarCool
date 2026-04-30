@@ -2,13 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { clientFetch } from "@/lib/api/client";
+import * as wishlistApi from "@/lib/api/wishlist";
 import type { WishlistItemDto } from "@/lib/api/types";
 
-/**
- * Hook for wishlist management. Backed by the NestJS wishlist API via the
- * Next.js /api/wishlist proxy.
- */
 export function useWishlist() {
   const { status } = useSession();
   const [items, setItems] = useState<WishlistItemDto[]>([]);
@@ -21,7 +17,7 @@ export function useWishlist() {
     }
     try {
       setLoading(true);
-      const data = await clientFetch<WishlistItemDto[]>("/api/wishlist");
+      const data = await wishlistApi.myWishlist();
       setItems(data);
     } finally {
       setLoading(false);
@@ -38,10 +34,7 @@ export function useWishlist() {
         window.location.href = "/auth/login";
         return;
       }
-      await clientFetch("/api/wishlist", {
-        method: "POST",
-        body: JSON.stringify({ productId }),
-      });
+      await wishlistApi.addToWishlist(productId);
       await refresh();
     },
     [status, refresh]
@@ -49,10 +42,7 @@ export function useWishlist() {
 
   const remove = useCallback(
     async (productId: string) => {
-      await clientFetch("/api/wishlist", {
-        method: "DELETE",
-        body: JSON.stringify({ productId }),
-      });
+      await wishlistApi.removeFromWishlist(productId);
       await refresh();
     },
     [refresh]
@@ -79,7 +69,6 @@ export function useWishlist() {
     remove,
     toggle,
     has,
-    // back-compat aliases for existing components
     isInWishlist: has,
     toggleWishlist: toggle,
   };

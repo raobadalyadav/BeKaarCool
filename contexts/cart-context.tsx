@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import { useSession } from "next-auth/react";
-import { clientFetch } from "@/lib/api/client";
+import * as cartApi from "@/lib/api/cart";
 import type { CartDto } from "@/lib/api/types";
 import { minorToRupees } from "@/lib/api/config";
 
@@ -51,7 +51,7 @@ const dtoToItems = (cart: CartDto): CartItem[] =>
   }));
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [cart, setCart] = useState<CartDto | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -72,7 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       setLoading(true);
-      const next = await clientFetch<CartDto>("/api/cart");
+      const next = await cartApi.getCart();
       setCart(next);
     } catch (err) {
       console.error("Failed to load cart:", err);
@@ -93,10 +93,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       setLoading(true);
       try {
-        const next = await clientFetch<CartDto>("/api/cart", {
-          method: "POST",
-          body: JSON.stringify(input),
-        });
+        const next = await cartApi.addToCart(input.variantId, input.quantity);
         setCart(next);
       } finally {
         setLoading(false);
@@ -108,10 +105,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = useCallback(async (id: string, quantity: number) => {
     setLoading(true);
     try {
-      const next = await clientFetch<CartDto>(`/api/cart/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ quantity }),
-      });
+      const next = await cartApi.updateCartItem(id, quantity);
       setCart(next);
     } finally {
       setLoading(false);
@@ -121,9 +115,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeFromCart = useCallback(async (id: string) => {
     setLoading(true);
     try {
-      const next = await clientFetch<CartDto>(`/api/cart/${id}`, {
-        method: "DELETE",
-      });
+      const next = await cartApi.removeFromCart(id);
       setCart(next);
     } finally {
       setLoading(false);

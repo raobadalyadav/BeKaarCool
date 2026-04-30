@@ -14,6 +14,8 @@ import {
     ChevronLeft
 } from "lucide-react"
 import { useDebounce } from "@/hooks/use-debounce"
+import * as productsApi from "@/lib/api/products"
+import { minorToRupees } from "@/lib/api/config"
 
 interface Product {
     _id: string
@@ -73,39 +75,22 @@ export default function SearchClient() {
     }, [initialQuery])
 
     const fetchRecentSearches = async () => {
-        try {
-            const res = await fetch("/api/search?type=recent")
-            if (res.ok) {
-                const data = await res.json()
-                setRecentSearches(data.searches || [])
+        const stored = typeof window !== "undefined" ? localStorage.getItem("recentSearches") : null
+        if (stored) {
+            try {
+                setRecentSearches(JSON.parse(stored))
+            } catch {
+                /* ignore */
             }
-        } catch (error) {
-            console.error("Failed to fetch recent searches:", error)
         }
     }
 
     const fetchPopularSearches = async () => {
-        try {
-            const res = await fetch("/api/search?type=popular")
-            if (res.ok) {
-                const data = await res.json()
-                setPopularSearches(data.searches || [])
-            }
-        } catch (error) {
-            console.error("Failed to fetch popular searches:", error)
-        }
+        setPopularSearches(["T-Shirts", "Hoodies", "Mobile Covers", "Mugs"])
     }
 
-    const fetchSuggestions = async (q: string) => {
-        try {
-            const res = await fetch(`/api/search?type=suggestions&q=${encodeURIComponent(q)}`)
-            if (res.ok) {
-                const data = await res.json()
-                setSuggestions(data.suggestions || [])
-            }
-        } catch (error) {
-            console.error("Failed to fetch suggestions:", error)
-        }
+    const fetchSuggestions = async (_q: string) => {
+        setSuggestions([])
     }
 
     const performSearch = async (searchQuery: string, pageNum: number) => {
@@ -115,13 +100,19 @@ export default function SearchClient() {
         setShowSuggestions(false)
 
         try {
-            const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&page=${pageNum}&limit=20`)
-            if (res.ok) {
-                const data = await res.json()
-                setProducts(data.products || [])
-                setTotalPages(data.pagination?.pages || 0)
-                setPage(pageNum)
-            }
+            const data = await productsApi.search({ q: searchQuery, first: 20 })
+            setProducts(
+                data.hits.map((h) => ({
+                    _id: h.id,
+                    name: h.title,
+                    slug: h.slug,
+                    images: [],
+                    price: minorToRupees(h.priceMinor),
+                    rating: h.ratingAvg ?? undefined,
+                }))
+            )
+            setTotalPages(1)
+            setPage(pageNum)
         } catch (error) {
             console.error("Search failed:", error)
         } finally {
@@ -153,16 +144,10 @@ export default function SearchClient() {
     }
 
     const clearRecentSearches = async () => {
-        try {
-            await fetch("/api/search", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "clear" })
-            })
-            setRecentSearches([])
-        } catch (error) {
-            console.error("Failed to clear searches:", error)
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("recentSearches")
         }
+        setRecentSearches([])
     }
 
     return (

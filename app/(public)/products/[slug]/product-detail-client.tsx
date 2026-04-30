@@ -16,8 +16,9 @@ interface ProductDetailClientProps {
     relatedProducts?: any[]
 }
 
-import { useAppDispatch } from "@/store"
-import { addToCartLocal, fetchCart } from "@/store/slices/cart-slice"
+import { useCart } from "@/contexts/cart-context"
+import { useWishlist } from "@/hooks/use-wishlist"
+import * as checkoutApi from "@/lib/api/checkout"
 
 export default function ProductDetailClient({ product, relatedProducts = [] }: ProductDetailClientProps) {
     const [selectedImage, setSelectedImage] = useState(0)
@@ -31,57 +32,33 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
     const [deliveryInfo, setDeliveryInfo] = useState<string | null>(null)
 
     const { toast } = useToast()
-    const dispatch = useAppDispatch()
+    const { addToCart } = useCart()
+    const { has: isInWishlist, toggle: toggleWishlist } = useWishlist()
     const { data: session } = useSession()
 
+    const productId = product.id ?? product._id
+    const variantId =
+        product.variants?.find((v: any) => v.optionsJson?.size === selectedSize && v.optionsJson?.color === selectedColor)?.id ??
+        product.variants?.[0]?.id ??
+        product.defaultVariantId
+
     const handleAddToCart = async () => {
-        if (!selectedSize) {
-            toast({
-                title: "Please select a size",
-                description: "Choose your size before adding to bag",
-                variant: "destructive"
-            })
+        if (!variantId) {
+            toast({ title: "No variant available", variant: "destructive" })
             return
         }
-
         setLoading(true)
         try {
-            const response = await fetch("/api/cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    productId: product._id,
-                    quantity,
-                    size: selectedSize,
-                    color: selectedColor,
-                }),
-            })
-
-            if (response.ok) {
-                toast({
-                    title: "Added to Bag!",
-                    description: `${product.name} has been added to your cart.`,
-                })
-                dispatch(fetchCart())
-            } else {
-                throw new Error("Failed to add to cart")
-            }
-        } catch (error) {
-            // Fallback for guest users
-            dispatch(addToCartLocal({
-                productId: product._id,
-                name: product.name,
-                price: product.price,
-                originalPrice: product.originalPrice,
-                image: images[0],
-                quantity,
-                size: selectedSize,
-                color: selectedColor
-            }))
-
+            await addToCart({ variantId, quantity })
             toast({
                 title: "Added to Bag!",
-                description: `${product.name} has been added to your bag.`,
+                description: `${product.name ?? product.title} has been added to your cart.`,
+            })
+        } catch (error) {
+            toast({
+                title: "Failed to add",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
             })
         } finally {
             setLoading(false)
@@ -100,22 +77,8 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
 
         setWishlistLoading(true)
         try {
-            const method = isWishlisted ? "DELETE" : "POST"
-            const response = await fetch("/api/wishlist", {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId: product._id }),
-            })
-
-            if (response.ok) {
-                setIsWishlisted(!isWishlisted)
-                toast({
-                    title: isWishlisted ? "Removed from Wishlist" : "Added to Wishlist",
-                    description: isWishlisted
-                        ? `${product.name} removed from your wishlist`
-                        : `${product.name} added to your wishlist`,
-                })
-            }
+            await toggleWishlist(productId)
+            setIsWishlisted(isInWishlist(productId))
         } catch (error) {
             console.error("Wishlist error:", error)
         } finally {
@@ -134,11 +97,9 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
         }
 
         try {
-            const response = await fetch(`/api/pincode?code=${pincode}`)
-            const data = await response.json()
-
+            const data = await checkoutApi.checkPincode(pincode)
             if (data.serviceable) {
-                setDeliveryInfo(`Delivery available! Expected by ${data.estimatedDays || "3-5"} days`)
+                setDeliveryInfo(`Delivery available to ${data.city}, ${data.state}`)
             } else {
                 setDeliveryInfo("Sorry, delivery not available at this location")
             }

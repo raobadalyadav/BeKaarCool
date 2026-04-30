@@ -30,6 +30,13 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    const backend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    return [
+      { source: '/bff/graphql', destination: `${backend}/graphql` },
+      { source: '/bff/:path*', destination: `${backend}/:path*` },
+    ]
+  },
   async headers() {
     return [
       {

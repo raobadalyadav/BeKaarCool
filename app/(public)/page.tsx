@@ -16,6 +16,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { ChevronRight, Star, Truck, RefreshCcw, ShieldCheck, AlertCircle, Clock, Zap, Heart, Gift, Percent, Tag } from "lucide-react"
+import * as productsApi from "@/lib/api/products"
+import * as contentApi from "@/lib/api/content"
+import { minorToRupees } from "@/lib/api/config"
 
 // Interfaces
 interface Product {
@@ -113,23 +116,7 @@ export default function HomePage() {
   }, [flashSaleEnd])
 
   const loadRecentlyViewed = () => {
-    try {
-      const stored = localStorage.getItem("recentlyViewed")
-      if (stored) {
-        const productIds = JSON.parse(stored) as string[]
-        // We'll fetch these products if we have IDs
-        if (productIds.length > 0) {
-          fetch(`/api/products?ids=${productIds.slice(0, 10).join(",")}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data.products) setRecentlyViewed(data.products)
-            })
-            .catch(() => { })
-        }
-      }
-    } catch (e) {
-      // Ignore localStorage errors
-    }
+    // Recently-viewed lookup is disabled until backend exposes a batch product-by-id query.
   }
 
   const fetchHomeData = async () => {
@@ -137,32 +124,43 @@ export default function HomePage() {
       setLoading(true)
       setError(null)
 
-      const [productsRes, categoriesRes, bannersRes, offersRes] = await Promise.all([
-        fetch("/api/products?limit=50"),
-        fetch("/api/categories?withCount=true&featured=true"),
-        fetch("/api/banners?placement=homepage"),
-        fetch("/api/offers?limit=6&active=true")
+      const [productsConn, cats, banList] = await Promise.all([
+        productsApi.listProducts({ first: 50, status: "published" }),
+        productsApi.listCategories(),
+        contentApi.banners(),
       ])
 
-      if (productsRes.ok) {
-        const productsData = await productsRes.json()
-        setProducts(productsData.products || [])
-      }
-
-      if (categoriesRes.ok) {
-        const categoriesData = await categoriesRes.json()
-        setCategories(categoriesData || [])
-      }
-
-      if (bannersRes.ok) {
-        const bannersData = await bannersRes.json()
-        setBanners(bannersData || [])
-      }
-
-      if (offersRes.ok) {
-        const offersData = await offersRes.json()
-        setOffers(offersData.offers || offersData || [])
-      }
+      const mapped: Product[] = productsConn.edges.map((e) => {
+        const v = e.node.variants[0]
+        return {
+          _id: e.node.id,
+          name: e.node.title,
+          slug: e.node.slug,
+          description: e.node.descriptionHtml ?? "",
+          price: v ? minorToRupees(v.priceMinor) : 0,
+          originalPrice: v?.compareAtMinor ? minorToRupees(v.compareAtMinor) : undefined,
+          images: [],
+          category: e.node.categoryId ?? "",
+          rating: e.node.ratingAvg ?? 0,
+          sold: 0,
+          featured: false,
+          createdAt: e.node.createdAt,
+          stock: v?.inStock ? 100 : 0,
+        }
+      })
+      setProducts(mapped)
+      setCategories(
+        cats.map((c) => ({ _id: c.id, name: c.name, slug: c.slug }))
+      )
+      setBanners(
+        banList.map((b) => ({
+          _id: b.id,
+          title: b.title,
+          subtitle: b.excerpt,
+          image: "/placeholder.svg",
+        }))
+      )
+      setOffers([])
     } catch (err) {
       console.error("Error fetching home data:", err)
       setError("Failed to load content. Please refresh the page.")
@@ -171,13 +169,8 @@ export default function HomePage() {
     }
   }
 
-  // Track banner click
-  const trackBannerClick = async (bannerId: string) => {
-    try {
-      await fetch(`/api/banners/${bannerId}/click`, { method: "POST" })
-    } catch (err) {
-      // Silent fail for analytics
-    }
+  const trackBannerClick = async (_bannerId: string) => {
+    // No-op until backend exposes banner click tracking.
   }
 
   // Filter Products

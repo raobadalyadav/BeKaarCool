@@ -11,6 +11,8 @@ import { useDebounce } from "@/hooks/use-debounce"
 import { useSearchParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import * as productsApi from "@/lib/api/products"
+import { minorToRupees } from "@/lib/api/config"
 
 interface Product {
   _id: string
@@ -98,49 +100,79 @@ export default function ProductsPageClient() {
     setError(null)
 
     try {
-      const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-        sort: sortBy,
-      })
+      let mapped: Product[]
+      let total: number
 
-      if (debouncedSearch) params.append("search", debouncedSearch)
-      if (selectedCategories.length > 0) params.append("category", selectedCategories.join(","))
-      if (selectedSizes.length > 0) params.append("sizes", selectedSizes.join(","))
-      if (selectedBrands.length > 0) params.append("brands", selectedBrands.join(","))
-      if (selectedRating > 0) params.append("rating", selectedRating.toString())
-      if (priceRange[0] > 0) params.append("minPrice", priceRange[0].toString())
-      if (priceRange[1] < 10000) params.append("maxPrice", priceRange[1].toString())
-
-      const response = await fetch(`/api/products?${params}`)
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch products")
+      if (debouncedSearch) {
+        const sortMap: Record<string, "price_asc" | "price_desc" | "rating_desc" | "popularity" | undefined> = {
+          "price-low": "price_asc",
+          "price-high": "price_desc",
+          "rating": "rating_desc",
+          "trending": "popularity",
+        }
+        const result = await productsApi.search({
+          q: debouncedSearch,
+          first: pagination.limit,
+          sort: sortMap[sortBy],
+        })
+        mapped = result.hits.map((h) => ({
+          _id: h.id,
+          name: h.title,
+          slug: h.slug,
+          description: "",
+          price: minorToRupees(h.priceMinor),
+          images: [],
+          category: h.categoryId ?? "",
+          rating: h.ratingAvg ?? 0,
+          sold: 0,
+          featured: false,
+          stock: h.inStock ? 100 : 0,
+        }))
+        total = result.estimatedTotalHits
+      } else {
+        const conn = await productsApi.listProducts({
+          first: pagination.limit,
+          status: "published",
+        })
+        mapped = conn.edges.map((e) => {
+          const v = e.node.variants[0]
+          return {
+            _id: e.node.id,
+            name: e.node.title,
+            slug: e.node.slug,
+            description: e.node.descriptionHtml ?? "",
+            price: v ? minorToRupees(v.priceMinor) : 0,
+            originalPrice: v?.compareAtMinor ? minorToRupees(v.compareAtMinor) : undefined,
+            images: [],
+            category: e.node.categoryId ?? "",
+            rating: e.node.ratingAvg ?? 0,
+            sold: 0,
+            featured: false,
+            stock: v?.inStock ? 100 : 0,
+          }
+        })
+        total = mapped.length
       }
 
-      const data = await response.json()
-      setProducts(data.products || [])
-      setPagination(prev => ({
-        ...prev,
-        total: data.pagination?.total || 0,
-        pages: data.pagination?.pages || 0
-      }))
+      setProducts(mapped)
+      setPagination(prev => ({ ...prev, total, pages: Math.ceil(total / prev.limit) }))
     } catch (err) {
       console.error("Error fetching products:", err)
       setError("Failed to load products. Please try again.")
     } finally {
       setLoading(false)
     }
-  }, [pagination.page, pagination.limit, sortBy, debouncedSearch, selectedCategories, selectedSizes, selectedBrands, selectedRating, priceRange])
+  }, [pagination.limit, sortBy, debouncedSearch])
 
   const fetchFilterOptions = async () => {
     try {
-      const response = await fetch("/api/products/filters")
-      if (response.ok) {
-        const data = await response.json()
-        setFilterOptions(data)
-        setPriceRange([data.priceRange.min, data.priceRange.max])
-      }
+      const cats = await productsApi.listCategories()
+      setFilterOptions({
+        categories: cats.map((c) => ({ name: c.name, count: 0 })),
+        brands: [],
+        sizes: [],
+        priceRange: { min: 0, max: 10000 },
+      })
     } catch (err) {
       console.error("Error fetching filter options:", err)
     }

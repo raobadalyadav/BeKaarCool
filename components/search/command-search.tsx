@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import * as productsApi from "@/lib/api/products"
+import { minorToRupees } from "@/lib/api/config"
 import {
   CommandDialog,
   CommandEmpty,
@@ -37,9 +39,8 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const searchProducts = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}&limit=8`)
-      const data = await response.json()
-      setResults(data.products || [])
+      const data = await productsApi.search({ q: query, first: 8 })
+      setResults(data.hits ?? [])
     } catch (error) {
       console.error("Search error:", error)
     } finally {
@@ -99,37 +100,24 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
           <CommandGroup heading="Products">
             {results.map((product) => (
               <CommandItem
-                key={product._id}
-                value={product._id}
-                onSelect={() => handleSelect(product._id, "product")}
+                key={product.id}
+                value={product.id}
+                onSelect={() => handleSelect(product.slug ?? product.id, "product")}
                 className="flex items-center gap-3 p-3"
               >
-                <Image fill
-                  src={product.images[0] || "/placeholder.svg"}
-                  alt={product.name}
-                  className="w-10 h-10 rounded-md object-cover"
-                />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">{product.name}</p>
-                    {product.featured && <Sparkles className="h-3 w-3 text-yellow-500" />}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>{product.category}</span>
-                    {product.brand && (
-                      <>
-                        <span>•</span>
-                        <span>{product.brand}</span>
-                      </>
-                    )}
+                    <p className="font-medium truncate">{product.title}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">₹{product.price}</p>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span>★</span>
-                    <span>{product.rating.toFixed(1)}</span>
-                  </div>
+                  <p className="font-semibold">₹{minorToRupees(product.priceMinor).toLocaleString()}</p>
+                  {product.ratingAvg != null && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <span>★</span>
+                      <span>{Number(product.ratingAvg).toFixed(1)}</span>
+                    </div>
+                  )}
                 </div>
               </CommandItem>
             ))}

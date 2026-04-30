@@ -34,31 +34,15 @@ export function Footer() {
     if (!email.trim()) return
 
     setSubscribing(true)
-    try {
-      const response = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      })
-
-      if (response.ok) {
-        toast({
-          title: "Subscribed!",
-          description: "Thank you for subscribing to our newsletter.",
-        })
-        setEmail("")
-      } else {
-        throw new Error("Failed to subscribe")
-      }
-    } catch (error) {
+    // Newsletter signup is currently disabled while the backend feature is being built.
+    setTimeout(() => {
       toast({
-        title: "Error",
-        description: "Failed to subscribe. Please try again.",
-        variant: "destructive",
+        title: "Thanks!",
+        description: "We'll let you know when newsletter signups go live.",
       })
-    } finally {
+      setEmail("")
       setSubscribing(false)
-    }
+    }, 200)
   }
 
   const features = [

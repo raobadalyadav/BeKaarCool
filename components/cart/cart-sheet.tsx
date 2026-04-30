@@ -1,10 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { useAppSelector, useAppDispatch } from "@/store"
-import { removeFromCart, updateCartItem } from "@/store/slices/cart-slice"
+import { useCart } from "@/contexts/cart-context"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
@@ -13,26 +11,24 @@ import { ShoppingBag, Trash2, Plus, Minus, X, Truck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function CartSheet({ children }: { children: React.ReactNode }) {
-    const dispatch = useAppDispatch()
-    const { items, subtotal } = useAppSelector((state) => state.cart)
+    const { items, total: subtotal, updateQuantity, removeFromCart } = useCart()
     const { toast } = useToast()
     const [isOpen, setIsOpen] = useState(false)
 
-    // Free shipping threshold (e.g., ₹999)
     const freeShippingThreshold = 999
     const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal)
     const progressPercentage = Math.min(100, (subtotal / freeShippingThreshold) * 100)
 
     const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
         if (newQuantity < 1) return
-        dispatch(updateCartItem({ itemId, quantity: newQuantity }))
+        updateQuantity(itemId, newQuantity)
     }
 
-    const handleRemoveItem = (itemId: string, name: string) => {
-        dispatch(removeFromCart(itemId))
+    const handleRemoveItem = (itemId: string) => {
+        removeFromCart(itemId)
         toast({
             title: "Removed from bag",
-            description: `${name} has been removed.`,
+            description: "Item has been removed.",
         })
     }
 
@@ -87,18 +83,9 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                         <div className="space-y-6 py-6">
                             {items.map((item) => (
                                 <div key={item.id} className="flex gap-4">
-                                    <div className="relative w-20 h-24 flex-shrink-0 bg-gray-50 rounded border overflow-hidden">
-                                        <Image
-                                            src={item.image}
-                                            alt={item.name}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    </div>
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div>
-                                            <h4 className="text-sm font-medium text-gray-800 line-clamp-1">{item.name}</h4>
-                                            <p className="text-xs text-gray-500 mt-0.5">Size: {item.size} | Color: {item.color}</p>
+                                            <h4 className="text-sm font-medium text-gray-800 line-clamp-1">Variant {item.variantId.slice(0, 8)}</h4>
                                         </div>
 
                                         <div className="flex items-center justify-between mt-2">
@@ -120,14 +107,11 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                                             </div>
                                             <div className="text-right">
                                                 <span className="text-sm font-bold text-gray-900">₹{item.price * item.quantity}</span>
-                                                {item.originalPrice && (
-                                                    <span className="block text-[10px] text-gray-400 line-through">₹{item.originalPrice * item.quantity}</span>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => handleRemoveItem(item.id, item.name)}
+                                        onClick={() => handleRemoveItem(item.id)}
                                         className="text-gray-400 hover:text-red-500 self-start p-1"
                                     >
                                         <X className="w-4 h-4" />

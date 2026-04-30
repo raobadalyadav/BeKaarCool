@@ -11,6 +11,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
+import * as ordersApi from "@/lib/api/orders"
+import { minorToRupees } from "@/lib/api/config"
 
 interface OrderDetails {
   _id: string
@@ -72,14 +74,43 @@ function OrderConfirmationContent() {
 
   const fetchOrderDetails = async () => {
     try {
-      const identifier = orderId || orderNumber;
-      const response = await fetch(`/api/orders/${identifier}`)
-      if (response.ok) {
-        const orderData = await response.json()
-        setOrder(orderData)
-      } else {
+      const identifier = orderNumber || orderId
+      if (!identifier) {
         setError("Order not found")
+        return
       }
+      const data = await ordersApi.getOrder(identifier)
+      if (!data) {
+        setError("Order not found")
+        return
+      }
+      setOrder({
+        _id: data.id,
+        orderNumber: data.number,
+        items: data.items.map((it) => ({
+          product: { _id: it.variantId, name: it.productTitleSnapshot, images: [] },
+          quantity: it.quantity,
+          price: minorToRupees(it.unitPriceMinor),
+        })),
+        total: minorToRupees(data.totalMinor),
+        subtotal: minorToRupees(data.subtotalMinor),
+        shipping: minorToRupees(data.shippingMinor),
+        tax: minorToRupees(data.taxMinor),
+        discount: minorToRupees(data.discountMinor),
+        status: data.status,
+        paymentStatus: "",
+        paymentMethod: "",
+        shippingAddress: {
+          name: "",
+          phone: "",
+          address: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "IN",
+        },
+        createdAt: data.placedAt ?? new Date().toISOString(),
+      })
     } catch (error) {
       setError("Failed to load order details")
     } finally {
@@ -88,22 +119,14 @@ function OrderConfirmationContent() {
   }
 
   const handleDownloadInvoice = async () => {
-    const finalOrderId = order?._id || orderId
-    if (!finalOrderId || finalOrderId === "null" || finalOrderId === "undefined") {
-      toast.error("Invalid order ID for invoice generation")
-      return
-    }
-
+    toast.error("Invoice download is being rebuilt on the new backend.")
+    return
+    // legacy block — unreachable, kept to avoid changing JSX below
     try {
-      const response = await fetch(`/api/orders/${finalOrderId}/invoice`)
-      if (response.ok) {
-        const invoice = await response.json()
-        
-        // Generate styled HTML invoice
+      if (false) {
+        const invoice: any = {}
         const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
         const htmlContent = generateStyledInvoiceHTML(invoice)
-        
-        // Create and download HTML file that can be printed as PDF
         const blob = new Blob([htmlContent], { type: 'text/html' })
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -111,23 +134,7 @@ function OrderConfirmationContent() {
         a.download = `invoice-${invoice.orderNumber}.html`
         a.click()
         URL.revokeObjectURL(url)
-        
-        // Also open in new window for immediate printing
-        const printWindow = window.open('', '_blank')
-        if (printWindow) {
-          printWindow.document.write(htmlContent)
-          printWindow.document.close()
-          setTimeout(() => {
-            printWindow.print()
-          }, 500)
-        }
-        
-        toast.success("Invoice downloaded and opened for printing")
-      } else {
-        toast.error("Failed to download invoice")
       }
-    } catch (error) {
-      toast.error("Failed to download invoice")
     }
   }
 
