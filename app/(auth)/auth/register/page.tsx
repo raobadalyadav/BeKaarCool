@@ -13,6 +13,7 @@ import { Eye, EyeOff, User, Mail, Lock, Phone, Loader2, Chrome, CheckCircle } fr
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useToast } from "@/hooks/use-toast"
+import { registerAction } from "@/lib/auth-actions"
 
 interface RegisterForm {
   name: string
@@ -64,25 +65,14 @@ export default function RegisterPage() {
     setSuccess("")
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-          phone: data.phone,
-          role: "customer",
-        }),
+      const [firstName, ...rest] = data.name.trim().split(" ")
+      const result = await registerAction({
+        email: data.email,
+        password: data.password,
+        firstName,
+        lastName: rest.join(" ") || undefined,
       })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || "Registration failed")
-      }
+      if (!result.ok) throw new Error(result.error)
 
       setSuccess("Account created successfully! Redirecting to login...")
       toast({
@@ -105,19 +95,10 @@ export default function RegisterPage() {
     }
   }
 
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignUp = () => {
     setGoogleLoading(true)
-    try {
-      await signIn("google", { callbackUrl: "/" })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Google sign-up failed",
-        variant: "destructive"
-      })
-    } finally {
-      setGoogleLoading(false)
-    }
+    const backend = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+    window.location.href = `${backend}/auth/google`
   }
 
   return (

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { MapPin, Plus, Edit2, Trash2, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import * as usersApi from "@/lib/api/users"
 
 interface Address {
     _id: string
@@ -44,11 +45,20 @@ export default function AddressesPage() {
 
     const fetchAddresses = async () => {
         try {
-            const res = await fetch("/api/addresses")
-            if (res.ok) {
-                const data = await res.json()
-                setAddresses(data.addresses || data || [])
-            }
+            const list = await usersApi.myAddresses()
+            setAddresses(
+                list.map((a) => ({
+                    _id: a.id,
+                    name: a.name,
+                    phone: a.phone,
+                    addressLine1: a.line1,
+                    addressLine2: a.line2,
+                    city: a.city,
+                    state: a.state,
+                    pincode: a.pincode,
+                    isDefault: a.isDefault,
+                }))
+            )
         } catch (error) {
             console.error("Failed to fetch addresses:", error)
         }
@@ -58,20 +68,24 @@ export default function AddressesPage() {
         e.preventDefault()
         setLoading(true)
         try {
-            const method = editingAddress ? "PUT" : "POST"
-            const url = editingAddress ? `/api/addresses/${editingAddress._id}` : "/api/addresses"
-            const res = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form)
-            })
-            if (res.ok) {
-                toast({ title: `Address ${editingAddress ? "updated" : "added"} successfully!` })
-                resetForm()
-                fetchAddresses()
-            } else {
-                throw new Error("Failed to save address")
+            // Backend doesn't support edit-in-place yet; deletion+create is OK for now.
+            if (editingAddress) {
+                await usersApi.deleteAddress(editingAddress._id)
             }
+            await usersApi.createAddress({
+                name: form.name ?? "",
+                phone: form.phone ?? "",
+                line1: form.addressLine1 ?? "",
+                line2: form.addressLine2,
+                city: form.city ?? "",
+                state: form.state ?? "",
+                pincode: form.pincode ?? "",
+                country: "IN",
+                isDefault: form.isDefault,
+            })
+            toast({ title: `Address ${editingAddress ? "updated" : "added"} successfully!` })
+            resetForm()
+            fetchAddresses()
         } catch (error) {
             toast({ title: "Error saving address", variant: "destructive" })
         } finally {
@@ -82,11 +96,9 @@ export default function AddressesPage() {
     const handleDelete = async (id: string) => {
         if (!confirm("Are you sure you want to delete this address?")) return
         try {
-            const res = await fetch(`/api/addresses/${id}`, { method: "DELETE" })
-            if (res.ok) {
-                toast({ title: "Address deleted" })
-                fetchAddresses()
-            }
+            await usersApi.deleteAddress(id)
+            toast({ title: "Address deleted" })
+            fetchAddresses()
         } catch (error) {
             toast({ title: "Error deleting address", variant: "destructive" })
         }

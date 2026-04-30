@@ -1,44 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Chrome, Github, Loader2 } from "lucide-react"
-import { toast } from "sonner"
+import { Chrome, Loader2 } from "lucide-react"
 
 interface SocialAuthProps {
   mode?: "signin" | "signup"
   disabled?: boolean
 }
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+
 export function SocialAuth({ mode = "signin", disabled = false }: SocialAuthProps) {
   const [googleLoading, setGoogleLoading] = useState(false)
-  const [githubLoading, setGithubLoading] = useState(false)
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleAuth = () => {
     setGoogleLoading(true)
-    try {
-      await signIn("google", { callbackUrl: "/" })
-    } catch (error) {
-      toast.error(`Google ${mode} failed`)
-    } finally {
-      setGoogleLoading(false)
-    }
+    window.location.href = `${BACKEND_URL}/auth/google`
   }
 
-  const handleGithubAuth = async () => {
-    setGithubLoading(true)
-    try {
-      await signIn("github", { callbackUrl: "/" })
-    } catch (error) {
-      toast.error(`GitHub ${mode} failed`)
-    } finally {
-      setGithubLoading(false)
-    }
-  }
-
-  const isLoading = googleLoading || githubLoading
+  const isLoading = googleLoading
 
   return (
     <>
@@ -67,21 +50,6 @@ export function SocialAuth({ mode = "signin", disabled = false }: SocialAuthProp
             <Chrome className="mr-2 h-4 w-4" />
           )}
           {mode === "signin" ? "Sign in" : "Sign up"} with Google
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGithubAuth}
-          disabled={disabled || isLoading}
-          className="w-full"
-        >
-          {githubLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Github className="mr-2 h-4 w-4" />
-          )}
-          {mode === "signin" ? "Sign in" : "Sign up"} with GitHub
         </Button>
       </div>
     </>

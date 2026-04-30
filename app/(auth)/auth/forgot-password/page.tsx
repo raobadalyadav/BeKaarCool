@@ -9,6 +9,7 @@ import { Mail, ArrowLeft, Loader2, CheckCircle, KeyRound } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useToast } from "@/hooks/use-toast"
+import { requestPasswordResetAction } from "@/lib/auth-actions"
 
 interface ForgotPasswordForm {
   email: string
@@ -32,19 +33,8 @@ export default function ForgotPasswordPage() {
     setSuccess("")
 
     try {
-      const response = await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: data.email }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to send reset email")
-      }
+      const result = await requestPasswordResetAction(data.email)
+      if (!result.ok) throw new Error(result.error)
 
       setSuccess("Password reset email sent! Please check your inbox and spam folder.")
       toast({

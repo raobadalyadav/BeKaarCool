@@ -11,6 +11,7 @@ import { Eye, EyeOff, Lock, Loader2, CheckCircle, ShieldCheck } from "lucide-rea
 import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { useToast } from "@/hooks/use-toast"
+import { resetPasswordAction, verifyResetTokenAction } from "@/lib/auth-actions"
 
 interface ResetPasswordForm {
   password: string
@@ -65,13 +66,8 @@ function ResetPasswordContent() {
       }
 
       try {
-        const response = await fetch("/api/auth/reset-password/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        })
-
-        if (response.ok) {
+        const result = await verifyResetTokenAction(token)
+        if (result.ok) {
           setValidToken(true)
         } else {
           setError("Invalid or expired reset token")
@@ -91,20 +87,11 @@ function ResetPasswordContent() {
     setError("")
 
     try {
-      const response = await fetch("/api/auth/reset-password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          password: data.password,
-        }),
+      const result = await resetPasswordAction({
+        token: token ?? "",
+        newPassword: data.password,
       })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to reset password")
-      }
+      if (!result.ok) throw new Error(result.error)
 
       setSuccess("Password reset successfully! Redirecting to login...")
       toast({

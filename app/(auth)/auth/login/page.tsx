@@ -102,19 +102,10 @@ function LoginForm() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     setGoogleLoading(true)
-    try {
-      await signIn("google", { callbackUrl: "/" })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Google sign-in failed",
-        variant: "destructive"
-      })
-    } finally {
-      setGoogleLoading(false)
-    }
+    const backend = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
+    window.location.href = `${backend}/auth/google`
   }
 
   return (

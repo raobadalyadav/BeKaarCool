@@ -120,22 +120,6 @@ function OrderConfirmationContent() {
 
   const handleDownloadInvoice = async () => {
     toast.error("Invoice download is being rebuilt on the new backend.")
-    return
-    // legacy block — unreachable, kept to avoid changing JSX below
-    try {
-      if (false) {
-        const invoice: any = {}
-        const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
-        const htmlContent = generateStyledInvoiceHTML(invoice)
-        const blob = new Blob([htmlContent], { type: 'text/html' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `invoice-${invoice.orderNumber}.html`
-        a.click()
-        URL.revokeObjectURL(url)
-      }
-    }
   }
 
   if (loading) {

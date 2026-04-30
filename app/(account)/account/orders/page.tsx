@@ -17,6 +17,8 @@ import { formatDate } from "@/lib/utils"
 import { toast } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
+import * as ordersApi from "@/lib/api/orders"
+import { minorToRupees } from "@/lib/api/config"
 
 interface OrderItem {
     product: {
@@ -100,25 +102,24 @@ export default function MyOrdersPage() {
     const fetchOrders = async () => {
         setLoading(true)
         try {
-            const params = new URLSearchParams({
-                page: pagination.page.toString(),
-                limit: pagination.limit.toString(),
-            })
-
-            if (statusFilter !== "all") {
-                params.append("status", statusFilter)
-            }
-
-            const res = await fetch(`/api/orders?${params}`)
-            if (res.ok) {
-                const data = await res.json()
-                setOrders(data.orders || [])
-                setPagination(prev => ({
-                    ...prev,
-                    total: data.pagination?.total || 0,
-                    pages: data.pagination?.pages || 0
+            const list = await ordersApi.listOrders(pagination.limit)
+            const mapped: Order[] = list
+                .filter((o) => statusFilter === "all" || o.status === statusFilter)
+                .map((o) => ({
+                    _id: o.id,
+                    orderNumber: o.number,
+                    status: o.status,
+                    paymentStatus: "",
+                    total: minorToRupees(o.totalMinor),
+                    items: o.items.map((it) => ({
+                        product: { _id: it.variantId, name: it.productTitleSnapshot, images: [], price: minorToRupees(it.unitPriceMinor) },
+                        quantity: it.quantity,
+                        price: minorToRupees(it.unitPriceMinor),
+                    })),
+                    createdAt: o.placedAt ?? new Date().toISOString(),
                 }))
-            }
+            setOrders(mapped)
+            setPagination(prev => ({ ...prev, total: mapped.length, pages: 1 }))
         } catch (error) {
             console.error("Failed to fetch orders:", error)
         } finally {
@@ -126,133 +127,31 @@ export default function MyOrdersPage() {
         }
     }
 
-    const handleCancelOrder = async (orderId: string) => {
+    const handleCancelOrder = async (orderNumber: string) => {
         if (!cancelReason.trim()) {
             toast.error("Please provide a reason for cancellation")
             return
         }
 
-        setCancellingOrderId(orderId)
+        setCancellingOrderId(orderNumber)
         try {
-            const response = await fetch(`/api/orders/${orderId}/cancel`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ reason: cancelReason }),
-            })
-
-            if (response.ok) {
-                toast.success("Order cancelled successfully")
-                fetchOrders()
-                setCancelReason("")
-            } else {
-                const data = await response.json()
-                toast.error(data.message || "Failed to cancel order")
-            }
+            await ordersApi.cancelOrder({ number: orderNumber, reason: cancelReason })
+            toast.success("Order cancelled successfully")
+            fetchOrders()
+            setCancelReason("")
         } catch (error) {
-            toast.error("Failed to cancel order")
+            toast.error(error instanceof Error ? error.message : "Failed to cancel order")
         } finally {
             setCancellingOrderId(null)
         }
     }
 
-    const handlePayNow = async (order: Order) => {
-        // Fallback check in case state hasn't updated but script is there
-        const isReady = razorpayLoaded || (typeof window !== "undefined" && !!window.Razorpay)
-        if (!isReady) {
-            toast.error("Payment system is loading. Please try again in a few seconds.")
-            return
-        }
-
-        setPaymentProcessingId(order._id)
-
-        try {
-            // 1. Initiate Razorpay Order
-            const initRes = await fetch(`/api/orders/${order._id}/pay/initiate`, {
-                method: "POST"
-            })
-            const initData = await initRes.json()
-
-            if (!initRes.ok) throw new Error(initData.error || "Failed to initiate payment")
-
-            // 2. Open Razorpay Checkout
-            const options = {
-                key: initData.key,
-                amount: initData.amount,
-                currency: initData.currency,
-                name: "Baefikra",
-                description: `Payment for Order #${order.orderNumber}`,
-                order_id: initData.razorpayOrderId,
-                handler: async (response: any) => {
-                    // 3. Verify Payment
-                    try {
-                        const verifyRes = await fetch(`/api/orders/${order._id}/pay/verify`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                razorpayOrderId: response.razorpay_order_id,
-                                paymentId: response.razorpay_payment_id,
-                                signature: response.razorpay_signature
-                            })
-                        })
-
-                        const verifyData = await verifyRes.json()
-
-                        if (verifyRes.ok && verifyData.verified) {
-                            toast.success("Payment successful!")
-                            fetchOrders() // Refresh orders
-                        } else {
-                            throw new Error(verifyData.message || "Payment verification failed")
-                        }
-                    } catch (err: any) {
-                        toast.error(err.message || "Payment verification failed")
-                    }
-                },
-                prefill: {
-                    email: session?.user?.email || "",
-                    contact: order.items[0]?.product ? "9999999999" : "" // We don't have phone readily here unless added to order model returned
-                },
-                theme: {
-                    color: "#FACC15"
-                },
-                modal: {
-                    ondismiss: () => setPaymentProcessingId(null)
-                }
-            }
-
-            const razorpay = new window.Razorpay(options)
-            razorpay.open()
-
-        } catch (error: any) {
-            toast.error(error.message || "Failed to start payment")
-            setPaymentProcessingId(null)
-        }
+    const handlePayNow = async (_order: Order) => {
+        toast.error("Pay-now for pending orders is being rebuilt on the new backend.")
     }
 
-    const handleDownloadInvoice = async (orderId: string) => {
-        if (!orderId || orderId === "undefined" || orderId === "null") {
-            toast.error("Invalid order ID for invoice generation")
-            return
-        }
-        try {
-            const response = await fetch(`/api/orders/${orderId}/invoice`)
-            if (response.ok) {
-                const invoice = await response.json()
-                const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
-                const htmlContent = generateStyledInvoiceHTML(invoice)
-                const blob = new Blob([htmlContent], { type: 'text/html' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `invoice-${invoice.orderNumber}.html`
-                a.click()
-                URL.revokeObjectURL(url)
-                toast.success("Invoice downloaded")
-            } else {
-                toast.error("Failed to download invoice")
-            }
-        } catch (error) {
-            toast.error("Failed to download invoice")
-        }
+    const handleDownloadInvoice = async (_orderId: string) => {
+        toast.error("Invoice download is being rebuilt on the new backend.")
     }
 
     const filteredOrders = orders.filter(
@@ -426,8 +325,8 @@ export default function MyOrdersPage() {
                                                             </div>
                                                             <AlertDialogFooter>
                                                                 <AlertDialogCancel onClick={() => setCancelReason("")}>Keep Order</AlertDialogCancel>
-                                                                <AlertDialogAction onClick={() => handleCancelOrder(order._id)} className="bg-red-500" disabled={cancellingOrderId === order._id || !cancelReason.trim()}>
-                                                                    {cancellingOrderId === order._id ? "Cancelling..." : "Confirm Cancel"}
+                                                                <AlertDialogAction onClick={() => handleCancelOrder(order.orderNumber)} className="bg-red-500" disabled={cancellingOrderId === order.orderNumber || !cancelReason.trim()}>
+                                                                    {cancellingOrderId === order.orderNumber ? "Cancelling..." : "Confirm Cancel"}
                                                                 </AlertDialogAction>
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>

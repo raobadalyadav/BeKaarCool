@@ -60,21 +60,25 @@ export default function TrackOrderPage() {
     setError("")
 
     try {
-      // Try to find order by order number first
-      const response = await fetch(`/api/orders/track?orderNumber=${encodeURIComponent(trackingInput.trim())}`)
-
-      if (!response.ok) {
-        throw new Error("Order not found")
+      const { getOrder, shipmentForOrder } = await import("@/lib/api/orders")
+      const data = await getOrder(trackingInput.trim())
+      if (!data) throw new Error("Order not found")
+      const ship = await shipmentForOrder(data.id).catch(() => null)
+      const order: any = {
+        orderNumber: data.number,
+        status: data.status,
+        estimatedDelivery: undefined,
+        tracking: {
+          currentLocation: ship?.status,
+          trackingNumber: ship?.trackingNumber,
+          carrier: "Delhivery",
+        },
+        statusHistory: [
+          { status: data.status, location: "Baefikra", timestamp: data.placedAt ?? new Date().toISOString() },
+        ],
+        items: data.items,
+        total: Number(data.totalMinor) / 100,
       }
-
-      const data = await response.json()
-
-      if (!data.order) {
-        throw new Error("Order not found")
-      }
-
-      // Map API response to tracking info format
-      const order = data.order
       const trackingData: TrackingInfo = {
         orderNumber: order.orderNumber,
         status: order.status,

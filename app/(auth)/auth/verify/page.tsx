@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2, CheckCircle, XCircle, Mail } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
+import { verifyEmailAction, resendVerificationAction } from "@/lib/auth-actions"
 
 function VerifyEmailContent() {
   const [loading, setLoading] = useState(true)
@@ -28,22 +29,15 @@ function VerifyEmailContent() {
       }
 
       try {
-        const response = await fetch("/api/auth/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token }),
-        })
-
-        const result = await response.json()
-
-        if (response.ok) {
+        const result = await verifyEmailAction(token)
+        if (result.ok) {
           setVerified(true)
           toast.success("Email verified successfully!")
           setTimeout(() => {
             router.push("/auth/login")
           }, 3000)
         } else {
-          setError(result.message || "Verification failed")
+          setError(result.error)
         }
       } catch (error) {
         setError("Failed to verify email")
@@ -58,13 +52,8 @@ function VerifyEmailContent() {
   const handleResendVerification = async () => {
     setResendLoading(true)
     try {
-      const response = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      })
-
-      if (response.ok) {
+      const result = await resendVerificationAction(token ?? "")
+      if (result.ok) {
         toast.success("Verification email sent!")
       } else {
         toast.error("Failed to resend verification email")

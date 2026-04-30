@@ -22,11 +22,7 @@ import * as checkoutApi from "@/lib/api/checkout";
 import * as usersApi from "@/lib/api/users";
 import type { AddressDto } from "@/lib/api/types";
 
-declare global {
-  interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
-  }
-}
+type RazorpayCtor = new (options: Record<string, unknown>) => { open: () => void };
 
 type PaymentMethod = "razorpay" | "cod";
 
@@ -148,7 +144,8 @@ export default function CheckoutPage() {
         theme: { color: "#FACC15" },
         modal: { ondismiss: () => setLoading(false) },
       };
-      const rzp = new window.Razorpay(options);
+      const RZP = (window as unknown as { Razorpay: RazorpayCtor }).Razorpay;
+      const rzp = new RZP(options);
       rzp.open();
     } catch (e) {
       toast({

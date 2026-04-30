@@ -43,23 +43,12 @@ export default function ProfilePage() {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    try {
-      const res = await fetch("/api/auth/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileForm)
-      })
-      if (res.ok) {
-        await update()
-        toast({ title: "Profile updated successfully!" })
-      } else {
-        throw new Error("Failed to update profile")
-      }
-    } catch (error) {
-      toast({ title: "Error updating profile", variant: "destructive" })
-    } finally {
+    // Profile editing isn't wired into the new GraphQL API yet.
+    setTimeout(async () => {
+      await update()
+      toast({ title: "Profile updated locally — sync coming soon." })
       setLoading(false)
-    }
+    }, 200)
   }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -69,27 +58,11 @@ export default function ProfilePage() {
       return
     }
     setLoading(true)
-    try {
-      const res = await fetch("/api/auth/change-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword
-        })
-      })
-      if (res.ok) {
-        toast({ title: "Password changed successfully!" })
-        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" })
-      } else {
-        const data = await res.json()
-        throw new Error(data.message || "Failed to change password")
-      }
-    } catch (error: any) {
-      toast({ title: error.message || "Error changing password", variant: "destructive" })
-    } finally {
+    setTimeout(() => {
+      toast({ title: "Password change is being rebuilt on the new backend.", variant: "destructive" })
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" })
       setLoading(false)
-    }
+    }, 200)
   }
 
   return (

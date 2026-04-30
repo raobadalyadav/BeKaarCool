@@ -107,13 +107,29 @@ export default function OrderDetailPage() {
 
     const fetchOrder = async () => {
         try {
-            const res = await fetch(`/api/orders/${params.id}`)
-            if (res.ok) {
-                const data = await res.json()
-                setOrder(data.order || data)
-            } else {
-                throw new Error("Order not found")
-            }
+            const { getOrder } = await import("@/lib/api/orders")
+            const data = await getOrder(params.id as string)
+            if (!data) throw new Error("Order not found")
+            const minor = (m: string) => Number(m) / 100
+            setOrder({
+                _id: data.id,
+                orderNumber: data.number,
+                status: data.status,
+                paymentStatus: "",
+                paymentMethod: "",
+                total: minor(data.totalMinor),
+                subtotal: minor(data.subtotalMinor),
+                shipping: minor(data.shippingMinor),
+                tax: minor(data.taxMinor),
+                discount: minor(data.discountMinor),
+                items: data.items.map((it) => ({
+                    product: { _id: it.variantId, name: it.productTitleSnapshot, images: [], price: minor(it.unitPriceMinor) },
+                    quantity: it.quantity,
+                    price: minor(it.unitPriceMinor),
+                })),
+                shippingAddress: { name: "", phone: "", address: "", city: "", state: "", pincode: "", country: "IN" },
+                createdAt: data.placedAt ?? new Date().toISOString(),
+            } as any)
         } catch (error) {
             console.error("Failed to fetch order:", error)
             toast({ title: "Order not found", variant: "destructive" })
@@ -123,122 +139,28 @@ export default function OrderDetailPage() {
     }
 
     const handleCancelOrder = async () => {
+        if (!order) return
         if (!confirm("Are you sure you want to cancel this order?")) return
 
         setCancelling(true)
         try {
-            const res = await fetch(`/api/orders/${params.id}/cancel`, {
-                method: "POST"
-            })
-            if (res.ok) {
-                toast({ title: "Order cancelled successfully" })
-                fetchOrder()
-            } else {
-                const data = await res.json()
-                throw new Error(data.message || "Failed to cancel order")
-            }
+            const { cancelOrder } = await import("@/lib/api/orders")
+            await cancelOrder({ number: order.orderNumber, reason: "User-initiated cancel" })
+            toast({ title: "Order cancelled successfully" })
+            fetchOrder()
         } catch (error: any) {
-            toast({ title: error.message, variant: "destructive" })
+            toast({ title: error?.message ?? "Failed to cancel order", variant: "destructive" })
         } finally {
             setCancelling(false)
         }
     }
 
     const handleDownloadInvoice = async () => {
-        if (!order?._id) {
-            toast({ title: "Order details not available", variant: "destructive" })
-            return
-        }
-        try {
-            const response = await fetch(`/api/orders/${order._id}/invoice`)
-            if (response.ok) {
-                const invoice = await response.json()
-                const { generateStyledInvoiceHTML } = await import('@/lib/pdf-invoice')
-                const htmlContent = generateStyledInvoiceHTML(invoice)
-                
-                // Create and download HTML file that can be printed as PDF
-                const blob = new Blob([htmlContent], { type: 'text/html' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `invoice-${invoice.orderNumber}.html`
-                a.click()
-                URL.revokeObjectURL(url)
-                
-                toast({ title: "Invoice downloaded successfully" })
-            } else {
-                toast({ title: "Failed to download invoice", variant: "destructive" })
-            }
-        } catch (error) {
-            toast({ title: "Failed to download invoice", variant: "destructive" })
-        }
+        toast({ title: "Invoice download is being rebuilt on the new backend.", variant: "destructive" })
     }
 
     const handlePayNow = async () => {
-        if (!order) return
-        const isReady = razorpayLoaded || (typeof window !== "undefined" && !!window.Razorpay)
-        if (!isReady) {
-            toast({ title: "Payment system loading", description: "Please try again in a moment.", variant: "destructive" })
-            return
-        }
-
-        setPaymentProcessing(true)
-
-        try {
-            // 1. Initiate
-            const initRes = await fetch(`/api/orders/${order._id}/pay/initiate`, { method: "POST" })
-            const initData = await initRes.json()
-
-            if (!initRes.ok) throw new Error(initData.error || "Failed to initiate payment")
-
-            // 2. Open Razorpay
-            const options = {
-                key: initData.key,
-                amount: initData.amount,
-                currency: initData.currency,
-                name: "Baefikra",
-                description: `Payment for Order #${order.orderNumber}`,
-                order_id: initData.razorpayOrderId,
-                handler: async (response: any) => {
-                    // 3. Verify
-                    try {
-                        const verifyRes = await fetch(`/api/orders/${order._id}/pay/verify`, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                razorpayOrderId: response.razorpay_order_id,
-                                paymentId: response.razorpay_payment_id,
-                                signature: response.razorpay_signature
-                            })
-                        })
-
-                        const verifyData = await verifyRes.json()
-
-                        if (verifyRes.ok && verifyData.verified) {
-                            toast({ title: "Payment successful!" })
-                            fetchOrder() // Refresh UI
-                        } else {
-                            throw new Error(verifyData.message || "Payment verification failed")
-                        }
-                    } catch (err: any) {
-                        toast({ title: err.message || "Payment verification failed", variant: "destructive" })
-                    }
-                },
-                prefill: {
-                    email: session?.user?.email || "",
-                    contact: order.shippingAddress.phone || ""
-                },
-                theme: { color: "#FACC15" },
-                modal: { ondismiss: () => setPaymentProcessing(false) }
-            }
-
-            const razorpay = new window.Razorpay(options)
-            razorpay.open()
-
-        } catch (error: any) {
-            toast({ title: error.message || "Failed to start payment", variant: "destructive" })
-            setPaymentProcessing(false)
-        }
+        toast({ title: "Pay-now for pending orders is being rebuilt on the new backend.", variant: "destructive" })
     }
 
     const formatDate = (dateStr: string) => {
@@ -515,30 +437,20 @@ export default function OrderDetailPage() {
                                             onClick={async () => {
                                                 const reason = (document.getElementById("return-reason-detail") as HTMLTextAreaElement)?.value || "No reason provided"
                                                 try {
-                                                    const res = await fetch("/api/returns", {
-                                                        method: "POST",
-                                                        headers: { "Content-Type": "application/json" },
-                                                        body: JSON.stringify({
-                                                            orderId: order._id,
-                                                            type: "return",
+                                                    const { requestReturn } = await import("@/lib/api/orders")
+                                                    await requestReturn({
+                                                        orderNumber: order.orderNumber,
+                                                        items: order.items.map((i: any) => ({
+                                                            orderItemId: i.product?._id ?? "",
+                                                            quantity: i.quantity,
                                                             reason,
-                                                            pickupAddress: order.shippingAddress,
-                                                            items: order.items.map(i => ({
-                                                                product: i.product?._id,
-                                                                quantity: i.quantity,
-                                                                reason,
-                                                                condition: "unopened"
-                                                            }))
-                                                        })
+                                                        })),
+                                                        reason,
                                                     })
-                                                    if (res.ok) {
-                                                        toast({ title: "Return request submitted successfully" })
-                                                        fetchOrder()
-                                                    } else {
-                                                        toast({ title: "Failed to submit return request", variant: "destructive" })
-                                                    }
+                                                    toast({ title: "Return request submitted successfully" })
+                                                    fetchOrder()
                                                 } catch (e) {
-                                                    toast({ title: "An error occurred", variant: "destructive" })
+                                                    toast({ title: "Failed to submit return request", variant: "destructive" })
                                                 }
                                             }}
                                         >
