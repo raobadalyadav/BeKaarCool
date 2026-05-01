@@ -170,8 +170,8 @@ export default function MyOrdersPage() {
         toast.error("Pay-now for pending orders is being rebuilt on the new backend.")
     }
 
-    const handleDownloadInvoice = async (_orderId: string) => {
-        toast.error("Invoice download is being rebuilt on the new backend.")
+    const handleDownloadInvoice = (orderNumber: string) => {
+        window.open(`/account/orders/${orderNumber}/invoice`, "_blank")
     }
 
     const filteredOrders = orders.filter(
@@ -325,7 +325,7 @@ export default function MyOrdersPage() {
                                                         {paymentProcessingId === order._id ? "Processing..." : "Pay Now"}
                                                     </Button>
                                                 )}
-                                                <Button variant="outline" size="sm" onClick={() => handleDownloadInvoice(order._id)}>
+                                                <Button variant="outline" size="sm" onClick={() => handleDownloadInvoice(order.orderNumber)}>
                                                     <Download className="w-4 h-4 mr-1" /> Invoice
                                                 </Button>
                                                 {["pending", "confirmed"].includes(order.status.toLowerCase()) && (

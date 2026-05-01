@@ -20,6 +20,8 @@ import {
   Truck,
   Shield,
   RotateCcw,
+  Bookmark,
+  ArrowUp,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart-context";
@@ -32,13 +34,17 @@ export default function CartPage() {
   const { toast } = useToast();
 
   const {
-    items,
+    items: allItems,
     total: subtotal,
     loading,
     updateQuantity,
     removeFromCart,
+    saveForLater,
+    moveToCart,
   } = useCart();
 
+  const items = allItems.filter((it) => !it.savedForLater);
+  const savedItems = allItems.filter((it) => it.savedForLater);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,6 +83,38 @@ export default function CartPage() {
       toast({
         title: "Error",
         description: e instanceof Error ? e.message : "Failed to remove",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleSaveForLater = async (itemId: string) => {
+    setUpdating(itemId);
+    try {
+      await saveForLater(itemId);
+      toast({ title: "Saved for later" });
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: e instanceof Error ? e.message : "",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleMoveToCart = async (itemId: string) => {
+    setUpdating(itemId);
+    try {
+      await moveToCart(itemId);
+      toast({ title: "Moved to cart" });
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: e instanceof Error ? e.message : "",
         variant: "destructive",
       });
     } finally {
@@ -243,6 +281,16 @@ export default function CartPage() {
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => handleSaveForLater(item.id)}
+                            disabled={updating === item.id}
+                            className="text-gray-600 hover:bg-gray-50 h-9"
+                          >
+                            <Bookmark className="h-4 w-4 mr-1" />
+                            Save for later
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleRemove(item.id)}
                             disabled={updating === item.id}
                             className="text-red-600 hover:text-red-700 hover:bg-red-50 h-9"
@@ -271,6 +319,70 @@ export default function CartPage() {
                 </Card>
               );
             })}
+
+            {savedItems.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Bookmark className="w-5 h-5" /> Saved for later ({savedItems.length})
+                </h2>
+                <div className="space-y-3">
+                  {savedItems.map((item) => (
+                    <Card key={item.id} className="overflow-hidden">
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <Link
+                          href={`/products/${item.productSlug}`}
+                          className="relative h-20 w-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden border"
+                        >
+                          {item.productImage ? (
+                            <Image
+                              src={item.productImage}
+                              alt={item.productTitle}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </Link>
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/products/${item.productSlug}`}
+                            className="font-medium text-sm line-clamp-2 hover:text-yellow-600"
+                          >
+                            {item.productTitle}
+                          </Link>
+                          <p className="text-xs text-gray-500 mt-1 font-mono">
+                            SKU: {item.sku}
+                          </p>
+                          <p className="text-sm font-bold mt-1">
+                            ₹{item.price.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-1.5 flex-shrink-0">
+                          <Button
+                            size="sm"
+                            onClick={() => handleMoveToCart(item.id)}
+                            disabled={updating === item.id}
+                            className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-8 text-xs"
+                          >
+                            <ArrowUp className="h-3 w-3 mr-1" />
+                            Move to cart
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemove(item.id)}
+                            disabled={updating === item.id}
+                            className="text-red-600 hover:bg-red-50 h-8 text-xs"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" /> Remove
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">

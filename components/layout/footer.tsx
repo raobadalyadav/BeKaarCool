@@ -149,6 +149,9 @@ export function Footer() {
               <Link suppressHydrationWarning href="/contact" className="block text-gray-400 hover:text-yellow-400 transition-colors">
                 Contact Us
               </Link>
+              <Link suppressHydrationWarning href="/corporate" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+                Bulk & Corporate
+              </Link>
             </div>
           </div>
 

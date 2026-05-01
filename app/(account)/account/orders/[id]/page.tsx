@@ -179,8 +179,9 @@ export default function OrderDetailPage() {
         }
     }
 
-    const handleDownloadInvoice = async () => {
-        toast({ title: "Invoice download is being rebuilt on the new backend.", variant: "destructive" })
+    const handleDownloadInvoice = () => {
+        if (!order) return
+        router.push(`/account/orders/${order.orderNumber}/invoice`)
     }
 
     const handlePayNow = async () => {

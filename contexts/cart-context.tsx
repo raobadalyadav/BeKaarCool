@@ -31,6 +31,7 @@ export interface CartItem {
   /** rupees, derived from compareAtMinor */
   compareAt?: number | null;
   options: Record<string, string>;
+  savedForLater: boolean;
 }
 
 interface CartContextType {
@@ -45,6 +46,8 @@ interface CartContextType {
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   refresh: () => Promise<void>;
+  saveForLater: (id: string) => Promise<void>;
+  moveToCart: (id: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -71,6 +74,7 @@ const dtoToItems = (cart: CartDto): CartItem[] =>
       sku: it.sku,
       compareAt: it.compareAtMinor ? minorToRupees(it.compareAtMinor) : null,
       options,
+      savedForLater: it.savedForLater,
     };
   });
 
@@ -87,7 +91,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     () => (cart ? minorToRupees(cart.subtotalMinor) : 0),
     [cart]
   );
-  const itemCount = items.reduce((sum, it) => sum + it.quantity, 0);
+  const itemCount = items
+    .filter((it) => !it.savedForLater)
+    .reduce((sum, it) => sum + it.quantity, 0);
 
   const refresh = useCallback(async () => {
     if (status !== "authenticated") {
@@ -151,6 +157,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const saveForLater = useCallback(async (id: string) => {
+    setLoading(true);
+    try {
+      const next = await cartApi.saveForLater(id);
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const moveToCart = useCallback(async (id: string) => {
+    setLoading(true);
+    try {
+      const next = await cartApi.moveToCart(id);
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const clearCart = useCallback(async () => {
     if (!cart) return;
     await Promise.all(cart.items.map((it) => removeFromCart(it.id)));
@@ -167,6 +193,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updateQuantity,
         clearCart,
         refresh,
+        saveForLater,
+        moveToCart,
         loading,
       }}
     >

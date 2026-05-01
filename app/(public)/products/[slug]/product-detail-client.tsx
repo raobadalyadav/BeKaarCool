@@ -36,7 +36,7 @@ interface ProductDetailClientProps {
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/hooks/use-wishlist"
 import * as checkoutApi from "@/lib/api/checkout"
-import * as reviewsApi from "@/lib/api/reviews"
+import * as alertsApi from "@/lib/api/alerts"
 import { QnaSection } from "@/components/product/qna-section"
 
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
@@ -49,6 +49,8 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
     const [wishlistLoading, setWishlistLoading] = useState(false)
     const [pincode, setPincode] = useState("")
     const [deliveryInfo, setDeliveryInfo] = useState<string | null>(null)
+    const [notifyLoading, setNotifyLoading] = useState(false)
+    const [notifySubscribed, setNotifySubscribed] = useState(false)
 
     const { toast } = useToast()
     const { addToCart } = useCart()
@@ -81,6 +83,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
             })
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleNotifyMe = async () => {
+        if (!variantId) return
+        if (!session) {
+            window.location.href = `/auth/login?redirect=/products/${product.slug}`
+            return
+        }
+        setNotifyLoading(true)
+        try {
+            await alertsApi.notifyMeWhenInStock(variantId)
+            setNotifySubscribed(true)
+            toast({
+                title: "We'll let you know",
+                description: "You'll get an email the moment this is back in stock.",
+            })
+        } catch (error) {
+            toast({
+                title: "Couldn't subscribe",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
+            })
+        } finally {
+            setNotifyLoading(false)
         }
     }
 
@@ -268,18 +295,33 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-4">
-                        <Button
-                            className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-12 text-sm uppercase tracking-wider"
-                            onClick={handleAddToCart}
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <ShoppingBag className="w-4 h-4 mr-2" />
-                            )}
-                            {loading ? "Adding..." : "Add to Bag"}
-                        </Button>
+                        {(product.stock ?? 100) <= 0 ? (
+                            <Button
+                                className="flex-1 bg-gray-900 hover:bg-black text-white font-bold h-12 text-sm uppercase tracking-wider"
+                                onClick={handleNotifyMe}
+                                disabled={notifyLoading || notifySubscribed}
+                            >
+                                {notifyLoading ? (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : null}
+                                {notifySubscribed
+                                    ? "We'll notify you"
+                                    : "Notify me when in stock"}
+                            </Button>
+                        ) : (
+                            <Button
+                                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-12 text-sm uppercase tracking-wider"
+                                onClick={handleAddToCart}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                    <ShoppingBag className="w-4 h-4 mr-2" />
+                                )}
+                                {loading ? "Adding..." : "Add to Bag"}
+                            </Button>
+                        )}
                         <Button
                             variant="outline"
                             className={`h-12 px-6 border-gray-300 ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-gray-600'}`}

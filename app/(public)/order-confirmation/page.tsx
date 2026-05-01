@@ -139,8 +139,9 @@ function OrderConfirmationContent() {
     }
   }
 
-  const handleDownloadInvoice = async () => {
-    toast.error("Invoice download is being rebuilt on the new backend.")
+  const handleDownloadInvoice = () => {
+    if (!order) return
+    window.open(`/account/orders/${order.orderNumber}/invoice`, "_blank")
   }
 
   if (loading) {
