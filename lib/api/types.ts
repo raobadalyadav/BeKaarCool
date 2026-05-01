@@ -80,6 +80,15 @@ export interface CartItemDto {
   variantId: string;
   quantity: number;
   priceMinor: string;
+  productId: string;
+  productSlug: string;
+  productTitle: string;
+  productImage?: string | null;
+  sku: string;
+  compareAtMinor?: string | null;
+  /** JSON-stringified Record<string,string> */
+  optionsJson: string;
+  savedForLater: boolean;
 }
 
 export interface CartDto {
@@ -110,6 +119,22 @@ export interface OrderItemDto {
   quantity: number;
   unitPriceMinor: string;
   totalMinor: string;
+  variantOptionsJson: string;
+  productSlug?: string | null;
+  productImage?: string | null;
+  cancelledQuantity: number;
+  returnedQuantity: number;
+}
+
+export interface OrderShippingAddressDto {
+  name: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
 }
 
 export type OrderStatus =
@@ -136,6 +161,14 @@ export interface OrderDto {
   totalMinor: string;
   placedAt: string;
   items: OrderItemDto[];
+  couponCode?: string | null;
+  paidAt?: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
+  cancelledAt?: string | null;
+  shippingAddress?: OrderShippingAddressDto | null;
+  paymentMethod?: string | null;
+  paymentStatus?: string;
 }
 
 export interface CheckoutSessionDto {
@@ -177,6 +210,15 @@ export interface WishlistItemDto {
   id: string;
   productId: string;
   createdAt: string;
+  productSlug?: string | null;
+  productTitle?: string | null;
+  productImage?: string | null;
+  priceMinor?: string | null;
+  compareAtMinor?: string | null;
+  ratingAvg?: number | null;
+  ratingCount?: number | null;
+  inStock?: boolean | null;
+  defaultVariantId?: string | null;
 }
 
 export interface ReviewDto {
@@ -188,6 +230,8 @@ export interface ReviewDto {
   status: "pending" | "approved" | "rejected";
   helpfulCount: number;
   notHelpfulCount: number;
+  createdAt?: string | null;
+  reviewerName?: string | null;
 }
 
 export interface SearchHitDto {
@@ -199,6 +243,7 @@ export interface SearchHitDto {
   brandId?: string;
   categoryId?: string;
   ratingAvg: number;
+  image?: string;
 }
 
 export interface SearchResultDto {
@@ -218,6 +263,8 @@ export interface CouponDto {
   isActive: boolean;
   startsAt?: string;
   endsAt?: string;
+  minOrderMinor?: string;
+  maxDiscountMinor?: string;
 }
 
 export interface NotificationDto {

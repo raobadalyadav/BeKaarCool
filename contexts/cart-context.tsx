@@ -23,6 +23,14 @@ export interface CartItem {
   price: number;
   /** raw paise as string (for accurate checkout math) */
   priceMinor: string;
+  productId: string;
+  productSlug: string;
+  productTitle: string;
+  productImage?: string | null;
+  sku: string;
+  /** rupees, derived from compareAtMinor */
+  compareAt?: number | null;
+  options: Record<string, string>;
 }
 
 interface CartContextType {
@@ -43,13 +51,28 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const dtoToItems = (cart: CartDto): CartItem[] =>
-  cart.items.map((it) => ({
-    id: it.id,
-    variantId: it.variantId,
-    quantity: it.quantity,
-    priceMinor: it.priceMinor,
-    price: minorToRupees(it.priceMinor),
-  }));
+  cart.items.map((it) => {
+    let options: Record<string, string> = {};
+    try {
+      options = it.optionsJson ? JSON.parse(it.optionsJson) : {};
+    } catch {
+      options = {};
+    }
+    return {
+      id: it.id,
+      variantId: it.variantId,
+      quantity: it.quantity,
+      priceMinor: it.priceMinor,
+      price: minorToRupees(it.priceMinor),
+      productId: it.productId,
+      productSlug: it.productSlug,
+      productTitle: it.productTitle,
+      productImage: it.productImage,
+      sku: it.sku,
+      compareAt: it.compareAtMinor ? minorToRupees(it.compareAtMinor) : null,
+      options,
+    };
+  });
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession();

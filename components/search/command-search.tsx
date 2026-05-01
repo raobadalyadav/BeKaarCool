@@ -103,21 +103,26 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
                 key={product.id}
                 value={product.id}
                 onSelect={() => handleSelect(product.slug ?? product.id, "product")}
-                className="flex items-center gap-3 p-3"
+                className="flex items-center gap-3 p-2"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium truncate">{product.title}</p>
-                  </div>
+                <div className="relative h-12 w-10 flex-shrink-0 bg-muted rounded overflow-hidden">
+                  {product.image ? (
+                    <Image src={product.image} alt={product.title} fill sizes="40px" className="object-cover" />
+                  ) : (
+                    <Package className="w-5 h-5 m-auto text-muted-foreground" />
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">₹{minorToRupees(product.priceMinor).toLocaleString()}</p>
-                  {product.ratingAvg != null && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <span>★</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate text-sm">{product.title}</p>
+                  {product.ratingAvg != null && product.ratingAvg > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="text-yellow-500">★</span>
                       <span>{Number(product.ratingAvg).toFixed(1)}</span>
                     </div>
                   )}
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-sm">₹{minorToRupees(product.priceMinor).toLocaleString()}</p>
                 </div>
               </CommandItem>
             ))}

@@ -1,7 +1,12 @@
 import { gql } from "./client";
 import type { WishlistItemDto } from "./types";
 
-const FIELDS = `id productId createdAt`;
+const FIELDS = `
+  id productId createdAt
+  productSlug productTitle productImage
+  priceMinor compareAtMinor
+  ratingAvg ratingCount inStock defaultVariantId
+`;
 
 export async function myWishlist(): Promise<WishlistItemDto[]> {
   const data = await gql<{ myWishlist: WishlistItemDto[] }>({

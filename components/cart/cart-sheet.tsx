@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useCart } from "@/contexts/cart-context"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ShoppingBag, Trash2, Plus, Minus, X, Truck } from "lucide-react"
+import { ShoppingBag, Plus, Minus, X, Truck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function CartSheet({ children }: { children: React.ReactNode }) {
@@ -80,44 +81,77 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                             </Button>
                         </div>
                     ) : (
-                        <div className="space-y-6 py-6">
-                            {items.map((item) => (
-                                <div key={item.id} className="flex gap-4">
-                                    <div className="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h4 className="text-sm font-medium text-gray-800 line-clamp-1">Variant {item.variantId.slice(0, 8)}</h4>
-                                        </div>
-
-                                        <div className="flex items-center justify-between mt-2">
-                                            <div className="flex items-center border rounded-sm h-7">
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                                                    className="w-7 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600 disabled:opacity-50"
-                                                    disabled={item.quantity <= 1}
+                        <div className="space-y-5 py-6">
+                            {items.map((item) => {
+                                const opts = Object.entries(item.options ?? {}).filter(([k]) => k !== "image")
+                                return (
+                                    <div key={item.id} className="flex gap-3">
+                                        <Link
+                                            href={`/products/${item.productSlug}`}
+                                            onClick={() => setIsOpen(false)}
+                                            className="relative h-24 w-20 flex-shrink-0 bg-gray-100 rounded overflow-hidden border"
+                                        >
+                                            {item.productImage ? (
+                                                <Image
+                                                    src={item.productImage}
+                                                    alt={item.productTitle}
+                                                    fill
+                                                    sizes="80px"
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <ShoppingBag className="w-6 h-6 text-gray-300" />
+                                                </div>
+                                            )}
+                                        </Link>
+                                        <div className="flex-1 flex flex-col justify-between min-w-0">
+                                            <div>
+                                                <Link
+                                                    href={`/products/${item.productSlug}`}
+                                                    onClick={() => setIsOpen(false)}
+                                                    className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-yellow-600"
                                                 >
-                                                    <Minus className="w-3 h-3" />
-                                                </button>
-                                                <span className="w-8 flex items-center justify-center text-xs font-semibold">{item.quantity}</span>
-                                                <button
-                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                                                    className="w-7 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600"
-                                                >
-                                                    <Plus className="w-3 h-3" />
-                                                </button>
+                                                    {item.productTitle}
+                                                </Link>
+                                                {opts.length > 0 && (
+                                                    <p className="text-[11px] text-gray-500 mt-0.5">
+                                                        {opts.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                                                    </p>
+                                                )}
                                             </div>
-                                            <div className="text-right">
-                                                <span className="text-sm font-bold text-gray-900">₹{item.price * item.quantity}</span>
+                                            <div className="flex items-center justify-between mt-2">
+                                                <div className="flex items-center border rounded-sm h-7">
+                                                    <button
+                                                        onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                        className="w-7 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600 disabled:opacity-50"
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        <Minus className="w-3 h-3" />
+                                                    </button>
+                                                    <span className="w-7 flex items-center justify-center text-xs font-semibold">{item.quantity}</span>
+                                                    <button
+                                                        onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                                        className="w-7 h-full flex items-center justify-center hover:bg-gray-100 text-gray-600"
+                                                    >
+                                                        <Plus className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-sm font-bold text-gray-900">₹{(item.price * item.quantity).toLocaleString()}</span>
+                                                </div>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => handleRemoveItem(item.id)}
+                                            className="text-gray-400 hover:text-red-500 self-start p-1"
+                                            aria-label="Remove from bag"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => handleRemoveItem(item.id)}
-                                        className="text-gray-400 hover:text-red-500 self-start p-1"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     )}
                 </ScrollArea>

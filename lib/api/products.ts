@@ -105,7 +105,7 @@ export async function search(args: {
     query: `
       query Search($q: String!, $first: Int!, $filter: SearchFilterInput, $sort: String) {
         search(q: $q, first: $first, filter: $filter, sort: $sort) {
-          hits { id slug title priceMinor inStock brandId categoryId ratingAvg }
+          hits { id slug title priceMinor inStock brandId categoryId ratingAvg image }
           estimatedTotalHits
           facetsJson
         }
@@ -122,23 +122,28 @@ export async function search(args: {
   return data.search;
 }
 
-export async function productReviews(productId: string) {
-  const data = await gql<{
-    productReviews: Array<{
-      id: string;
-      rating: number;
-      title?: string;
-      body?: string;
-      verifiedPurchase: boolean;
-      status: string;
-      helpfulCount: number;
-      notHelpfulCount: number;
-    }>;
-  }>({
+export interface ProductReviewWire {
+  id: string;
+  rating: number;
+  title?: string;
+  body?: string;
+  verifiedPurchase: boolean;
+  status: string;
+  helpfulCount: number;
+  notHelpfulCount: number;
+  createdAt?: string | null;
+  reviewerName?: string | null;
+}
+
+export async function productReviews(
+  productId: string
+): Promise<ProductReviewWire[]> {
+  const data = await gql<{ productReviews: ProductReviewWire[] }>({
     query: `
       query Reviews($productId: String!) {
         productReviews(productId: $productId) {
-          id rating title body verifiedPurchase status helpfulCount notHelpfulCount
+          id rating title body verifiedPurchase status
+          helpfulCount notHelpfulCount createdAt reviewerName
         }
       }
     `,

@@ -10,4 +10,6 @@ export * as wishlistApi from "./wishlist";
 export * as reviewsApi from "./reviews";
 export * as contentApi from "./content";
 export * as mediaApi from "./media";
+export * as promotionsApi from "./promotions";
+export * as accountApi from "./account";
 export { gql, rest, clientFetch, gqlClient, ApiError } from "./client";

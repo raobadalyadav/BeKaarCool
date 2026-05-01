@@ -8,18 +8,20 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
     User, Package, CreditCard, Wallet, MapPin, Settings, HelpCircle, LogOut,
-    ChevronRight, Edit2, Home, Gift, Users
+    ChevronRight, Edit2, Home, Gift, Users, Shield, Bell
 } from "lucide-react"
 
 // Navigation items
 const navItems = [
     { id: "overview", label: "Overview", icon: User, href: "/account" },
     { id: "orders", label: "My Orders", icon: Package, href: "/account/orders" },
-    { id: "payments", label: "My Payments", icon: CreditCard, href: "/account/payments" },
+    { id: "addresses", label: "My Addresses", icon: MapPin, href: "/account/addresses" },
     { id: "wallet", label: "My Wallet", icon: Wallet, href: "/account/wallet" },
     { id: "rewards", label: "My Rewards", icon: Gift, href: "/account/rewards" },
     { id: "referral", label: "Refer & Earn", icon: Users, href: "/account/referral" },
-    { id: "addresses", label: "My Addresses", icon: MapPin, href: "/account/addresses" },
+    { id: "payments", label: "My Payments", icon: CreditCard, href: "/account/payments" },
+    { id: "notifications", label: "Notifications", icon: Bell, href: "/account/notifications" },
+    { id: "security", label: "Security", icon: Shield, href: "/account/security" },
     { id: "profile", label: "My Profile", icon: Settings, href: "/account/profile" },
     { id: "help", label: "Help & Support", icon: HelpCircle, href: "/account/support" },
 ]
@@ -34,6 +36,8 @@ const breadcrumbMap: Record<string, { label: string; parent?: string }> = {
     "/account/referral": { label: "Refer & Earn", parent: "/account" },
     "/account/addresses": { label: "My Addresses", parent: "/account" },
     "/account/profile": { label: "My Profile", parent: "/account" },
+    "/account/security": { label: "Security", parent: "/account" },
+    "/account/notifications": { label: "Notifications", parent: "/account" },
 }
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {

@@ -111,24 +111,48 @@ export default function OrderDetailPage() {
             const data = await getOrder(params.id as string)
             if (!data) throw new Error("Order not found")
             const minor = (m: string) => Number(m) / 100
+            const sa = data.shippingAddress
             setOrder({
                 _id: data.id,
                 orderNumber: data.number,
                 status: data.status,
-                paymentStatus: "",
-                paymentMethod: "",
+                paymentStatus: data.paymentStatus ?? "",
+                paymentMethod: data.paymentMethod ?? "",
                 total: minor(data.totalMinor),
                 subtotal: minor(data.subtotalMinor),
                 shipping: minor(data.shippingMinor),
                 tax: minor(data.taxMinor),
                 discount: minor(data.discountMinor),
-                items: data.items.map((it) => ({
-                    product: { _id: it.variantId, name: it.productTitleSnapshot, images: [], price: minor(it.unitPriceMinor) },
-                    quantity: it.quantity,
-                    price: minor(it.unitPriceMinor),
-                })),
-                shippingAddress: { name: "", phone: "", address: "", city: "", state: "", pincode: "", country: "IN" },
+                items: data.items.map((it) => {
+                    const opts = (() => { try { return JSON.parse(it.variantOptionsJson ?? "{}") } catch { return {} } })() as Record<string, string>
+                    return {
+                        _id: it.id, // order item id (used for cancellations/returns)
+                        product: {
+                            _id: it.variantId,
+                            name: it.productTitleSnapshot,
+                            slug: it.productSlug ?? "",
+                            images: it.productImage ? [it.productImage] : [],
+                            price: minor(it.unitPriceMinor),
+                        },
+                        quantity: it.quantity,
+                        price: minor(it.unitPriceMinor),
+                        size: opts.size,
+                        color: opts.color,
+                    }
+                }),
+                shippingAddress: sa
+                    ? {
+                        name: sa.name,
+                        phone: sa.phone,
+                        addressLine1: sa.line1,
+                        address: sa.line1 + (sa.line2 ? `, ${sa.line2}` : ""),
+                        city: sa.city,
+                        state: sa.state,
+                        pincode: sa.pincode,
+                    }
+                    : { name: "", phone: "", address: "", city: "", state: "", pincode: "" },
                 createdAt: data.placedAt ?? new Date().toISOString(),
+                updatedAt: data.placedAt ?? new Date().toISOString(),
             } as any)
         } catch (error) {
             console.error("Failed to fetch order:", error)
@@ -441,7 +465,7 @@ export default function OrderDetailPage() {
                                                     await requestReturn({
                                                         orderNumber: order.orderNumber,
                                                         items: order.items.map((i: any) => ({
-                                                            orderItemId: i.product?._id ?? "",
+                                                            orderItemId: i._id ?? i.product?._id ?? "",
                                                             quantity: i.quantity,
                                                             reason,
                                                         })),

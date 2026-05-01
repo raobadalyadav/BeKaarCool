@@ -106,9 +106,10 @@ export default function SearchClient() {
                     _id: h.id,
                     name: h.title,
                     slug: h.slug,
-                    images: [],
+                    images: h.image ? [h.image] : [],
                     price: minorToRupees(h.priceMinor),
                     rating: h.ratingAvg ?? undefined,
+                    inStock: h.inStock,
                 }))
             )
             setTotalPages(1)

@@ -4,9 +4,13 @@ import type { OrderDto, OrderStatus } from "./types";
 const ORDER_FIELDS = `
   id number status currency
   subtotalMinor shippingMinor taxMinor discountMinor totalMinor
-  placedAt
+  placedAt couponCode paidAt shippedAt deliveredAt cancelledAt
+  paymentMethod paymentStatus
+  shippingAddress { name phone line1 line2 city state pincode country }
   items {
-    id variantId productTitleSnapshot skuSnapshot quantity unitPriceMinor totalMinor
+    id variantId productTitleSnapshot skuSnapshot quantity
+    unitPriceMinor totalMinor variantOptionsJson
+    productSlug productImage cancelledQuantity returnedQuantity
   }
 `;
 

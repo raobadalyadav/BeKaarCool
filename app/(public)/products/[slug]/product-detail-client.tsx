@@ -11,16 +11,35 @@ import { ReviewSection } from "@/components/product/review-section"
 import { ProductCard } from "@/components/product/product-card"
 import { useSession } from "next-auth/react"
 
+interface QnaAnswer {
+    id: string
+    answer: string
+    isOfficial: boolean
+    upvotes: number
+    createdAt: string
+}
+
+interface QnaQuestion {
+    id: string
+    question: string
+    upvotes: number
+    createdAt: string
+    answers: QnaAnswer[]
+}
+
 interface ProductDetailClientProps {
     product: any
     relatedProducts?: any[]
+    questions?: QnaQuestion[]
 }
 
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/hooks/use-wishlist"
 import * as checkoutApi from "@/lib/api/checkout"
+import * as reviewsApi from "@/lib/api/reviews"
+import { QnaSection } from "@/components/product/qna-section"
 
-export default function ProductDetailClient({ product, relatedProducts = [] }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
     const [selectedImage, setSelectedImage] = useState(0)
     const [selectedSize, setSelectedSize] = useState("")
     const [selectedColor, setSelectedColor] = useState(product.variations?.colors?.[0]?.name || "")
@@ -333,7 +352,10 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
                                     Description
                                 </TabsTrigger>
                                 <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500">
-                                    Reviews ({product.reviewCount || 0})
+                                    Reviews ({product.reviews?.length ?? product.reviewCount ?? 0})
+                                </TabsTrigger>
+                                <TabsTrigger value="qna" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500">
+                                    Q&amp;A ({questions.length})
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="desc" className="pt-4 text-gray-600 text-sm leading-relaxed whitespace-pre-line">
@@ -352,6 +374,9 @@ export default function ProductDetailClient({ product, relatedProducts = [] }: P
                             </TabsContent>
                             <TabsContent value="reviews" className="pt-4">
                                 <ReviewSection productId={product._id} reviews={product.reviews || []} />
+                            </TabsContent>
+                            <TabsContent value="qna" className="pt-4">
+                                <QnaSection productId={product._id} questions={questions} />
                             </TabsContent>
                         </Tabs>
                     </div>

@@ -97,7 +97,31 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
-  const relatedProducts = await getRelatedProducts(product.category, product._id);
+  const [relatedProducts, reviewsRaw, questionsRaw] = await Promise.all([
+    getRelatedProducts(product.category, product._id),
+    productsApi.productReviews(product._id).catch(() => []),
+    productsApi.productQuestions(product._id).catch(() => []),
+  ]);
+
+  const reviews = reviewsRaw.map((r) => ({
+    _id: r.id,
+    rating: r.rating,
+    title: r.title ?? "",
+    comment: r.body ?? "",
+    verified: r.verifiedPurchase,
+    helpful: r.helpfulCount,
+    notHelpful: r.notHelpfulCount,
+    createdAt: r.createdAt ?? new Date().toISOString(),
+    user: { name: r.reviewerName ?? "Anonymous" },
+  }));
+
+  const questions = questionsRaw.map((q) => ({
+    id: q.id,
+    question: q.question,
+    upvotes: q.upvotes,
+    createdAt: q.createdAt,
+    answers: q.answers ?? [],
+  }));
 
   const breadcrumbItems = [
     { name: "Home", url: "/" },
@@ -107,7 +131,11 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
-      <ProductDetailClient product={product} relatedProducts={relatedProducts} />
+      <ProductDetailClient
+        product={{ ...product, reviews }}
+        relatedProducts={relatedProducts}
+        questions={questions}
+      />
 
       <Script
         id="product-schema"

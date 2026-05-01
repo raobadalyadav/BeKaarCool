@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,12 +16,15 @@ import {
   Banknote,
   Shield,
   Truck,
+  Tag,
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart-context";
 import * as checkoutApi from "@/lib/api/checkout";
 import * as usersApi from "@/lib/api/users";
-import type { AddressDto } from "@/lib/api/types";
+import { minorToRupees } from "@/lib/api/config";
+import type { AddressDto, CheckoutSessionDto } from "@/lib/api/types";
 
 type RazorpayCtor = new (options: Record<string, unknown>) => { open: () => void };
 
@@ -38,9 +42,20 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null
   );
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [session2, setSession2] = useState<CheckoutSessionDto | null>(null);
+  const sessionId = session2?.sessionId ?? null;
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("razorpay");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const shippingMinor = session2?.shippingMinor;
+  const discountMinor = session2?.discountMinor;
+  const shippingRupees = shippingMinor ? minorToRupees(shippingMinor) : 0;
+  const discountRupees = discountMinor ? minorToRupees(discountMinor) : 0;
+  const grandTotal = Math.max(0, total + shippingRupees - discountRupees);
 
   const [newAddress, setNewAddress] = useState({
     name: session?.user?.name ?? "",
@@ -68,7 +83,7 @@ export default function CheckoutPage() {
         const def = list.find((a) => a.isDefault) ?? list[0];
         if (def) setSelectedAddressId(def.id);
         const sess = await checkoutApi.startCheckout();
-        setSessionId(sess.sessionId);
+        setSession2(sess);
       } catch (e) {
         console.error("Checkout init failed:", e);
       }
@@ -97,6 +112,8 @@ export default function CheckoutPage() {
     }
     try {
       await checkoutApi.setCheckoutAddress(sessionId, selectedAddressId);
+      const shipped = await checkoutApi.setCheckoutShipping(sessionId, "standard");
+      setSession2((prev) => ({ ...(prev ?? { sessionId }), ...shipped }));
       setStep("PAYMENT");
     } catch (e) {
       toast({
@@ -104,6 +121,47 @@ export default function CheckoutPage() {
         description: e instanceof Error ? e.message : "Failed to set address",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!sessionId || !couponCode.trim()) return;
+    setCouponLoading(true);
+    try {
+      const next = await checkoutApi.applyCoupon(
+        sessionId,
+        couponCode.trim().toUpperCase()
+      );
+      setSession2((prev) => ({ ...(prev ?? { sessionId }), ...next }));
+      setAppliedCoupon(couponCode.trim().toUpperCase());
+      toast({ title: "Coupon applied", description: couponCode.trim().toUpperCase() });
+      setCouponCode("");
+    } catch (e) {
+      toast({
+        title: "Coupon failed",
+        description: e instanceof Error ? e.message : "Invalid coupon",
+        variant: "destructive",
+      });
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    if (!sessionId) return;
+    setCouponLoading(true);
+    try {
+      const next = await checkoutApi.removeCoupon(sessionId);
+      setSession2((prev) => ({ ...(prev ?? { sessionId }), ...next, discountMinor: undefined }));
+      setAppliedCoupon(null);
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: e instanceof Error ? e.message : "",
+        variant: "destructive",
+      });
+    } finally {
+      setCouponLoading(false);
     }
   };
 
@@ -465,9 +523,9 @@ export default function CheckoutPage() {
                         Processing...
                       </>
                     ) : paymentMethod === "cod" ? (
-                      `PLACE ORDER • ₹${total.toLocaleString()}`
+                      `PLACE ORDER • ₹${grandTotal.toLocaleString()}`
                     ) : (
-                      `PAY ₹${total.toLocaleString()}`
+                      `PAY ₹${grandTotal.toLocaleString()}`
                     )}
                   </Button>
                 </div>
@@ -481,46 +539,81 @@ export default function CheckoutPage() {
                 Order Summary ({items.length} items)
               </h4>
 
-              <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
-                {items.slice(0, 3).map((item) => (
+              <div className="space-y-3 mb-4 max-h-64 overflow-y-auto pr-1">
+                {items.map((item) => (
                   <div key={item.id} className="flex gap-3 text-sm">
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate font-medium">
-                        Variant {item.variantId.slice(0, 8)}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Qty: {item.quantity}
-                      </p>
+                    <div className="relative h-14 w-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden border">
+                      {item.productImage && (
+                        <Image
+                          src={item.productImage}
+                          alt={item.productTitle}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      )}
                     </div>
-                    <p className="font-medium">
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate font-medium">{item.productTitle}</p>
+                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="font-medium whitespace-nowrap">
                       ₹{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 ))}
-                {items.length > 3 && (
-                  <p className="text-xs text-gray-500">
-                    +{items.length - 3} more items
-                  </p>
-                )}
               </div>
 
               <Separator className="my-4" />
 
               <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-gray-500" />
+                  <Input
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="Enter coupon code"
+                    className="h-8"
+                    disabled={!!appliedCoupon || couponLoading}
+                  />
+                  {appliedCoupon ? (
+                    <Button size="sm" variant="ghost" onClick={handleRemoveCoupon} disabled={couponLoading} className="px-2">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={handleApplyCoupon} disabled={couponLoading || !couponCode.trim()}>
+                      Apply
+                    </Button>
+                  )}
+                </div>
+
+                {appliedCoupon && (
+                  <div className="text-xs text-green-700 bg-green-50 rounded px-2 py-1">
+                    <strong>{appliedCoupon}</strong> applied
+                  </div>
+                )}
+
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
                   <span>₹{total.toLocaleString()}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 flex items-center gap-1">
+                    <Truck className="h-3 w-3" /> Shipping
+                  </span>
+                  <span>{shippingRupees === 0 ? <span className="text-green-600 font-bold">FREE</span> : `₹${shippingRupees.toLocaleString()}`}</span>
+                </div>
+                {discountRupees > 0 && (
+                  <div className="flex justify-between text-green-700">
+                    <span>Discount</span>
+                    <span>− ₹{discountRupees.toLocaleString()}</span>
+                  </div>
+                )}
                 <Separator />
                 <div className="flex justify-between font-bold text-base">
                   <span>Total</span>
-                  <span>₹{total.toLocaleString()}</span>
+                  <span>₹{grandTotal.toLocaleString()}</span>
                 </div>
-              </div>
-
-              <div className="mt-4 bg-green-50 text-green-700 text-xs font-medium px-3 py-2 rounded flex items-center gap-2">
-                <Truck className="h-4 w-4" />
-                Free shipping on this order
               </div>
             </div>
           </div>

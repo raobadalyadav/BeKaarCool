@@ -84,31 +84,52 @@ function OrderConfirmationContent() {
         setError("Order not found")
         return
       }
+      const sa = data.shippingAddress
       setOrder({
         _id: data.id,
         orderNumber: data.number,
-        items: data.items.map((it) => ({
-          product: { _id: it.variantId, name: it.productTitleSnapshot, images: [] },
-          quantity: it.quantity,
-          price: minorToRupees(it.unitPriceMinor),
-        })),
+        items: data.items.map((it) => {
+          const opts = (() => { try { return JSON.parse(it.variantOptionsJson ?? "{}") } catch { return {} } })() as Record<string, string>
+          return {
+            product: {
+              _id: it.variantId,
+              name: it.productTitleSnapshot,
+              images: it.productImage ? [it.productImage] : [],
+            },
+            quantity: it.quantity,
+            price: minorToRupees(it.unitPriceMinor),
+            size: opts.size,
+            color: opts.color,
+          }
+        }),
         total: minorToRupees(data.totalMinor),
         subtotal: minorToRupees(data.subtotalMinor),
         shipping: minorToRupees(data.shippingMinor),
         tax: minorToRupees(data.taxMinor),
         discount: minorToRupees(data.discountMinor),
+        couponCode: data.couponCode ?? undefined,
         status: data.status,
-        paymentStatus: "",
-        paymentMethod: "",
-        shippingAddress: {
-          name: "",
-          phone: "",
-          address: "",
-          city: "",
-          state: "",
-          pincode: "",
-          country: "IN",
-        },
+        paymentStatus: data.paymentStatus ?? "",
+        paymentMethod: data.paymentMethod ?? "",
+        shippingAddress: sa
+          ? {
+              name: sa.name,
+              phone: sa.phone,
+              address: sa.line1 + (sa.line2 ? `, ${sa.line2}` : ""),
+              city: sa.city,
+              state: sa.state,
+              pincode: sa.pincode,
+              country: sa.country,
+            }
+          : {
+              name: "",
+              phone: "",
+              address: "",
+              city: "",
+              state: "",
+              pincode: "",
+              country: "IN",
+            },
         createdAt: data.placedAt ?? new Date().toISOString(),
       })
     } catch (error) {
@@ -321,7 +342,7 @@ function OrderConfirmationContent() {
             {/* Actions */}
             <Card>
               <CardContent className="p-4 space-y-3">
-                <Link href={`/account/orders/${order._id}`}>
+                <Link href={`/account/orders/${order.orderNumber}`}>
                   <Button className="w-full" variant="outline">
                     <Eye className="mr-2 h-4 w-4" />
                     View Order Details

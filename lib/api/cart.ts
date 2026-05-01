@@ -3,7 +3,11 @@ import type { CartDto } from "./types";
 
 const CART_FIELDS = `
   id currency subtotalMinor
-  items { id variantId quantity priceMinor }
+  items {
+    id variantId quantity priceMinor
+    productId productSlug productTitle productImage
+    sku compareAtMinor optionsJson savedForLater
+  }
 `;
 
 export async function getCart(): Promise<CartDto> {

@@ -105,19 +105,39 @@ export default function MyOrdersPage() {
             const list = await ordersApi.listOrders(pagination.limit)
             const mapped: Order[] = list
                 .filter((o) => statusFilter === "all" || o.status === statusFilter)
-                .map((o) => ({
-                    _id: o.id,
-                    orderNumber: o.number,
-                    status: o.status,
-                    paymentStatus: "",
-                    total: minorToRupees(o.totalMinor),
-                    items: o.items.map((it) => ({
-                        product: { _id: it.variantId, name: it.productTitleSnapshot, images: [], price: minorToRupees(it.unitPriceMinor) },
-                        quantity: it.quantity,
-                        price: minorToRupees(it.unitPriceMinor),
-                    })),
-                    createdAt: o.placedAt ?? new Date().toISOString(),
-                }))
+                .map((o) => {
+                    const opts0 = (() => {
+                        try { return JSON.parse(o.items[0]?.variantOptionsJson ?? "{}") } catch { return {} }
+                    })() as Record<string, string>
+                    return {
+                        _id: o.id,
+                        orderNumber: o.number,
+                        status: o.status,
+                        paymentStatus: o.paymentStatus ?? "",
+                        paymentMethod: o.paymentMethod ?? "",
+                        total: minorToRupees(o.totalMinor),
+                        items: o.items.map((it) => {
+                            const opts = (() => {
+                                try { return JSON.parse(it.variantOptionsJson ?? "{}") } catch { return {} }
+                            })() as Record<string, string>
+                            return {
+                                product: {
+                                    _id: it.variantId,
+                                    name: it.productTitleSnapshot,
+                                    slug: it.productSlug ?? "",
+                                    images: it.productImage ? [it.productImage] : [],
+                                    price: minorToRupees(it.unitPriceMinor),
+                                },
+                                quantity: it.quantity,
+                                price: minorToRupees(it.unitPriceMinor),
+                                size: opts.size,
+                                color: opts.color,
+                            }
+                        }),
+                        createdAt: o.placedAt ?? new Date().toISOString(),
+                        ...(opts0.size && { _firstSize: opts0.size as string }),
+                    }
+                })
             setOrders(mapped)
             setPagination(prev => ({ ...prev, total: mapped.length, pages: 1 }))
         } catch (error) {
@@ -296,7 +316,7 @@ export default function MyOrdersPage() {
                                                 <p className="font-bold text-lg text-yellow-600">₹{(order.total || order.totalAmount || 0).toLocaleString("en-IN")}</p>
                                             </div>
                                             <div className="flex flex-wrap gap-2">
-                                                <Link href={`/account/orders/${order._id}`}>
+                                                <Link href={`/account/orders/${order.orderNumber}`}>
                                                     <Button variant="outline" size="sm"><Eye className="w-4 h-4 mr-1" /> Details</Button>
                                                 </Link>
                                                 {order.paymentMethod === 'cod' && order.paymentStatus !== 'paid' && !["cancelled", "refunded", "delivered"].includes(order.status.toLowerCase()) && (

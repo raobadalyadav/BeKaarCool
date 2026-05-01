@@ -19,6 +19,11 @@ interface ReviewSectionProps {
   reviews: any[]
 }
 
+const formatDate = (s?: string | null) => {
+  if (!s) return "Recently"
+  try { return new Date(s).toLocaleDateString() } catch { return "Recently" }
+}
+
 export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
   const { data: session } = useSession()
   const { toast } = useToast()
@@ -26,6 +31,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
   const [title, setTitle] = useState("")
   const [comment, setComment] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const [localReviews, setLocalReviews] = useState<any[]>(reviews ?? [])
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,20 +54,37 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
 
     setSubmitting(true)
     try {
-      await reviewsApi.createReview({
+      const created = await reviewsApi.createReview({
         productId,
         rating,
         title: title.trim(),
         body: comment.trim(),
       })
       toast({
-        title: "Review submitted successfully!",
-        description: "Thank you for your feedback.",
+        title: "Review submitted",
+        description:
+          created.status === "approved"
+            ? "Thanks for your feedback!"
+            : "Thanks! It will appear once it passes review.",
       })
+      if (created.status === "approved") {
+        setLocalReviews((prev) => [
+          {
+            _id: created.id,
+            rating: created.rating,
+            title: created.title ?? "",
+            comment: created.body ?? "",
+            verified: created.verifiedPurchase,
+            helpful: 0,
+            createdAt: new Date().toISOString(),
+            user: { name: session?.user?.name ?? "You" },
+          },
+          ...prev,
+        ])
+      }
       setRating(0)
       setTitle("")
       setComment("")
-      window.location.reload()
     } catch (error) {
       toast({
         title: "Error submitting review",
@@ -73,8 +96,8 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
     }
   }
 
-  const safeReviews = reviews || []
-  
+  const safeReviews = localReviews ?? []
+
   const averageRating =
     safeReviews.length > 0 ? safeReviews.reduce((sum, review) => sum + review.rating, 0) / safeReviews.length : 0
 
@@ -206,10 +229,10 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   </div>
 
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <span className="font-medium">{review.user?.name || "Anonymous"}</span>
                       {review.verified && (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Verified Purchase</span>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Verified Purchase</span>
                       )}
                     </div>
 
@@ -224,21 +247,14 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-600">{new Date(review.createdAt).toLocaleDateString()}</span>
+                      <span className="text-sm text-gray-600">{formatDate(review.createdAt)}</span>
                     </div>
 
-                    <h4 className="font-medium mb-2">{review.title}</h4>
-                    <p className="text-gray-700 mb-3">{review.comment}</p>
-
-                    {(review.size || review.color) && (
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                        {review.size && <span>Size: {review.size}</span>}
-                        {review.color && <span>Color: {review.color}</span>}
-                      </div>
-                    )}
+                    {review.title && <h4 className="font-medium mb-2">{review.title}</h4>}
+                    {review.comment && <p className="text-gray-700 mb-3 whitespace-pre-line">{review.comment}</p>}
 
                     <div className="flex items-center gap-4">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" disabled>
                         <ThumbsUp className="h-4 w-4 mr-1" />
                         Helpful ({review.helpful || 0})
                       </Button>
