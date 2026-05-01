@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useSession } from "next-auth/react";
@@ -81,9 +82,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [status]);
 
+  // Track the last status we fetched for so StrictMode-double-runs and
+  // unrelated re-renders don't refire the cart query.
+  const lastFetchedStatusRef = useRef<string | null>(null);
   useEffect(() => {
+    if (lastFetchedStatusRef.current === status) return;
+    lastFetchedStatusRef.current = status;
     refresh();
-  }, [refresh]);
+  }, [status, refresh]);
 
   const addToCart = useCallback(
     async (input: { variantId: string; quantity: number }) => {

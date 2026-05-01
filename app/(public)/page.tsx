@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -79,8 +79,13 @@ export default function HomePage() {
   // Flash sale timer
   const [flashSaleEnd, setFlashSaleEnd] = useState<Date | null>(null)
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
+  // StrictMode in dev runs effects twice — guard the network calls so we
+  // don't fire the same homepage queries 2x on every page load.
+  const fetchedRef = useRef(false)
 
   useEffect(() => {
+    if (fetchedRef.current) return
+    fetchedRef.current = true
     fetchHomeData()
     loadRecentlyViewed()
 

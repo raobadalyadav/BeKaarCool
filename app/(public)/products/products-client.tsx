@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -178,7 +178,10 @@ export default function ProductsPageClient() {
     }
   }
 
+  const filterOptionsFetchedRef = useRef(false)
   useEffect(() => {
+    if (filterOptionsFetchedRef.current) return
+    filterOptionsFetchedRef.current = true
     fetchFilterOptions()
   }, [])
 
