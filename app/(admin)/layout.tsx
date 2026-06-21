@@ -7,7 +7,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Package, Tags, Award, ShoppingBag,
   Warehouse, TicketPercent, Users, LogOut, Menu, X, ChevronRight,
-  Layers, Star, FileText, BarChart2,
+  Layers, Star, FileText, BarChart2, UserCog, RefreshCcw, Upload, ScrollText,
 } from "lucide-react"
 import { useState } from "react"
 import { signOut } from "next-auth/react"
@@ -24,6 +24,10 @@ const NAV = [
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/staff", label: "Staff", icon: UserCog },
+  { href: "/admin/returns", label: "Returns", icon: RefreshCcw },
+  { href: "/admin/bulk-upload", label: "Bulk Upload", icon: Upload },
+  { href: "/admin/audit-logs", label: "Audit Logs", icon: ScrollText },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
 ]
 

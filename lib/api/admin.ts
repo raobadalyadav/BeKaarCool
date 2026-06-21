@@ -605,6 +605,196 @@ export async function adminCustomerAnalytics() {
   return data.adminCustomerAnalytics;
 }
 
+// ─── Returns (Admin) ─────────────────────────────────────────────────────
+
+export interface AdminReturnDto {
+  id: string;
+  orderId: string;
+  orderNumber?: string;
+  userId?: string;
+  status: string;
+  reason?: string;
+  notes?: string;
+  requestedAt: string;
+  approvedAt?: string;
+  refundedAt?: string;
+}
+
+export async function adminListReturns(status?: string): Promise<AdminReturnDto[]> {
+  const data = await gql<{ adminListReturns: AdminReturnDto[] }>({
+    query: `
+      query AdminListReturns($status: String) {
+        adminListReturns(status: $status) {
+          id orderId orderNumber userId status reason notes requestedAt approvedAt refundedAt
+        }
+      }
+    `,
+    variables: { status: status ?? null },
+    cache: "no-store",
+  });
+  return data.adminListReturns;
+}
+
+export async function adminApproveReturn(returnId: string): Promise<boolean> {
+  const data = await gql<{ adminApproveReturn: boolean }>({
+    query: `mutation AdminApproveReturn($returnId: String!) { adminApproveReturn(returnId: $returnId) }`,
+    variables: { returnId },
+    cache: "no-store",
+  });
+  return data.adminApproveReturn;
+}
+
+export async function adminRejectReturn(returnId: string, reason?: string): Promise<boolean> {
+  const data = await gql<{ adminRejectReturn: boolean }>({
+    query: `mutation AdminRejectReturn($returnId: String!, $reason: String) { adminRejectReturn(returnId: $returnId, reason: $reason) }`,
+    variables: { returnId, reason },
+    cache: "no-store",
+  });
+  return data.adminRejectReturn;
+}
+
+export async function adminMarkReturnPickedUp(returnId: string): Promise<boolean> {
+  const data = await gql<{ adminMarkReturnPickedUp: boolean }>({
+    query: `mutation AdminMarkPickedUp($returnId: String!) { adminMarkReturnPickedUp(returnId: $returnId) }`,
+    variables: { returnId },
+    cache: "no-store",
+  });
+  return data.adminMarkReturnPickedUp;
+}
+
+export async function adminRefundReturn(returnId: string, amountMinor: string, reason?: string): Promise<boolean> {
+  const data = await gql<{ adminRefundReturn: boolean }>({
+    query: `mutation AdminRefundReturn($returnId: String!, $amountMinor: String!, $reason: String) { adminRefundReturn(returnId: $returnId, amountMinor: $amountMinor, reason: $reason) }`,
+    variables: { returnId, amountMinor, reason },
+    cache: "no-store",
+  });
+  return data.adminRefundReturn;
+}
+
+// ─── Audit Logs ───────────────────────────────────────────────────────────
+
+export interface AuditLogDto {
+  id: string;
+  actorId?: string;
+  actorEmail?: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  before?: string;
+  after?: string;
+  reason?: string;
+  ip?: string;
+  userAgent?: string;
+  occurredAt: string;
+}
+
+export async function adminAuditLogs(args?: {
+  entityType?: string;
+  actorId?: string;
+  limit?: number;
+}): Promise<AuditLogDto[]> {
+  const data = await gql<{ adminAuditLogs: AuditLogDto[] }>({
+    query: `
+      query AdminAuditLogs($entityType: String, $actorId: String, $limit: Int) {
+        adminAuditLogs(entityType: $entityType, actorId: $actorId, limit: $limit) {
+          id actorId actorEmail action entityType entityId before after reason ip userAgent occurredAt
+        }
+      }
+    `,
+    variables: {
+      entityType: args?.entityType ?? null,
+      actorId: args?.actorId ?? null,
+      limit: args?.limit ?? null,
+    },
+    cache: "no-store",
+  });
+  return data.adminAuditLogs;
+}
+
+// ─── Staff Management ─────────────────────────────────────────────────────
+
+export interface StaffDto {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  role: string;
+  status: string;
+  twoFactorEnabled: boolean;
+  createdAt: string;
+}
+
+export async function adminListStaff(): Promise<StaffDto[]> {
+  const data = await gql<{ adminListStaff: StaffDto[] }>({
+    query: `
+      query AdminListStaff {
+        adminListStaff { id email firstName lastName phone role status twoFactorEnabled createdAt }
+      }
+    `,
+    cache: "no-store",
+  });
+  return data.adminListStaff;
+}
+
+export async function adminCreateStaff(input: {
+  email: string;
+  password: string;
+  role: string;
+  firstName?: string;
+  lastName?: string;
+}): Promise<StaffDto> {
+  const data = await gql<{ adminCreateStaff: StaffDto }>({
+    query: `
+      mutation AdminCreateStaff($email: String!, $password: String!, $role: String!, $firstName: String, $lastName: String) {
+        adminCreateStaff(email: $email, password: $password, role: $role, firstName: $firstName, lastName: $lastName) {
+          id email firstName lastName phone role status twoFactorEnabled createdAt
+        }
+      }
+    `,
+    variables: input,
+    cache: "no-store",
+  });
+  return data.adminCreateStaff;
+}
+
+export async function adminUpdateUser(
+  id: string,
+  input: { role?: string; status?: string; firstName?: string; lastName?: string }
+): Promise<boolean> {
+  const data = await gql<{ adminUpdateUser: boolean }>({
+    query: `
+      mutation AdminUpdateUser($id: String!, $role: String, $status: String, $firstName: String, $lastName: String) {
+        adminUpdateUser(id: $id, role: $role, status: $status, firstName: $firstName, lastName: $lastName)
+      }
+    `,
+    variables: { id, ...input },
+    cache: "no-store",
+  });
+  return data.adminUpdateUser;
+}
+
+// ─── Bulk Import ──────────────────────────────────────────────────────────
+
+export interface BulkImportResult {
+  imported: number;
+  skipped: number;
+  errors: string[];
+}
+
+export async function adminBulkImportProducts(csv: string): Promise<BulkImportResult> {
+  const data = await gql<{ adminBulkImportProducts: BulkImportResult }>({
+    query: `
+      mutation AdminBulkImport($csv: String!) {
+        adminBulkImportProducts(csv: $csv) { imported skipped errors }
+      }
+    `,
+    variables: { csv },
+    cache: "no-store",
+  });
+  return data.adminBulkImportProducts;
+}
+
 // ─── Customers ────────────────────────────────────────────────────────────
 
 export async function adminListCustomers() {
