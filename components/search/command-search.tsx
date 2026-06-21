@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import * as productsApi from "@/lib/api/products"
 import { minorToRupees } from "@/lib/api/config"
@@ -22,11 +22,34 @@ interface CommandSearchProps {
   onOpenChange: (open: boolean) => void
 }
 
+const RECENT_SEARCHES_KEY = "bf_recent_searches"
+const MAX_RECENT = 5
+
+function getRecentSearches(): string[] {
+  if (typeof window === "undefined") return []
+  try { return JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) ?? "[]") } catch { return [] }
+}
+
+function saveRecentSearch(q: string) {
+  const existing = getRecentSearches().filter((s) => s !== q)
+  localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify([q, ...existing].slice(0, MAX_RECENT)))
+}
+
 export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [recentSearches, setRecentSearches] = useState<string[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    productsApi.listCategories().then(setCategories).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (open) setRecentSearches(getRecentSearches())
+  }, [open])
 
   useEffect(() => {
     if (query.length >= 2) {
@@ -48,31 +71,28 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
     }
   }
 
-  const handleSelect = (value: string, type: "product" | "search" | "category") => {
+  const handleSelect = useCallback((value: string, type: "product" | "search" | "category") => {
     onOpenChange(false)
     setQuery("")
-    
     switch (type) {
       case "product":
         router.push(`/products/${value}`)
         break
       case "search":
-        router.push(`/products?search=${encodeURIComponent(value)}`)
+        saveRecentSearch(value)
+        router.push(`/search?q=${encodeURIComponent(value)}`)
         break
       case "category":
-        router.push(`/products?category=${encodeURIComponent(value)}`)
+        router.push(`/products?categoryId=${encodeURIComponent(value)}`)
         break
     }
-  }
+  }, [router, onOpenChange])
 
   const quickActions = [
     { label: "Featured Products", value: "featured=true", icon: Sparkles },
     { label: "New Arrivals", value: "sort=newest", icon: TrendingUp },
     { label: "Best Sellers", value: "sort=popular", icon: Package },
   ]
-
-  const categories = ["T-Shirts", "Hoodies", "Mugs", "Posters", "Phone Cases", "Accessories"]
-  const trendingSearches = ["Custom T-shirts", "Logo Design", "Personalized Mugs", "Wedding Invitations"]
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
@@ -129,9 +149,28 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
           </CommandGroup>
         )}
 
-        {/* Quick Actions */}
+        {/* Quick Actions + Categories + Recent searches */}
         {query.length === 0 && (
           <>
+            {recentSearches.length > 0 && (
+              <>
+                <CommandGroup heading="Recent Searches">
+                  {recentSearches.map((s) => (
+                    <CommandItem
+                      key={s}
+                      value={`recent-${s}`}
+                      onSelect={() => handleSelect(s, "search")}
+                      className="flex items-center gap-3"
+                    >
+                      <Search className="h-4 w-4 text-muted-foreground" />
+                      <span>{s}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandSeparator />
+              </>
+            )}
+
             <CommandGroup heading="Quick Actions">
               {quickActions.map((action) => {
                 const Icon = action.icon
@@ -149,40 +188,24 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
               })}
             </CommandGroup>
 
-            <CommandSeparator />
-
-            <CommandGroup heading="Categories">
-              {categories.map((category) => (
-                <CommandItem
-                  key={category}
-                  value={category}
-                  onSelect={() => handleSelect(category, "category")}
-                  className="flex items-center gap-3"
-                >
-                  <Tag className="h-4 w-4" />
-                  <span>{category}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-
-            <CommandSeparator />
-
-            <CommandGroup heading="Trending Searches">
-              {trendingSearches.map((search) => (
-                <CommandItem
-                  key={search}
-                  value={search}
-                  onSelect={() => handleSelect(search, "search")}
-                  className="flex items-center gap-3"
-                >
-                  <TrendingUp className="h-4 w-4" />
-                  <span>{search}</span>
-                  <Badge variant="secondary" className="ml-auto">
-                    Trending
-                  </Badge>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {categories.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup heading="Categories">
+                  {categories.slice(0, 8).map((cat) => (
+                    <CommandItem
+                      key={cat.id}
+                      value={cat.name}
+                      onSelect={() => handleSelect(cat.id, "category")}
+                      className="flex items-center gap-3"
+                    >
+                      <Tag className="h-4 w-4" />
+                      <span>{cat.name}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
           </>
         )}
 

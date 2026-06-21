@@ -6,7 +6,6 @@ import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   Facebook,
   Twitter,
@@ -23,6 +22,20 @@ import {
   CreditCard,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Logo, VisaIcon, MastercardIcon, UpiIcon, RazorpayIcon, CodIcon } from "@/components/layout/logo"
+
+async function subscribeNewsletter(email: string): Promise<void> {
+  const res = await fetch("/bff/graphql", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `mutation { newsletterSubscribe(email: ${JSON.stringify(email)}) }`,
+    }),
+  })
+  if (!res.ok) throw new Error("Network error")
+  const json = await res.json()
+  if (json.errors?.length) throw new Error(json.errors[0].message)
+}
 
 export function Footer() {
   const [email, setEmail] = useState("")
@@ -32,17 +45,16 @@ export function Footer() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
-
     setSubscribing(true)
-    // Newsletter signup is currently disabled while the backend feature is being built.
-    setTimeout(() => {
-      toast({
-        title: "Thanks!",
-        description: "We'll let you know when newsletter signups go live.",
-      })
+    try {
+      await subscribeNewsletter(email.trim())
+      toast({ title: "Subscribed!", description: "You'll get 10% off on your first order." })
       setEmail("")
+    } catch {
+      toast({ title: "Error", description: "Could not subscribe. Please try again.", variant: "destructive" })
+    } finally {
       setSubscribing(false)
-    }, 200)
+    }
   }
 
   const features = [
@@ -73,13 +85,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <div className="h-10 w-10 bg-yellow-400 rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-lg">B</span>
-              </div>
-              <span className="font-bold text-2xl text-yellow-400">
-                Baefikra
-              </span>
+            <div>
+              <Logo width={148} height={37} textColor="#FFFFFF" />
             </div>
             <p className="text-gray-400 leading-relaxed">
               India's favourite online fashion store. Explore trendy t-shirts, hoodies, accessories and more at amazing prices. Shop the coolest styles with confidence!
@@ -230,21 +237,14 @@ export function Footer() {
             </div>
 
             {/* Payment Methods */}
-            <div className="flex items-center space-x-3">
-              <span className="text-gray-500 text-sm">We accept:</span>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
-                  Visa
-                </Badge>
-                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
-                  Mastercard
-                </Badge>
-                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
-                  UPI
-                </Badge>
-                <Badge variant="outline" className="text-xs border-gray-700 text-gray-400 bg-gray-800">
-                  COD
-                </Badge>
+            <div className="flex items-center gap-3 flex-wrap justify-center md:justify-end">
+              <span className="text-gray-500 text-xs">We accept:</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <VisaIcon />
+                <MastercardIcon />
+                <UpiIcon />
+                <RazorpayIcon />
+                <CodIcon />
               </div>
             </div>
           </div>

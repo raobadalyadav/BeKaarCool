@@ -312,4 +312,7 @@ export interface ContentItemDto {
   title: string;
   excerpt?: string;
   bodyHtml?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  imageUrl?: string;
 }

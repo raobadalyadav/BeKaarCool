@@ -1,7 +1,7 @@
 import { gql } from "./client";
 import type { ContentItemDto } from "./types";
 
-const FIELDS = `id slug title excerpt bodyHtml`;
+const FIELDS = `id slug title excerpt bodyHtml ctaText ctaUrl imageUrl`;
 
 export async function blogPosts(): Promise<ContentItemDto[]> {
   const data = await gql<{ blogPosts: ContentItemDto[] }>({

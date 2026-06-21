@@ -2,12 +2,11 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,35 +16,19 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart/cart-sheet"
-import { useLanguage } from "@/contexts/language-context"
-import { useCurrency } from "@/contexts/currency-context"
 import { Search, User, Menu } from "lucide-react"
-import { useTheme } from "next-themes"
 import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/contexts/cart-context"
-import { CommandSearch } from "@/components/search/command-search"
+import { InlineSearch } from "@/components/search/inline-search"
+import { Logo } from "@/components/layout/logo"
 
 export function Header() {
   const { data: session } = useSession()
   const router = useRouter()
   const { toast } = useToast()
-  const { language, setLanguage, t } = useLanguage()
-  const { currency, setCurrency } = useCurrency()
-  const { theme, setTheme } = useTheme()
-  const [commandOpen, setCommandOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   const { itemCount: cartCount } = useCart()
-
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setCommandOpen((open) => !open)
-      }
-    }
-    document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
-  }, [])
 
 
 
@@ -102,7 +85,9 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[300px]">
                   <div className="flex flex-col space-y-6 mt-8">
-                    <div className="font-bold text-xl px-2">Menu</div>
+                    <div className="px-2">
+                      <Logo width={130} height={32} textColor="#111111" />
+                    </div>
                     <nav className="flex flex-col space-y-2">
                       <Link href="/products?category=Men" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Men</Link>
                       <Link href="/products?category=Women" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Women</Link>
@@ -121,10 +106,8 @@ export function Header() {
               </Sheet>
 
               {/* Logo */}
-              <Link href="/" className="flex-shrink-0">
-                <span className="font-bold text-2xl tracking-tight text-yellow-500">
-                  Baefikra
-                </span>
+              <Link href="/" className="flex-shrink-0 flex items-center">
+                <Logo width={140} height={36} textColor="#111111" />
               </Link>
 
               {/* Desktop Navigation */}
@@ -145,21 +128,13 @@ export function Header() {
             <div className="flex items-center flex-1 justify-end gap-2 md:gap-4">
 
               {/* Search Bar (Desktop) */}
-              <div className="hidden md:block flex-1 max-w-sm mx-4">
-                <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
-                  <Input
-                    placeholder="Search by product, category or collection"
-                    className="bg-muted/40 border-transparent focus:border-border focus:bg-background h-10 w-full pl-10 text-xs font-medium"
-                    onClick={() => setCommandOpen(true)}
-                    readOnly
-                  />
-                </div>
+              <div className="hidden md:block flex-1 max-w-xl mx-2">
+                <InlineSearch />
               </div>
 
               <div className="flex items-center gap-1 md:gap-3 text-muted-foreground">
                 {/* Mobile Search Icon */}
-                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setCommandOpen(true)}>
+                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileSearchOpen(true)}>
                   <Search className="h-5 w-5" />
                 </Button>
 
@@ -253,7 +228,19 @@ export function Header() {
         </header>
       </div>
 
-      <CommandSearch open={commandOpen} onOpenChange={setCommandOpen} />
+      {/* Mobile full-screen search overlay */}
+      {mobileSearchOpen && (
+        <div className="fixed inset-0 z-[300] bg-white flex flex-col md:hidden">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 bg-white">
+            <button onClick={() => setMobileSearchOpen(false)} className="p-2 rounded hover:bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <div className="flex-1">
+              <InlineSearch onFocusChange={(f) => { if (!f) setMobileSearchOpen(false) }} />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
