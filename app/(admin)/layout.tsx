@@ -7,6 +7,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Package, Tags, Award, ShoppingBag,
   Warehouse, TicketPercent, Users, LogOut, Menu, X, ChevronRight,
+  Layers, Star, FileText,
 } from "lucide-react"
 import { useState } from "react"
 import { signOut } from "next-auth/react"
@@ -16,9 +17,12 @@ const NAV = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },
   { href: "/admin/brands", label: "Brands", icon: Award },
+  { href: "/admin/collections", label: "Collections", icon: Layers },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/inventory", label: "Inventory", icon: Warehouse },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
+  { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/customers", label: "Customers", icon: Users },
 ]
 

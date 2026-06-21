@@ -373,6 +373,120 @@ export async function adminToggleCoupon(id: string, active: boolean): Promise<bo
   return data.adminToggleCoupon;
 }
 
+// ─── Collections ─────────────────────────────────────────────────────────
+
+export async function adminListCollections() {
+  const data = await gql<{
+    collections: Array<{ id: string; slug: string; name: string; type: string; visibility: string }>;
+  }>({
+    query: `query AdminCollections { collections { id slug name type visibility } }`,
+    cache: "no-store",
+  });
+  return data.collections;
+}
+
+export async function adminCreateCollection(input: {
+  slug: string;
+  name: string;
+  type?: string;
+}): Promise<{ id: string; slug: string; name: string; type: string }> {
+  const data = await gql<{ adminCreateCollection: { id: string; slug: string; name: string; type: string } }>({
+    query: `
+      mutation AdminCreateCollection($slug: String!, $name: String!, $type: String) {
+        adminCreateCollection(slug: $slug, name: $name, type: $type) { id slug name type }
+      }
+    `,
+    variables: { slug: input.slug, name: input.name, type: input.type ?? "manual" },
+    cache: "no-store",
+  });
+  return data.adminCreateCollection;
+}
+
+export async function adminAddProductToCollection(collectionId: string, productId: string): Promise<boolean> {
+  const data = await gql<{ adminAddProductToCollection: boolean }>({
+    query: `
+      mutation AdminAddToCollection($collectionId: String!, $productId: String!) {
+        adminAddProductToCollection(collectionId: $collectionId, productId: $productId)
+      }
+    `,
+    variables: { collectionId, productId },
+    cache: "no-store",
+  });
+  return data.adminAddProductToCollection;
+}
+
+export async function adminRemoveProductFromCollection(collectionId: string, productId: string): Promise<boolean> {
+  const data = await gql<{ adminRemoveProductFromCollection: boolean }>({
+    query: `
+      mutation AdminRemoveFromCollection($collectionId: String!, $productId: String!) {
+        adminRemoveProductFromCollection(collectionId: $collectionId, productId: $productId)
+      }
+    `,
+    variables: { collectionId, productId },
+    cache: "no-store",
+  });
+  return data.adminRemoveProductFromCollection;
+}
+
+// ─── Reviews (Admin) ──────────────────────────────────────────────────────
+
+export async function adminListReviews(args?: { first?: number; status?: string; productId?: string }) {
+  const data = await gql<{
+    adminListReviews: Array<{
+      id: string;
+      productId: string;
+      productTitle: string;
+      rating: number;
+      title?: string;
+      body?: string;
+      verifiedPurchase: boolean;
+      status: string;
+      helpfulCount: number;
+      notHelpfulCount: number;
+      createdAt?: string;
+      reviewerName?: string;
+    }>;
+  }>({
+    query: `
+      query AdminListReviews($first: Int, $status: String, $productId: String) {
+        adminListReviews(first: $first, status: $status, productId: $productId) {
+          id productId productTitle rating title body
+          verifiedPurchase status helpfulCount notHelpfulCount createdAt reviewerName
+        }
+      }
+    `,
+    variables: {
+      first: args?.first ?? 100,
+      status: args?.status ?? null,
+      productId: args?.productId ?? null,
+    },
+    cache: "no-store",
+  });
+  return data.adminListReviews;
+}
+
+export async function adminModerateReview(reviewId: string, status: "approved" | "rejected"): Promise<boolean> {
+  const data = await gql<{ adminModerateReview: boolean }>({
+    query: `
+      mutation AdminModerateReview($reviewId: String!, $status: String!) {
+        adminModerateReview(reviewId: $reviewId, status: $status)
+      }
+    `,
+    variables: { reviewId, status },
+    cache: "no-store",
+  });
+  return data.adminModerateReview;
+}
+
+export async function adminDeleteReview(id: string): Promise<boolean> {
+  const data = await gql<{ adminDeleteReview: boolean }>({
+    query: `mutation AdminDeleteReview($id: String!) { adminDeleteReview(id: $id) }`,
+    variables: { id },
+    cache: "no-store",
+  });
+  return data.adminDeleteReview;
+}
+
 // ─── Customers ────────────────────────────────────────────────────────────
 
 export async function adminListCustomers() {

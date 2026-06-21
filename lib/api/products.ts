@@ -82,10 +82,31 @@ export async function listBrands(): Promise<BrandDto[]> {
 
 export async function listCollections(): Promise<CollectionDto[]> {
   const data = await gql<{ collections: CollectionDto[] }>({
-    query: `query { collections { id slug name } }`,
+    query: `query { collections { id slug name type visibility } }`,
     next: { revalidate: 600, tags: ["collections"] },
   });
   return data.collections;
+}
+
+export async function getCollectionBySlug(slug: string): Promise<(CollectionDto & { products: ProductConnection }) | null> {
+  const data = await gql<{
+    collection: (CollectionDto & { products: ProductConnection }) | null;
+  }>({
+    query: `
+      query Collection($slug: String!) {
+        collection(slug: $slug) {
+          id slug name type visibility description
+          products(first: 60) {
+            edges { cursor node { ${PRODUCT_FIELDS} } }
+            pageInfo { hasNextPage endCursor }
+          }
+        }
+      }
+    `,
+    variables: { slug },
+    next: { revalidate: 300, tags: [`collection:${slug}`] },
+  });
+  return data.collection;
 }
 
 export async function search(args: {

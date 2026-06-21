@@ -89,6 +89,9 @@ export interface CollectionDto {
   id: string;
   slug: string;
   name: string;
+  type?: string;
+  visibility?: string;
+  description?: string;
 }
 
 export interface CartItemDto {

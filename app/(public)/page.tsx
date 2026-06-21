@@ -19,6 +19,7 @@ import { ChevronRight, Star, Truck, RefreshCcw, ShieldCheck, AlertCircle, Clock,
 import * as productsApi from "@/lib/api/products"
 import * as contentApi from "@/lib/api/content"
 import { minorToRupees } from "@/lib/api/config"
+import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
 
 // Interfaces
 interface Product {
@@ -527,29 +528,11 @@ export default function HomePage() {
       )}
 
       {/* 10. Recently Viewed */}
-      {recentlyViewed.length > 0 && (
-        <section className="py-8 md:py-12 bg-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-2 mb-6">
-              <Clock className="w-6 h-6 text-gray-500" />
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900 tracking-wide uppercase">
-                Recently Viewed
-              </h2>
-            </div>
-            <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {recentlyViewed.map(product => (
-                  <CarouselItem key={product._id} className="pl-2 md:pl-4 basis-[45%] md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
-                    <ProductCard product={product} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex -left-4" />
-              <CarouselNext className="hidden md:flex -right-4" />
-            </Carousel>
-          </div>
-        </section>
-      )}
+      <section className="py-8 md:py-12 bg-gray-100">
+        <div className="container mx-auto px-4">
+          <RecentlyViewedStrip />
+        </div>
+      </section>
 
       {/* 11. Features / Trust Badges */}
       <section className="py-8 bg-white border-t mt-8">

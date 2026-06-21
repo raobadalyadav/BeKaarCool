@@ -38,6 +38,8 @@ import { useWishlist } from "@/hooks/use-wishlist"
 import * as checkoutApi from "@/lib/api/checkout"
 import * as alertsApi from "@/lib/api/alerts"
 import { QnaSection } from "@/components/product/qna-section"
+import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
+import { useRecentlyViewed } from "@/hooks/use-recently-viewed"
 
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
     const [selectedImage, setSelectedImage] = useState(0)
@@ -56,6 +58,20 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
     const { addToCart } = useCart()
     const { has: isInWishlist, toggle: toggleWishlist } = useWishlist()
     const { data: session } = useSession()
+    const { add: addRecentlyViewed } = useRecentlyViewed()
+
+    useEffect(() => {
+        addRecentlyViewed({
+            id: product.id ?? product._id,
+            slug: product.slug,
+            name: product.name ?? product.title,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            image: product.images?.[0],
+            brandName: product.brandName || product.brand,
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [product.id])
 
     const productId = product.id ?? product._id
     const variantId = (() => {
@@ -493,6 +509,11 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     </div>
                 </div>
             )}
+
+            {/* Recently Viewed */}
+            <div className="mt-4 border-t border-gray-100 pt-8">
+                <RecentlyViewedStrip excludeId={product.id ?? product._id} />
+            </div>
         </div>
     )
 }
