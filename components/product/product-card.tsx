@@ -125,9 +125,12 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
         </div>
 
         <CardContent className={`p-3 flex flex-col flex-1 ${viewMode === "list" ? "justify-center" : ""}`}>
-          {/* Brand Name (Optional - mimicking generic brand if not present) */}
+          {/* Brand Name */}
           <div className="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase mb-0.5">
-            {product.brand || "Bewakoof®"}
+            {(() => {
+              const b = product.brandName || product.brand || ""
+              return /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(b) ? "Baefikra" : b || "Baefikra"
+            })()}
           </div>
 
           {/* Product Name */}

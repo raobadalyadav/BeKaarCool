@@ -113,24 +113,39 @@ async function rawRequest<T>(opts: RequestOpts): Promise<T> {
 }
 
 export async function rest<T>(opts: RequestOpts): Promise<T> {
-  try {
-    return await rawRequest<T>(opts);
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 401) {
-      if (isServer) {
-        const refreshed = await refreshAccessTokenServer();
-        if (refreshed) {
-          return await rawRequest<T>({ ...opts, token: refreshed.accessToken });
+  let attempt = 0;
+  while (true) {
+    try {
+      return await rawRequest<T>(opts);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 401) {
+        if (isServer) {
+          const refreshed = await refreshAccessTokenServer();
+          if (refreshed) {
+            return await rawRequest<T>({ ...opts, token: refreshed.accessToken });
+          }
+          await clearServerTokens();
+        } else {
+          const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
+          if (refreshRes.ok) {
+            return await rawRequest<T>(opts);
+          }
         }
-        await clearServerTokens();
-      } else {
-        const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
-        if (refreshRes.ok) {
-          return await rawRequest<T>(opts);
-        }
+        throw e;
       }
+
+      if (
+        attempt < 2 &&
+        e instanceof ApiError &&
+        (e.status === 429 || e.status === 500 || e.status === 503)
+      ) {
+        await new Promise((r) => setTimeout(r, (attempt + 1) * 1000));
+        attempt++;
+        continue;
+      }
+
+      throw e;
     }
-    throw e;
   }
 }
 
@@ -183,26 +198,45 @@ export async function gql<T>(args: {
     return json.data;
   };
 
-  try {
-    return await exec(args.token);
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 401) {
-      if (isServer) {
-        const refreshed = await refreshAccessTokenServer();
-        if (refreshed) {
-          return await exec(refreshed.accessToken);
+  const isThrottled = (e: unknown) =>
+    e instanceof ApiError &&
+    (e.status === 429 ||
+      (e.message?.includes("ThrottlerException") ||
+        e.message?.includes("Too Many Requests")));
+
+  const isTransient = (e: unknown) =>
+    e instanceof ApiError && (e.status === 500 || e.status === 503);
+
+  let attempt = 0;
+  while (true) {
+    try {
+      return await exec(args.token);
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 401) {
+        if (isServer) {
+          const refreshed = await refreshAccessTokenServer();
+          if (refreshed) {
+            return await exec(refreshed.accessToken);
+          }
+          await clearServerTokens();
+        } else {
+          const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
+          if (refreshRes.ok) {
+            return await exec(args.token);
+          }
         }
-        await clearServerTokens();
-      } else {
-        // Browser: ask the Next.js API route to refresh the HttpOnly cookies
-        const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
-        if (refreshRes.ok) {
-          // Cookies are now updated server-side; browser sends them automatically
-          return await exec(args.token);
-        }
+        throw e;
       }
+
+      // Retry throttled or transient 500 errors (max 2 retries, backoff 1s/2s)
+      if (attempt < 2 && (isThrottled(e) || isTransient(e))) {
+        await new Promise((r) => setTimeout(r, (attempt + 1) * 1000));
+        attempt++;
+        continue;
+      }
+
+      throw e;
     }
-    throw e;
   }
 }
 

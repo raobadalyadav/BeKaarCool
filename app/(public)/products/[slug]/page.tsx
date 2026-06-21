@@ -62,7 +62,12 @@ async function getProduct(slug: string) {
   }
 }
 
-async function getRelatedProducts(categoryId: string, productId: string) {
+async function getRelatedProducts(
+  categoryId: string,
+  productId: string,
+  categories: { id: string; name: string }[],
+  brands: { id: string; name: string }[]
+) {
   if (!categoryId) return [];
   try {
     const conn = await productsApi.listProducts({
@@ -71,7 +76,11 @@ async function getRelatedProducts(categoryId: string, productId: string) {
       status: "published",
     });
     return conn.edges
-      .map((e) => toUiProduct(e.node))
+      .map((e) => {
+        const categoryName = categories.find((c) => c.id === e.node.categoryId)?.name;
+        const brandName = brands.find((b) => b.id === e.node.brandId)?.name;
+        return toUiProduct(e.node, categoryName, brandName);
+      })
       .filter((p) => p._id !== productId)
       .slice(0, 6);
   } catch (error) {
@@ -110,8 +119,13 @@ export default async function ProductPage({ params }: Props) {
     notFound();
   }
 
+  const [categoriesForRelated, brandsForRelated] = await Promise.all([
+    productsApi.listCategories().catch(() => [] as { id: string; name: string; slug: string }[]),
+    productsApi.listBrands().catch(() => [] as { id: string; name: string; slug: string }[]),
+  ]);
+
   const [relatedProducts, reviewsRaw, questionsRaw] = await Promise.all([
-    getRelatedProducts(product.category, product._id),
+    getRelatedProducts(product.category, product._id, categoriesForRelated, brandsForRelated),
     productsApi.productReviews(product._id).catch(() => []),
     productsApi.productQuestions(product._id).catch(() => []),
   ]);
