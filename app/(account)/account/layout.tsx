@@ -6,9 +6,10 @@ import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import {
     User, Package, CreditCard, Wallet, MapPin, Settings, HelpCircle, LogOut,
-    ChevronRight, Edit2, Home, Gift, Users, Shield, Bell
+    ChevronRight, Edit2, Home, Gift, Users, Shield, Bell, CheckCircle2
 } from "lucide-react"
 
 // Navigation items
@@ -109,26 +110,34 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                     {/* Sidebar */}
                     <aside className="lg:w-72 flex-shrink-0">
                         {/* User Card */}
-                        <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
-                            <div className="flex items-center gap-4">
-                                <Avatar className="h-16 w-16">
-                                    <AvatarImage src={user.avatar || "/placeholder.svg"} />
-                                    <AvatarFallback className="bg-[#F38508] text-black text-xl font-bold">
-                                        {user.name?.charAt(0).toUpperCase()}
+                        <div className="bg-white rounded-xl shadow-sm p-5 mb-4 border">
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-14 w-14 flex-shrink-0">
+                                    <AvatarImage src={(user as { avatar?: string }).avatar ?? ""} />
+                                    <AvatarFallback className="bg-gradient-to-br from-[#F38508] to-[#D97706] text-black text-lg font-black">
+                                        {(user.name ?? user.email ?? "?").split(" ").map((w: string) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
-                                    <h2 className="font-bold text-lg text-gray-900 truncate">{user.name}</h2>
-                                    <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                                    {user.phone && <p className="text-sm text-gray-500">{user.phone}</p>}
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                        <h2 className="font-bold text-base text-gray-900 truncate">{user.name || "—"}</h2>
+                                        {user.emailVerified && (
+                                            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+                                    {(user as { phone?: string }).phone && (
+                                        <p className="text-xs text-gray-400 mt-0.5">{(user as { phone?: string }).phone}</p>
+                                    )}
                                 </div>
                             </div>
                             <Link href="/account/profile">
                                 <Button
                                     variant="outline"
-                                    className="w-full mt-4 border-[#F38508] text-[#F38508] hover:bg-orange-50"
+                                    size="sm"
+                                    className="w-full mt-4 border-[#F38508] text-[#F38508] hover:bg-orange-50 text-xs"
                                 >
-                                    <Edit2 className="w-4 h-4 mr-2" /> Edit Profile
+                                    <Edit2 className="w-3.5 h-3.5 mr-1.5" /> Edit Profile
                                 </Button>
                             </Link>
                         </div>

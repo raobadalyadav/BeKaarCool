@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   trailingSlash: false,
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

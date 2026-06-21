@@ -51,6 +51,9 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
 
+  const [selectedShippingCode, setSelectedShippingCode] = useState<string>("shiprocket_surface");
+  const [availableRates, setAvailableRates] = useState<Array<{ methodCode: string; name: string; amountMinor: string; etaDays: number | null }>>([]);
+
   const shippingMinor = session2?.shippingMinor;
   const discountMinor = session2?.discountMinor;
   const shippingRupees = shippingMinor ? minorToRupees(shippingMinor) : 0;
@@ -111,13 +114,38 @@ export default function CheckoutPage() {
       toast({ title: "Pick or add an address first", variant: "destructive" });
       return;
     }
+    setLoading(true);
     try {
       if (status === "unauthenticated") {
-          // If unauthenticated, save guest details first
-          await checkoutApi.setGuestDetails(sessionId, newAddress.email || "guest@example.com", newAddress.phone, newAddress.name);
+        await checkoutApi.setGuestDetails(sessionId, newAddress.email || "guest@example.com", newAddress.phone, newAddress.name);
       }
       await checkoutApi.setCheckoutAddress(sessionId, selectedAddressId);
-      const shipped = await checkoutApi.setCheckoutShipping(sessionId, "standard");
+
+      // Resolve a real shipping method code from the backend
+      const selectedAddr = addresses.find((a) => a.id === selectedAddressId);
+      let methodCode = "shiprocket_surface";
+      if (selectedAddr?.pincode) {
+        try {
+          const totalItems = items.reduce((s, i) => s + i.quantity, 0);
+          const rates = await checkoutApi.shippingRates({
+            originPincode: "400001",
+            destPincode: selectedAddr.pincode,
+            weightGrams: Math.max(100, totalItems * 400),
+            cod: paymentMethod === "cod",
+            declaredValueMinor: String(Math.round(total * 100)),
+          });
+          if (rates.length > 0) {
+            setAvailableRates(rates);
+            const freeRate = rates.find((r) => r.amountMinor === "0");
+            methodCode = (freeRate ?? rates[0]).methodCode;
+            setSelectedShippingCode(methodCode);
+          }
+        } catch {
+          // Non-fatal: fall through with default method code
+        }
+      }
+
+      const shipped = await checkoutApi.setCheckoutShipping(sessionId, methodCode);
       setSession2((prev) => ({ ...(prev ?? { sessionId }), ...shipped }));
       setStep("PAYMENT");
     } catch (e) {
@@ -126,6 +154,8 @@ export default function CheckoutPage() {
         description: e instanceof Error ? e.message : "Failed to set address",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -441,9 +471,14 @@ export default function CheckoutPage() {
                   <Button
                     className="w-full md:w-auto bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
                     onClick={handleNextStep}
-                    disabled={!selectedAddressId}
+                    disabled={!selectedAddressId || loading}
                   >
-                    SAVE & CONTINUE
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Checking rates...
+                      </>
+                    ) : "SAVE & CONTINUE"}
                   </Button>
                 </div>
               ) : (

@@ -66,7 +66,7 @@ const config = {
 				'900': '#78350F',
 			},
 			// Blue accent
-			accent: {
+			accentBlue: {
 				'50':  '#EFF6FF',
 				'100': '#DBEAFE',
 				'200': '#BFDBFE',
