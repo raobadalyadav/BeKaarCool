@@ -101,7 +101,7 @@ export default function OffersClient() {
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-3">
           <nav className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-yellow-600">
+            <Link href="/" className="hover:text-[#F38508]">
               <Home className="w-4 h-4" />
             </Link>
             <ChevronRight className="w-4 h-4" />
@@ -226,7 +226,7 @@ function CouponCard({
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-0 flex">
-        <div className="w-28 flex-shrink-0 bg-gradient-to-b from-yellow-400 to-yellow-500 flex flex-col items-center justify-center text-black p-4 text-center">
+        <div className="w-28 flex-shrink-0 bg-gradient-to-b from-[#F38508] to-[#D97706] flex flex-col items-center justify-center text-white p-4 text-center">
           {coupon.type === "free_shipping" ? (
             <Truck className="w-7 h-7 mb-1" />
           ) : (

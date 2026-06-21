@@ -143,7 +143,7 @@ export default function AddressesPage() {
                         resetForm()
                         setShowForm(true)
                     }}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+                    className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
                 >
                     <Plus className="w-4 h-4 mr-2" /> Add Address
                 </Button>
@@ -222,7 +222,7 @@ export default function AddressesPage() {
                                 <Label htmlFor="isDefault">Set as default address</Label>
                             </div>
                             <div className="md:col-span-2 flex gap-2">
-                                <Button type="submit" disabled={loading} className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+                                <Button type="submit" disabled={loading} className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
                                     {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                                     {editingAddress ? "Update" : "Save"} Address
                                 </Button>
@@ -246,12 +246,12 @@ export default function AddressesPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {addresses.map((addr) => (
-                        <Card key={addr._id} className={addr.isDefault ? "border-yellow-400 border-2" : ""}>
+                        <Card key={addr._id} className={addr.isDefault ? "border-[#F38508] border-2" : ""}>
                             <CardContent className="pt-6">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-semibold">{addr.name}</h3>
                                     {addr.isDefault && (
-                                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Default</span>
+                                        <span className="text-xs bg-orange-100 text-[#D97706] px-2 py-1 rounded">Default</span>
                                     )}
                                 </div>
                                 <p className="text-sm text-gray-600">{addr.addressLine1 || addr.address}</p>

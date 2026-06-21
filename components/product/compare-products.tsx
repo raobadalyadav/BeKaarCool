@@ -75,7 +75,7 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
         {
             key: "rating", label: "Rating", render: (p: Product) => p.rating ? (
                 <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star className="w-4 h-4 fill-[#F38508] text-[#F38508]" />
                     {p.rating.toFixed(1)}
                 </span>
             ) : "-"
@@ -140,7 +140,7 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
                                                     />
                                                 </div>
                                                 <Link href={`/products/${product.slug}`}>
-                                                    <p className="font-medium text-sm hover:text-yellow-600 line-clamp-2">
+                                                    <p className="font-medium text-sm hover:text-[#F38508] line-clamp-2">
                                                         {product.name}
                                                     </p>
                                                 </Link>
@@ -169,7 +169,7 @@ export function CompareProducts({ products, onRemove, isOpen, onClose }: Compare
                                             <Button
                                                 size="sm"
                                                 onClick={() => addToCart(product)}
-                                                className="bg-yellow-400 hover:bg-yellow-500 text-black"
+                                                className="bg-[#F38508] hover:bg-[#D97706] text-black"
                                             >
                                                 <ShoppingCart className="w-4 h-4 mr-1" /> Add
                                             </Button>

@@ -166,7 +166,7 @@ export default function ProfilePage() {
             <Button
               type="submit"
               disabled={savingProfile}
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+              className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
             >
               {savingProfile && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Save Changes

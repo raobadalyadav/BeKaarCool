@@ -110,7 +110,7 @@ export default function ReferralPage() {
             <Skeleton className="h-12 w-64" />
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="font-mono text-2xl font-bold tracking-wider px-4 py-2 bg-yellow-50 border border-yellow-200 rounded">
+              <div className="font-mono text-2xl font-bold tracking-wider px-4 py-2 bg-orange-50 border border-orange-200 rounded">
                 {stats?.code}
               </div>
               <Button
@@ -200,8 +200,8 @@ function StatCard({
   return (
     <Card>
       <CardContent className="p-5 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
-          <Icon className="w-5 h-5 text-yellow-600" />
+        <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+          <Icon className="w-5 h-5 text-[#F38508]" />
         </div>
         <div className="min-w-0">
           <p className="text-xs text-gray-500">{label}</p>

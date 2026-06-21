@@ -114,7 +114,7 @@ export default function WishlistPage() {
             for easy access later.
           </p>
           <Link href="/products">
-            <Button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+            <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
               Start Shopping
             </Button>
           </Link>
@@ -169,13 +169,13 @@ export default function WishlistPage() {
                 <div className="p-3 flex-1 flex flex-col gap-1.5">
                   <Link
                     href={`/products/${slug}`}
-                    className="text-sm font-medium line-clamp-2 hover:text-yellow-600"
+                    className="text-sm font-medium line-clamp-2 hover:text-[#F38508]"
                   >
                     {title}
                   </Link>
                   {(item.ratingCount ?? 0) > 0 && (
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-3 w-3 fill-[#F38508] text-[#F38508]" />
                       {(item.ratingAvg ?? 0).toFixed(1)} ({item.ratingCount})
                     </div>
                   )}
@@ -201,7 +201,7 @@ export default function WishlistPage() {
                         item.inStock === false ||
                         !item.defaultVariantId
                       }
-                      className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-9 text-xs"
+                      className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-9 text-xs"
                     >
                       {movingId === item.productId ? (
                         <Loader2 className="w-3 h-3 animate-spin" />

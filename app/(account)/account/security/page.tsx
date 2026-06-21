@@ -190,7 +190,7 @@ function PasswordSection() {
       <CardContent>
         <p className="text-sm text-gray-600">
           Change your password from the{" "}
-          <a className="text-yellow-600 underline" href="/account/profile">Profile</a> page.
+          <a className="text-[#F38508] underline" href="/account/profile">Profile</a> page.
         </p>
       </CardContent>
     </Card>
@@ -271,7 +271,7 @@ function TwoFactorSection() {
               <p className="font-medium text-sm">2FA is not enabled</p>
               <p className="text-xs text-gray-500 mt-1">Protect your account with a one-time code on every login.</p>
             </div>
-            <Button onClick={startSetup} disabled={loading} className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+            <Button onClick={startSetup} disabled={loading} className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
               {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               Set up 2FA
             </Button>

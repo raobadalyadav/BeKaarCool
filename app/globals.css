@@ -2,237 +2,262 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Premium E-commerce Typography */
+/* ─────────────────────────────────────────────────────────────────────
+   Baefikra — Premium Fashion & Jewellery Design System
+   Fonts : Playfair Display (headings) · Inter (body)
+   Colors: Primary  #F38508  · Accent #5AA1E3 · Dark #111827
+   ───────────────────────────────────────────────────────────────────── */
+
 :root {
-  --font-heading: var(--font-outfit), 'Outfit', ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-jakarta), 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body:    var(--font-inter),    'Inter',           ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-playfair), 'Playfair Display', ui-serif, Georgia, serif;
+
+  /* ── Brand tokens ── */
+  --primary:         #F38508;
+  --primary-hover:   #D97706;
+  --secondary:       #111827;
+  --accent:          #5AA1E3;
+  --accent-hover:    #3B82C8;
+
+  --bg:              #FFFFFF;
+  --surface:         #F8FAFC;
+  --border:          #E5E7EB;
+
+  --text-primary:    #111827;
+  --text-secondary:  #6B7280;
+
+  --success:         #22C55E;
+  --warning:         #F59E0B;
+  --danger:          #EF4444;
 }
 
-/* Apply heading font to all headings */
+/* ── Typography rules ─────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
 }
 
-/* Smooth font rendering */
 body {
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* ── Shadcn/ui CSS variable overrides ─────────────────────────────── */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 48 96% 53%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background:           0 0% 100%;           /* #FFFFFF */
+    --foreground:           221 39% 11%;          /* #111827 */
+
+    --card:                 0 0% 100%;
+    --card-foreground:      221 39% 11%;
+
+    --popover:              0 0% 100%;
+    --popover-foreground:   221 39% 11%;
+
+    /* Primary = Brand Orange */
+    --primary:              30 95% 50%;           /* #F38508 */
+    --primary-foreground:   0 0% 100%;
+
+    /* Secondary = Charcoal Dark */
+    --secondary:            221 39% 11%;          /* #111827 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted:                210 20% 98%;          /* #F8FAFC */
+    --muted-foreground:     220 9% 46%;           /* #6B7280 */
+
+    /* Accent = Brand Blue */
+    --accent:               210 65% 62%;          /* #5AA1E3 */
+    --accent-foreground:    0 0% 100%;
+
+    --destructive:          0 84% 60%;            /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border:               220 13% 91%;          /* #E5E7EB */
+    --input:                220 13% 91%;
+    --ring:                 30 95% 50%;           /* Orange focus ring */
+    --radius:               0.5rem;
+
+    /* Sidebar */
+    --sidebar-background:   221 39% 11%;
+    --sidebar-foreground:   210 40% 90%;
+    --sidebar-primary:      30 95% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent:       221 35% 18%;
+    --sidebar-accent-foreground:  210 40% 95%;
+    --sidebar-border:       221 30% 20%;
+    --sidebar-ring:         30 95% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --background:           221 39% 8%;
+    --foreground:           210 40% 95%;
+    --card:                 221 39% 11%;
+    --card-foreground:      210 40% 95%;
+    --popover:              221 39% 9%;
+    --popover-foreground:   210 40% 95%;
+    --primary:              30 95% 50%;
+    --primary-foreground:   0 0% 100%;
+    --secondary:            221 35% 18%;
+    --secondary-foreground: 210 40% 95%;
+    --muted:                221 35% 15%;
+    --muted-foreground:     220 9% 55%;
+    --accent:               210 65% 55%;
+    --accent-foreground:    0 0% 100%;
+    --destructive:          0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border:               221 30% 18%;
+    --input:                221 30% 18%;
+    --ring:                 30 95% 50%;
+    --sidebar-background:   221 39% 6%;
+    --sidebar-foreground:   210 40% 85%;
+    --sidebar-primary:      30 95% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent:       221 35% 13%;
+    --sidebar-accent-foreground:  210 40% 90%;
+    --sidebar-border:       221 30% 14%;
+    --sidebar-ring:         30 95% 50%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-semibold tracking-tight;
-  }
-
-  h1 {
-    @apply text-4xl lg:text-5xl;
-  }
-
-  h2 {
-    @apply text-3xl lg:text-4xl;
-  }
-
-  h3 {
-    @apply text-2xl lg:text-3xl;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+    font-family: var(--font-heading);
   }
 }
 
+/* ── Component utilities ──────────────────────────────────────────── */
 @layer components {
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  .btn-gradient {
-    @apply bg-[#FDD835] text-black hover:bg-[#FBC02D] transition-all duration-300 font-bold;
+  /* Primary CTA — Orange */
+  .btn-primary {
+    background-color: #F38508;
+    color: #fff;
+    @apply font-semibold text-sm transition-all duration-200;
   }
+  .btn-primary:hover { background-color: #D97706; }
+
+  /* Dark secondary (Buy Now) */
+  .btn-secondary {
+    background-color: #111827;
+    color: #fff;
+    @apply font-semibold text-sm transition-all duration-200;
+  }
+  .btn-secondary:hover { background-color: #1F2937; }
+
+  /* Accent / link blue */
+  .btn-accent {
+    background-color: #5AA1E3;
+    color: #fff;
+    @apply font-semibold text-sm transition-all duration-200;
+  }
+  .btn-accent:hover { background-color: #3B82C8; }
+
+  /* Legacy alias kept for compatibility */
+  .btn-gradient { @apply btn-primary; }
 
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+    background: linear-gradient(135deg, #F38508 0%, #5AA1E3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .skeleton {
-    @apply animate-pulse bg-gray-200 rounded;
-  }
-
+  .skeleton  { @apply animate-pulse bg-gray-200 rounded; }
   .loading-spinner {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+    @apply animate-spin rounded-full border-2 border-gray-300;
+    border-top-color: #F38508;
+  }
+
+  /* Section header with orange left-border accent */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-header::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 1.5rem;
+    background-color: #F38508;
+    border-radius: 9999px;
+    flex-shrink: 0;
   }
 }
 
+/* ── Utility helpers ──────────────────────────────────────────────── */
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .glass { @apply bg-white/80 backdrop-blur-md border border-white/20; }
+  .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.10); }
 
-  .glass {
-    @apply bg-white/80 backdrop-blur-md border border-white/20;
-  }
-
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+  /* Brand color shortcuts */
+  .bg-brand          { background-color: #F38508; }
+  .bg-brand-hover    { background-color: #D97706; }
+  .bg-brand-accent   { background-color: #5AA1E3; }
+  .bg-brand-dark     { background-color: #111827; }
+  .bg-brand-surface  { background-color: #F8FAFC; }
+  .text-brand        { color: #F38508; }
+  .text-brand-accent { color: #5AA1E3; }
+  .text-brand-dark   { color: #111827; }
+  .border-brand      { border-color: #F38508; }
 }
 
-/* Custom animations */
+/* ── Animations ───────────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
+.animate-fade-in-up   { animation: fadeInUp    0.45s ease-out; }
+.animate-slide-in-right { animation: slideInRight 0.45s ease-out; }
 
-.animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out;
-}
-
-/* Print styles */
+/* ── Print ────────────────────────────────────────────────────────── */
 @media print {
-  .no-print {
-    display: none !important;
-  }
+  .no-print { display: none !important; }
 }
 
-/* Mobile optimizations */
+/* ── Mobile ───────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .container {
-    @apply px-4;
-  }
+  .container { @apply px-4; }
 }
 
-/* Focus styles for accessibility */
+/* ── Focus ring ───────────────────────────────────────────────────── */
 .focus-visible:focus {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  @apply outline-none ring-2 ring-offset-2;
+  --tw-ring-color: #F38508;
 }
 
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-gray-100 rounded-full;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400;
-}
-
-
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+/* ── Custom scrollbar ─────────────────────────────────────────────── */
+.custom-scrollbar::-webkit-scrollbar { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar-track { @apply bg-gray-100 rounded-full; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: #F38508; border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #D97706; }

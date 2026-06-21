@@ -67,7 +67,7 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       {/* Features Bar */}
-      <div className="bg-yellow-400 py-4">
+      <div className="bg-[#F38508] py-4">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {features.map((feature, index) => (
@@ -94,16 +94,16 @@ export function Footer() {
 
             {/* Social Links */}
             <div className="flex space-x-3">
-              <a suppressHydrationWarning href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a suppressHydrationWarning href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a suppressHydrationWarning href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a suppressHydrationWarning href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors">
+              <a suppressHydrationWarning href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -113,22 +113,22 @@ export function Footer() {
           <div className="space-y-6">
             <h3 className="font-bold text-lg text-white uppercase tracking-wide">Shop</h3>
             <div className="space-y-3">
-              <Link suppressHydrationWarning href="/products?category=Men" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Men" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Men&apos;s Fashion
               </Link>
-              <Link suppressHydrationWarning href="/products?category=Women" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Women" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Women&apos;s Fashion
               </Link>
-              <Link suppressHydrationWarning href="/products?category=Accessories" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Accessories" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Accessories
               </Link>
-              <Link suppressHydrationWarning href="/products?category=Footwear" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?category=Footwear" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Footwear
               </Link>
-              <Link suppressHydrationWarning href="/products?featured=true" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?featured=true" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Featured Products
               </Link>
-              <Link suppressHydrationWarning href="/products?sort=trending" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/products?sort=trending" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Trending Now
               </Link>
             </div>
@@ -138,25 +138,25 @@ export function Footer() {
           <div className="space-y-6">
             <h3 className="font-bold text-lg text-white uppercase tracking-wide">Help</h3>
             <div className="space-y-3">
-              <Link suppressHydrationWarning href="/track-order" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/track-order" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Track Your Order
               </Link>
-              <Link suppressHydrationWarning href="/shipping" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/shipping" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Shipping Information
               </Link>
-              <Link suppressHydrationWarning href="/returns" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/returns" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Returns & Exchanges
               </Link>
-              <Link suppressHydrationWarning href="/size-guide" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/size-guide" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Size Guide
               </Link>
-              <Link suppressHydrationWarning href="/faq" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/faq" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 FAQs
               </Link>
-              <Link suppressHydrationWarning href="/contact" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/contact" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Contact Us
               </Link>
-              <Link suppressHydrationWarning href="/corporate" className="block text-gray-400 hover:text-yellow-400 transition-colors">
+              <Link suppressHydrationWarning href="/corporate" className="block text-gray-400 hover:text-[#F38508] transition-colors">
                 Bulk & Corporate
               </Link>
             </div>
@@ -169,15 +169,15 @@ export function Footer() {
             {/* Contact Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-3 text-gray-400">
-                <Mail className="h-5 w-5 text-yellow-400" />
+                <Mail className="h-5 w-5 text-[#F38508]" />
                 <span className="text-sm">support@baefikra.com</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
-                <Phone className="h-5 w-5 text-yellow-400" />
+                <Phone className="h-5 w-5 text-[#F38508]" />
                 <span className="text-sm">+91 98765 43210</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-400">
-                <MapPin className="h-5 w-5 text-yellow-400" />
+                <MapPin className="h-5 w-5 text-[#F38508]" />
                 <span className="text-sm">Mumbai, Maharashtra, India</span>
               </div>
             </div>
@@ -197,7 +197,7 @@ export function Footer() {
                 />
                 <Button
                   type="submit"
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-4"
+                  className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold px-4"
                   disabled={subscribing}
                 >
                   <Send className="h-4 w-4" />
@@ -212,11 +212,11 @@ export function Footer() {
       <div className="border-t border-gray-800">
         <div className="container py-4">
           <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-            <Link suppressHydrationWarning href="/about" className="hover:text-yellow-400 transition-colors">About Us</Link>
+            <Link suppressHydrationWarning href="/about" className="hover:text-[#F38508] transition-colors">About Us</Link>
             <span>•</span>
-            <Link suppressHydrationWarning href="/privacy" className="hover:text-yellow-400 transition-colors">Privacy Policy</Link>
+            <Link suppressHydrationWarning href="/privacy" className="hover:text-[#F38508] transition-colors">Privacy Policy</Link>
             <span>•</span>
-            <Link suppressHydrationWarning href="/terms" className="hover:text-yellow-400 transition-colors">Terms of Service</Link>
+            <Link suppressHydrationWarning href="/terms" className="hover:text-[#F38508] transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

@@ -66,7 +66,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     if (status === "loading") {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F38508]"></div>
             </div>
         )
     }
@@ -76,7 +76,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
             <div className="container mx-auto px-4 py-8">
                 <Alert>
                     <AlertDescription>
-                        Please <Link href="/auth/login" className="text-yellow-600 font-semibold underline">log in</Link> to view your account.
+                        Please <Link href="/auth/login" className="text-[#F38508] font-semibold underline">log in</Link> to view your account.
                     </AlertDescription>
                 </Alert>
             </div>
@@ -97,7 +97,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                             {idx === breadcrumbs.length - 1 ? (
                                 <span className="text-gray-900 font-medium">{crumb.label}</span>
                             ) : (
-                                <Link href={crumb.href} className="hover:text-yellow-600 transition-colors">
+                                <Link href={crumb.href} className="hover:text-[#F38508] transition-colors">
                                     {idx === 0 ? <Home className="w-4 h-4" /> : crumb.label}
                                 </Link>
                             )}
@@ -113,7 +113,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-16 w-16">
                                     <AvatarImage src={user.avatar || "/placeholder.svg"} />
-                                    <AvatarFallback className="bg-yellow-400 text-black text-xl font-bold">
+                                    <AvatarFallback className="bg-[#F38508] text-black text-xl font-bold">
                                         {user.name?.charAt(0).toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
@@ -126,7 +126,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                             <Link href="/account/profile">
                                 <Button
                                     variant="outline"
-                                    className="w-full mt-4 border-yellow-400 text-yellow-600 hover:bg-yellow-50"
+                                    className="w-full mt-4 border-[#F38508] text-[#F38508] hover:bg-orange-50"
                                 >
                                     <Edit2 className="w-4 h-4 mr-2" /> Edit Profile
                                 </Button>
@@ -142,7 +142,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                                         key={item.id}
                                         href={item.href}
                                         className={`w-full flex items-center justify-between px-4 py-3 border-b last:border-b-0 transition-colors ${isActive
-                                            ? "bg-yellow-50 text-yellow-700 border-l-4 border-l-yellow-400"
+                                            ? "bg-orange-50 text-[#D97706] border-l-4 border-l-[#F38508]"
                                             : "hover:bg-gray-50 text-gray-700"
                                             }`}
                                     >

@@ -57,7 +57,7 @@ export default function Error({
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button
                         onClick={reset}
-                        className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold"
+                        className="bg-[#F38508] hover:bg-[#D97706] text-black font-semibold"
                     >
                         <RefreshCw className="w-4 h-4 mr-2" />
                         Try Again
@@ -77,7 +77,7 @@ export default function Error({
                 {/* Support Link */}
                 <p className="mt-8 text-sm text-gray-500">
                     Need help?{" "}
-                    <Link href="/contact" className="text-yellow-600 hover:text-yellow-700 underline">
+                    <Link href="/contact" className="text-[#F38508] hover:text-[#D97706] underline">
                         Contact Support
                     </Link>
                 </p>

@@ -34,6 +34,8 @@ export interface ProductDto {
   brandId?: string;
   categoryId?: string;
   images: string[];
+  videos?: string[];
+  view360Images?: string[];
   variants: VariantDto[];
   createdAt: string;
   // Extended fields
@@ -77,6 +79,7 @@ export interface CategoryDto {
   name: string;
   descriptionHtml?: string;
   parentId?: string;
+  productCount?: number;
 }
 
 export interface BrandDto {
@@ -251,6 +254,7 @@ export interface ReviewDto {
   notHelpfulCount: number;
   createdAt?: string | null;
   reviewerName?: string | null;
+  images?: string[];
 }
 
 export interface SearchHitDto {

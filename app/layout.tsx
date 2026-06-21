@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { env } from "@/lib/env";
@@ -10,18 +10,20 @@ import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// Primary font for headings - Modern, geometric, fashion-forward
-const outfit = Outfit({
+// Body font — Inter: modern, clean, highly readable
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-outfit"
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-// Secondary font for body text - Clean, professional, highly readable
-const plusJakarta = Plus_Jakarta_Sans({
+// Heading font — Playfair Display: elegant, luxury, serif
+const playfair = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-jakarta"
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = generateSEOMetadata({
@@ -37,14 +39,14 @@ export default async function RootLayout({
 }) {
   const session = await getServerSession(authOptions);
   return (
-    <html lang="en" suppressHydrationWarning className={`${outfit.variable} ${plusJakarta.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#1E40AF" />
+        <meta name="theme-color" content="#F38508" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={plusJakarta.className}>
+      <body className={inter.className}>
         <Providers session={session}>
           {children}
           <Script

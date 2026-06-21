@@ -14,7 +14,7 @@ export default function NotFound() {
                         404
                     </h1>
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-yellow-400 rounded-full p-6 shadow-lg transform -rotate-12">
+                        <div className="bg-[#F38508] rounded-full p-6 shadow-lg transform -rotate-12">
                             <Search className="w-12 h-12 text-black" />
                         </div>
                     </div>
@@ -33,7 +33,7 @@ export default function NotFound() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button
                         asChild
-                        className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold"
+                        className="bg-[#F38508] hover:bg-[#D97706] text-black font-semibold"
                     >
                         <Link href="/">
                             <Home className="w-4 h-4 mr-2" />

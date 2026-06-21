@@ -55,7 +55,7 @@ interface Pagination {
 }
 
 const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-700",
+    pending: "bg-orange-100 text-[#D97706]",
     confirmed: "bg-blue-100 text-blue-700",
     processing: "bg-purple-100 text-purple-700",
     shipped: "bg-indigo-100 text-indigo-700",
@@ -263,7 +263,7 @@ export default function MyOrdersPage() {
                                 <h3 className="text-xl font-semibold text-gray-700">No orders found</h3>
                                 <p className="text-gray-500 mt-2">Try adjusting your filters or start shopping</p>
                                 <Link href="/products">
-                                    <Button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">Browse Products</Button>
+                                    <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">Browse Products</Button>
                                 </Link>
                             </CardContent>
                         </Card>
@@ -313,7 +313,7 @@ export default function MyOrdersPage() {
                                         <div className="flex flex-wrap items-center justify-between mt-6 pt-4 border-t gap-4">
                                             <div>
                                                 <p className="text-xs text-gray-500">Order Total</p>
-                                                <p className="font-bold text-lg text-yellow-600">₹{(order.total || order.totalAmount || 0).toLocaleString("en-IN")}</p>
+                                                <p className="font-bold text-lg text-[#F38508]">₹{(order.total || order.totalAmount || 0).toLocaleString("en-IN")}</p>
                                             </div>
                                             <div className="flex flex-wrap gap-2">
                                                 <Link href={`/account/orders/${order.orderNumber}`}>

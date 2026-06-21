@@ -65,11 +65,11 @@ export async function getProductBySlug(
 }
 
 export async function listCategories(): Promise<CategoryDto[]> {
-  const data = await gql<{ categories: CategoryDto[] }>({
-    query: `query { categories { id slug name descriptionHtml parentId } }`,
-    next: { revalidate: 600, tags: ["categories"] },
+  const data = await gql<{ categoriesWithCounts: CategoryDto[] }>({
+    query: `query { categoriesWithCounts { id slug name descriptionHtml parentId productCount } }`,
+    next: { revalidate: 300, tags: ["categories"] },
   });
-  return data.categories;
+  return data.categoriesWithCounts;
 }
 
 export async function listBrands(): Promise<BrandDto[]> {

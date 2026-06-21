@@ -52,27 +52,27 @@ export function Header() {
   return (
     <>
       <div className="flex flex-col w-full">
-        {/* Top Bar Utilities */}
-        <div className="bg-muted/30 py-1 border-b text-[10px] md:text-xs">
-          <div className="container mx-auto px-4 flex justify-between items-center text-muted-foreground font-medium">
+        {/* Top Bar — Navy background like Robu.in */}
+        <div className="bg-[#111827] py-1.5 text-[11px] text-white/80">
+          <div className="container mx-auto px-4 flex justify-between items-center font-medium">
             <div className="flex items-center space-x-4 md:space-x-6">
-              <Link suppressHydrationWarning href="/offers" className="hover:text-primary transition-colors">Offers</Link>
-              <Link suppressHydrationWarning href="/fanbook" className="hidden md:inline hover:text-primary transition-colors">Fanbook</Link>
-              <Link suppressHydrationWarning href="/apps" className="flex items-center hover:text-primary transition-colors">
+              <Link suppressHydrationWarning href="/offers" className="hover:text-[#F38508] transition-colors">Offers</Link>
+              <Link suppressHydrationWarning href="/fanbook" className="hidden md:inline hover:text-[#F38508] transition-colors">Fanbook</Link>
+              <Link suppressHydrationWarning href="/apps" className="flex items-center hover:text-[#F38508] transition-colors">
                 <span className="hidden md:inline mr-1">Download App</span>
                 <span className="md:hidden">App</span>
               </Link>
-              <Link suppressHydrationWarning href="/stores" className="hidden md:inline hover:text-primary transition-colors">Find a store near me</Link>
+              <Link suppressHydrationWarning href="/stores" className="hidden md:inline hover:text-[#F38508] transition-colors">Find a store near me</Link>
             </div>
             <div className="flex items-center space-x-4 md:space-x-6">
-              <Link suppressHydrationWarning href="/contact" className="hover:text-primary transition-colors">Contact Us</Link>
-              <Link suppressHydrationWarning href="/track-order" className="hover:text-primary transition-colors">Track Order</Link>
+              <Link suppressHydrationWarning href="/contact" className="hover:text-[#F38508] transition-colors">Contact Us</Link>
+              <Link suppressHydrationWarning href="/track-order" className="hover:text-[#F38508] transition-colors">Track Order</Link>
             </div>
           </div>
         </div>
 
-        {/* Main Header */}
-        <header className="sticky top-0 z-50 w-full bg-background border-b shadow-sm">
+        {/* Main Header — white with navy text */}
+        <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
             {/* Left: Logo & Menu */}
             <div className="flex items-center gap-6 lg:gap-8">
@@ -110,15 +110,15 @@ export function Header() {
                 <Logo width={140} height={36} textColor="#111111" />
               </Link>
 
-              {/* Desktop Navigation */}
+              {/* Desktop Navigation — Navy underline on hover */}
               <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold tracking-wide uppercase">
-                <Link suppressHydrationWarning href="/products?category=Men" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Men" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
                   Men
                 </Link>
-                <Link suppressHydrationWarning href="/products?category=Women" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Women" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
                   Women
                 </Link>
-                <Link suppressHydrationWarning href="/products?category=Mobile%20Covers" className="hover:border-b-4 border-yellow-400 py-7 transition-all">
+                <Link suppressHydrationWarning href="/products?category=Mobile%20Covers" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
                   Mobile Covers
                 </Link>
               </nav>
@@ -194,10 +194,10 @@ export function Header() {
 
                 {/* Cart */}
                 <CartSheet>
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-muted-foreground hover:text-foreground">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-[#111827] hover:text-[#F38508]">
                     <ShoppingBagIcon className="h-5 w-5" />
                     {cartCount > 0 && (
-                      <span className="absolute top-0 right-0 h-4 w-4 bg-yellow-400 text-black text-[10px] font-bold flex items-center justify-center rounded-full">
+                      <span className="absolute top-0 right-0 h-4 w-4 bg-[#F38508] text-white text-[10px] font-bold flex items-center justify-center rounded-full">
                         {cartCount}
                       </span>
                     )}
@@ -212,16 +212,16 @@ export function Header() {
             </div>
           </div>
 
-          {/* Sub-Header / Mega Menu Categories Mockup (Optional) */}
-          <div className="w-full border-t hidden md:block">
+          {/* Sub-Header strip — Robu.in style with navy border */}
+          <div className="w-full border-t border-gray-100 hidden md:block bg-gray-50">
             <div className="container mx-auto px-4">
-              <div className="flex items-center space-x-6 h-10 text-xs font-medium text-muted-foreground overflow-x-auto scrollbar-hide">
-                <Link suppressHydrationWarning href="/products?sort=trending" className="whitespace-nowrap hover:text-foreground">LIVE NOW</Link>
-                <Link suppressHydrationWarning href="/products?category=Men" className="whitespace-nowrap hover:text-foreground">MEN</Link>
-                <Link suppressHydrationWarning href="/products?category=Women" className="whitespace-nowrap hover:text-foreground">WOMEN</Link>
-                <Link suppressHydrationWarning href="/products?category=Accessories" className="whitespace-nowrap hover:text-foreground">ACCESSORIES</Link>
-                <Link suppressHydrationWarning href="/products?sale=true" className="whitespace-nowrap hover:text-foreground">WINTERWEAR</Link>
-                <Link suppressHydrationWarning href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-foreground">PLUS SIZE</Link>
+              <div className="flex items-center space-x-6 h-9 text-xs font-semibold text-[#111827] overflow-x-auto scrollbar-hide uppercase tracking-wider">
+                <Link suppressHydrationWarning href="/products?sort=trending" className="whitespace-nowrap hover:text-[#F38508] transition-colors">🔴 LIVE NOW</Link>
+                <Link suppressHydrationWarning href="/products?category=Men" className="whitespace-nowrap hover:text-[#F38508] transition-colors">MEN</Link>
+                <Link suppressHydrationWarning href="/products?category=Women" className="whitespace-nowrap hover:text-[#F38508] transition-colors">WOMEN</Link>
+                <Link suppressHydrationWarning href="/products?category=Accessories" className="whitespace-nowrap hover:text-[#F38508] transition-colors">ACCESSORIES</Link>
+                <Link suppressHydrationWarning href="/products?sale=true" className="whitespace-nowrap text-[#F38508] hover:text-[#D97706] transition-colors font-bold">SALE</Link>
+                <Link suppressHydrationWarning href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-[#F38508] transition-colors">PLUS SIZE</Link>
               </div>
             </div>
           </div>

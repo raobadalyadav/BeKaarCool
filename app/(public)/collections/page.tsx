@@ -13,7 +13,7 @@ const TYPE_COLORS: Record<string, string> = {
   manual: "bg-blue-100 text-blue-700",
   rule_based: "bg-purple-100 text-purple-700",
   ip_licensed: "bg-orange-100 text-orange-700",
-  tribe_exclusive: "bg-yellow-100 text-yellow-800",
+  tribe_exclusive: "bg-orange-100 text-orange-800",
 }
 
 export const metadata = {
@@ -39,7 +39,7 @@ export default async function CollectionsPage() {
       {collections.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-lg">No collections available yet.</p>
-          <Link href="/products" className="text-yellow-600 font-semibold mt-2 inline-block hover:underline">
+          <Link href="/products" className="text-[#F38508] font-semibold mt-2 inline-block hover:underline">
             Browse all products →
           </Link>
         </div>
@@ -59,14 +59,14 @@ export default async function CollectionsPage() {
                   </span>
                 </div>
                 {collection.type === "tribe_exclusive" && (
-                  <div className="absolute top-3 right-3 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded">
+                  <div className="absolute top-3 right-3 bg-[#F38508] text-black text-xs font-bold px-2 py-0.5 rounded">
                     TRIBE
                   </div>
                 )}
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-bold text-gray-900 text-lg group-hover:text-yellow-600 transition-colors line-clamp-1">
+                  <h2 className="font-bold text-gray-900 text-lg group-hover:text-[#F38508] transition-colors line-clamp-1">
                     {collection.name}
                   </h2>
                   {collection.type && (
@@ -78,7 +78,7 @@ export default async function CollectionsPage() {
                 {collection.description && (
                   <p className="text-sm text-gray-500 mt-1 line-clamp-2">{collection.description}</p>
                 )}
-                <p className="text-xs text-yellow-600 font-semibold mt-3 group-hover:underline">
+                <p className="text-xs text-[#F38508] font-semibold mt-3 group-hover:underline">
                   Shop Now →
                 </p>
               </div>

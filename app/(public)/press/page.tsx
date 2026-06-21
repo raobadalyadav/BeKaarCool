@@ -53,7 +53,7 @@ export default function PressPage() {
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-yellow-600">
+                        <Link href="/" className="hover:text-[#F38508]">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -106,7 +106,7 @@ export default function PressPage() {
                                 <div className="space-y-3">
                                     {mediaItems.map(item => (
                                         <div key={item.title} className="border-b pb-3 last:border-0">
-                                            <p className="text-sm text-yellow-600 font-semibold">{item.outlet}</p>
+                                            <p className="text-sm text-[#F38508] font-semibold">{item.outlet}</p>
                                             <p className="text-gray-800">{item.title}</p>
                                             <p className="text-xs text-gray-500">{item.date}</p>
                                         </div>
@@ -122,7 +122,7 @@ export default function PressPage() {
                                 <p className="text-sm text-gray-600 mb-4">
                                     Download official logos, brand guidelines, and media kit.
                                 </p>
-                                <Button className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+                                <Button className="w-full bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
                                     <Download className="w-4 h-4 mr-2" /> Download Media Kit
                                 </Button>
                             </CardContent>
@@ -137,7 +137,7 @@ export default function PressPage() {
                                 </p>
                                 <a
                                     href="mailto:press@Baefikra.com"
-                                    className="flex items-center gap-2 text-yellow-400 hover:underline"
+                                    className="flex items-center gap-2 text-[#F38508] hover:underline"
                                 >
                                     <Mail className="w-4 h-4" /> press@Baefikra.com
                                 </a>

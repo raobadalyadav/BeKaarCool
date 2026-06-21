@@ -46,7 +46,7 @@ export default function InvoicePage() {
         <p className="text-red-600">{error}</p>
         <Link
           href={`/account/orders/${orderNumber}`}
-          className="text-yellow-600 underline mt-4 inline-block"
+          className="text-[#F38508] underline mt-4 inline-block"
         >
           ← Back to order
         </Link>

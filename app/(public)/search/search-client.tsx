@@ -157,7 +157,7 @@ export default function SearchClient() {
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-yellow-600">
+                        <Link href="/" className="hover:text-[#F38508]">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -186,7 +186,7 @@ export default function SearchClient() {
                                 setShowSuggestions(true)
                             }}
                             onFocus={() => setShowSuggestions(true)}
-                            className="pl-12 pr-12 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-yellow-400"
+                            className="pl-12 pr-12 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-[#F38508]"
                         />
                         {query && (
                             <button
@@ -263,7 +263,7 @@ export default function SearchClient() {
                                                 <button
                                                     key={search}
                                                     onClick={() => handleRecentSearch(search)}
-                                                    className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm hover:bg-yellow-100"
+                                                    className="px-3 py-1 bg-orange-50 text-[#D97706] rounded-full text-sm hover:bg-orange-100"
                                                 >
                                                     {search}
                                                 </button>
@@ -296,7 +296,7 @@ export default function SearchClient() {
                             <h3 className="text-lg font-semibold text-gray-700">No products found</h3>
                             <p className="text-gray-500 mt-2">Try different keywords or browse categories</p>
                             <Link href="/products">
-                                <Button className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+                                <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
                                     Browse All Products
                                 </Button>
                             </Link>
@@ -326,7 +326,7 @@ export default function SearchClient() {
                                             )}
                                         </div>
                                         <CardContent className="p-4">
-                                            <h3 className="font-semibold text-gray-900 line-clamp-2 hover:text-yellow-600">
+                                            <h3 className="font-semibold text-gray-900 line-clamp-2 hover:text-[#F38508]">
                                                 {product.name}
                                             </h3>
                                             {product.category && (

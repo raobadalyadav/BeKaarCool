@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <div className="w-16 h-16 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#F38508] rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-black font-bold text-2xl">B</span>
             </div>
           </Link>
@@ -68,8 +68,8 @@ export default function ForgotPasswordPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="mx-auto w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
-              <KeyRound className="h-7 w-7 text-yellow-600" />
+            <div className="mx-auto w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+              <KeyRound className="h-7 w-7 text-[#F38508]" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Forgot Password?</h2>
             <p className="text-gray-600 mt-2">
@@ -99,7 +99,7 @@ export default function ForgotPasswordPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
+                  className="pl-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
                   {...register("email")}
                 />
               </div>
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-base"
+              className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold text-base"
               disabled={loading}
             >
               {loading ? (
@@ -124,7 +124,7 @@ export default function ForgotPasswordPage() {
             <div className="text-center pt-4">
               <Link
                 href="/auth/login"
-                className="inline-flex items-center text-sm text-gray-600 hover:text-yellow-600 font-medium transition-colors"
+                className="inline-flex items-center text-sm text-gray-600 hover:text-[#F38508] font-medium transition-colors"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to login
@@ -135,7 +135,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/register" className="text-yellow-600 hover:text-yellow-700 font-semibold">
+          <Link href="/auth/register" className="text-[#F38508] hover:text-[#D97706] font-semibold">
             Sign up
           </Link>
         </p>

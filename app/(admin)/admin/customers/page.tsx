@@ -18,7 +18,7 @@ const ROLE_COLORS: Record<string, string> = {
   customer: "bg-blue-100 text-blue-700",
   admin: "bg-red-100 text-red-700",
   manager: "bg-purple-100 text-purple-700",
-  support: "bg-yellow-100 text-yellow-700",
+  support: "bg-orange-100 text-[#D97706]",
   finance: "bg-green-100 text-green-700",
   content: "bg-indigo-100 text-indigo-700",
 }
@@ -26,7 +26,7 @@ const ROLE_COLORS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-green-100 text-green-700",
   suspended: "bg-red-100 text-red-700",
-  pending: "bg-yellow-100 text-yellow-700",
+  pending: "bg-orange-100 text-[#D97706]",
 }
 
 export default function AdminCustomersPage() {
@@ -79,13 +79,13 @@ export default function AdminCustomersPage() {
             placeholder="Search by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
         >
           <option value="all">All Roles</option>
           {Object.keys(ROLE_COLORS).map((r) => (

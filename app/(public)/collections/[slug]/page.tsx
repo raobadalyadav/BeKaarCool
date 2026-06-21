@@ -76,7 +76,7 @@ export default async function CollectionPage({ params }: { params: { slug: strin
           <div>
             <div className="flex items-center gap-2 mb-2">
               {collection.type && collection.type !== "manual" && (
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-medium">
+                <span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-medium">
                   {TYPE_LABELS[collection.type] ?? collection.type}
                 </span>
               )}
@@ -94,7 +94,7 @@ export default async function CollectionPage({ params }: { params: { slug: strin
       {products.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-lg">No products in this collection yet.</p>
-          <Link href="/products" className="text-yellow-600 font-semibold mt-2 inline-block hover:underline">
+          <Link href="/products" className="text-[#F38508] font-semibold mt-2 inline-block hover:underline">
             Browse all products →
           </Link>
         </div>

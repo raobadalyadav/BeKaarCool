@@ -202,7 +202,7 @@ export default function CorporateClient() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+                  className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
                   size="lg"
                 >
                   {submitting && (
@@ -216,7 +216,7 @@ export default function CorporateClient() {
         </div>
 
         <div className="lg:col-span-1 order-1 lg:order-2 space-y-4">
-          <Card className="bg-yellow-50 border-yellow-200">
+          <Card className="bg-orange-50 border-orange-200">
             <CardContent className="p-5 space-y-3">
               <Feature
                 icon={Sparkles}
@@ -253,7 +253,7 @@ function Feature({
   return (
     <div className="flex gap-3">
       <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-        <Icon className="w-4 h-4 text-yellow-600" />
+        <Icon className="w-4 h-4 text-[#F38508]" />
       </div>
       <div>
         <p className="text-sm font-bold">{title}</p>

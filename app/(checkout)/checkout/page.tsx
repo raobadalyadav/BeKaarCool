@@ -221,7 +221,7 @@ export default function CheckoutPage() {
         <h2 className="text-2xl font-bold mb-4">Your Bag is Empty</h2>
         <Button
           onClick={() => router.push("/products")}
-          className="bg-yellow-400 text-black hover:bg-yellow-500"
+          className="bg-[#F38508] text-black hover:bg-[#D97706]"
         >
           Continue Shopping
         </Button>
@@ -248,7 +248,7 @@ export default function CheckoutPage() {
                 <h3 className="font-bold text-gray-800 flex items-center gap-2">
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "ADDRESS"
-                        ? "bg-yellow-400 text-black"
+                        ? "bg-[#F38508] text-black"
                         : "bg-green-500 text-white"
                       }`}
                   >
@@ -261,7 +261,7 @@ export default function CheckoutPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setStep("ADDRESS")}
-                    className="text-yellow-600 font-bold h-8"
+                    className="text-[#F38508] font-bold h-8"
                   >
                     CHANGE
                   </Button>
@@ -280,7 +280,7 @@ export default function CheckoutPage() {
                         <label
                           key={a.id}
                           className={`flex gap-3 items-start border p-4 rounded cursor-pointer ${selectedAddressId === a.id
-                              ? "border-yellow-400 bg-yellow-50"
+                              ? "border-[#F38508] bg-orange-50"
                               : "hover:border-gray-400"
                             }`}
                         >
@@ -407,7 +407,7 @@ export default function CheckoutPage() {
                   </details>
 
                   <Button
-                    className="w-full md:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+                    className="w-full md:w-auto bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
                     onClick={handleNextStep}
                     disabled={!selectedAddressId}
                   >
@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                 <h3 className="font-bold text-gray-800 flex items-center gap-2">
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "PAYMENT"
-                        ? "bg-yellow-400 text-black"
+                        ? "bg-[#F38508] text-black"
                         : "bg-gray-400 text-white"
                       }`}
                   >
@@ -467,7 +467,7 @@ export default function CheckoutPage() {
                   >
                     <label
                       className={`flex items-center space-x-3 border p-4 rounded cursor-pointer ${paymentMethod === "razorpay"
-                          ? "border-yellow-400 bg-yellow-50"
+                          ? "border-[#F38508] bg-orange-50"
                           : "hover:border-gray-400"
                         }`}
                     >
@@ -487,7 +487,7 @@ export default function CheckoutPage() {
 
                     <label
                       className={`flex items-center space-x-3 border p-4 rounded cursor-pointer ${paymentMethod === "cod"
-                          ? "border-yellow-400 bg-yellow-50"
+                          ? "border-[#F38508] bg-orange-50"
                           : "hover:border-gray-400"
                         }`}
                     >
@@ -510,7 +510,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <Button
-                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-12 mt-6"
+                    className="w-full bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-12 mt-6"
                     onClick={handlePlaceOrder}
                     disabled={
                       loading ||

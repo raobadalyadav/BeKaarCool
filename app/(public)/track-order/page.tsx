@@ -180,7 +180,7 @@ export default function TrackOrderPage() {
       case "out for delivery":
         return "bg-blue-100 text-blue-800"
       case "in transit":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-orange-100 text-orange-800"
       case "shipped":
         return "bg-purple-100 text-purple-800"
       default:

@@ -101,7 +101,7 @@ export default function BlogClient() {
             <div className="bg-white border-b">
                 <div className="container mx-auto px-4 py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-yellow-600">
+                        <Link href="/" className="hover:text-[#F38508]">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -165,12 +165,12 @@ export default function BlogClient() {
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        <Badge className="absolute top-3 left-3 bg-yellow-400 text-black">
+                                        <Badge className="absolute top-3 left-3 bg-[#F38508] text-black">
                                             {post.category}
                                         </Badge>
                                     </div>
                                     <CardContent className="p-6">
-                                        <h2 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-yellow-600 transition-colors">
+                                        <h2 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-[#F38508] transition-colors">
                                             {post.title}
                                         </h2>
                                         <p className="text-sm text-gray-600 mb-4 line-clamp-2">

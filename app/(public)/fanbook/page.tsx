@@ -21,7 +21,7 @@ const steps = [
     step: "1",
     title: "Place an order",
     description: "Shop our oversized tees, hoodies, and accessories.",
-    color: "bg-yellow-50 text-yellow-600 border-yellow-200",
+    color: "bg-orange-50 text-[#F38508] border-orange-200",
   },
   {
     icon: Camera,
@@ -57,8 +57,8 @@ export default function FanbookPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-yellow-400 via-yellow-300 to-orange-300 py-20 px-4 text-center">
-        <Badge className="mb-4 bg-black text-yellow-400 text-xs font-bold tracking-widest uppercase border-0">
+      <div className="bg-gradient-to-br from-[#F38508] via-orange-400 to-orange-300 py-20 px-4 text-center">
+        <Badge className="mb-4 bg-black text-[#F38508] text-xs font-bold tracking-widest uppercase border-0">
           Community
         </Badge>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-black mb-4 leading-tight">
@@ -139,8 +139,8 @@ export default function FanbookPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {perks.map((p) => (
               <div key={p.title} className="flex items-start gap-4 p-5 bg-white border rounded-xl hover:shadow-sm transition-shadow">
-                <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
-                  <p.icon className="w-5 h-5 text-yellow-600" />
+                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
+                  <p.icon className="w-5 h-5 text-[#F38508]" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm text-gray-900">{p.title}</p>
@@ -153,13 +153,13 @@ export default function FanbookPage() {
 
         {/* Review CTA */}
         <section className="bg-white border rounded-2xl p-8 text-center shadow-sm">
-          <Star className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
+          <Star className="w-10 h-10 text-[#F38508] mx-auto mb-3" />
           <h3 className="text-xl font-bold text-gray-900 mb-2">Bought something recently?</h3>
           <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
             Your review helps other shoppers make the right call — and earns you wallet credits. Every verified purchase review counts.
           </p>
           <Link href="/account/orders">
-            <Button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold gap-2 px-8">
+            <Button className="bg-[#F38508] hover:bg-[#D97706] text-white font-bold gap-2 px-8">
               <MessageSquare className="w-4 h-4" /> Write a Review
             </Button>
           </Link>

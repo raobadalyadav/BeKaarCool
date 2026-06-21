@@ -18,9 +18,9 @@ function QuickActionCard({
     return (
         <Link
             href={href}
-            className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md hover:border-yellow-300 text-left transition-all group block"
+            className="bg-white p-6 rounded-lg shadow-sm border hover:shadow-md hover:border-[#F38508]/40 text-left transition-all group block"
         >
-            <Icon className="w-8 h-8 text-yellow-500 mb-3 group-hover:scale-110 transition-transform" />
+            <Icon className="w-8 h-8 text-[#F38508] mb-3 group-hover:scale-110 transition-transform" />
             <h3 className="font-semibold text-gray-900">{title}</h3>
             <p className="text-sm text-gray-500 mt-1">{description}</p>
         </Link>

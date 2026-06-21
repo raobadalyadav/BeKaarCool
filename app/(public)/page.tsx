@@ -69,20 +69,20 @@ const CATEGORY_EMOJI: Record<string, string> = {
   kurta: "🥻", ethnic: "🥻", watches: "⌚", sunglasses: "🕶️",
 }
 const CATEGORY_BG = [
-  "bg-pink-50", "bg-blue-50", "bg-yellow-50",
+  "bg-pink-50", "bg-blue-50", "bg-orange-50",
   "bg-green-50", "bg-purple-50", "bg-orange-50",
 ]
 const HERO_SLIDES = [
   {
     gradient: "from-gray-900 via-gray-800 to-gray-900",
-    accent: "text-yellow-400",
+    accent: "text-[#F38508]",
     tag: "NEW COLLECTION",
     headline: "Style That\nSpeaks Louder",
     sub: "Oversized fits, bold graphics & more",
     cta: "Shop Men",
     link: "/products?category=Men",
     badge: "UP TO 50% OFF",
-    badgeColor: "bg-yellow-400 text-black",
+    badgeColor: "bg-[#F38508] text-black",
   },
   {
     gradient: "from-rose-600 via-pink-600 to-fuchsia-700",
@@ -96,7 +96,7 @@ const HERO_SLIDES = [
     badgeColor: "bg-white text-pink-600",
   },
   {
-    gradient: "from-yellow-400 via-orange-400 to-orange-500",
+    gradient: "from-[#F38508] via-orange-400 to-orange-500",
     accent: "text-gray-900",
     tag: "FLASH DEALS",
     headline: "Unbeatable\nPrices Today",
@@ -104,7 +104,7 @@ const HERO_SLIDES = [
     cta: "Explore Deals",
     link: "/products?sort=trending",
     badge: "ENDS TONIGHT",
-    badgeColor: "bg-gray-900 text-yellow-400",
+    badgeColor: "bg-gray-900 text-[#F38508]",
   },
 ]
 
@@ -243,12 +243,12 @@ export default function HomePage() {
               <h1 className={`text-4xl md:text-6xl font-black uppercase leading-none tracking-tighter whitespace-pre-line ${slide.accent}`}>
                 {slide.headline}
               </h1>
-              <p className={`mt-4 text-base md:text-lg ${slide.gradient.includes("yellow") ? "text-gray-800" : "text-white/80"}`}>
+              <p className={`mt-4 text-base md:text-lg ${slide.gradient.includes("from-[#F38508]") ? "text-gray-800" : "text-white/80"}`}>
                 {slide.sub}
               </p>
               <div className="mt-6 flex items-center gap-4 flex-wrap">
                 <Link href={slide.link}>
-                  <Button size="lg" className={`font-bold px-8 ${slide.gradient.includes("yellow") ? "bg-gray-900 text-white hover:bg-black" : "bg-yellow-400 text-black hover:bg-yellow-500"}`}>
+                  <Button size="lg" className={`font-bold px-8 ${slide.gradient.includes("from-[#F38508]") ? "bg-gray-900 text-white hover:bg-black" : "bg-[#F38508] text-black hover:bg-[#D97706]"}`}>
                     {slide.cta} <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
@@ -263,20 +263,20 @@ export default function HomePage() {
               <button
                 key={i}
                 onClick={() => setHeroSlide(i)}
-                className={`h-2 rounded-full transition-all ${i === heroSlide ? "w-6 bg-yellow-400" : "w-2 bg-white/40"}`}
+                className={`h-2 rounded-full transition-all ${i === heroSlide ? "w-6 bg-[#F38508]" : "w-2 bg-white/40"}`}
               />
             ))}
           </div>
         </div>
       )}
 
-      {/* ── 2. Trust badges ──────────────────────────────────────── */}
-      <div className="bg-yellow-400 py-3 border-b">
-        <div className="container mx-auto px-4 flex items-center justify-around gap-3 text-black text-xs font-bold uppercase tracking-wide flex-wrap">
-          <span className="flex items-center gap-1.5"><Truck className="w-4 h-4" /> Fast Delivery</span>
-          <span className="flex items-center gap-1.5"><RefreshCcw className="w-4 h-4" /> 7-Day Returns</span>
-          <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> Secure Payments</span>
-          <span className="flex items-center gap-1.5"><Star className="w-4 h-4" /> 100% Genuine</span>
+      {/* ── 2. Trust badges ────────────────────────────────────────── */}
+      <div className="bg-[#111827] py-2.5 border-b">
+        <div className="container mx-auto px-4 flex items-center justify-around gap-3 text-white text-xs font-semibold uppercase tracking-wide flex-wrap">
+          <span className="flex items-center gap-1.5"><Truck className="w-4 h-4 text-[#F38508]" /> Fast Delivery</span>
+          <span className="flex items-center gap-1.5"><RefreshCcw className="w-4 h-4 text-[#F38508]" /> 7-Day Returns</span>
+          <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-[#F38508]" /> Secure Payments</span>
+          <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-[#F38508]" /> 100% Genuine</span>
         </div>
       </div>
 
@@ -284,8 +284,8 @@ export default function HomePage() {
       <section className="py-8 md:py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg md:text-2xl font-black text-gray-900 uppercase tracking-wide">Shop By Category</h2>
-            <Link href="/products" className="text-xs font-semibold text-yellow-600 flex items-center gap-1 hover:underline">
+            <h2 className="section-header text-lg md:text-2xl font-black text-[#111827] uppercase tracking-wide">Shop By Category</h2>
+            <Link href="/products" className="text-xs font-semibold text-[#F38508] flex items-center gap-1 hover:underline">
               All <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -324,7 +324,7 @@ export default function HomePage() {
           <div className="container mx-auto px-4">
             <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
               <div className="flex items-center gap-3">
-                <Zap className="w-8 h-8 text-yellow-300 animate-pulse" />
+                <Zap className="w-8 h-8 text-[#F38508] animate-pulse" />
                 <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-wide">Flash Sale</h2>
               </div>
               <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-xl px-4 py-2">
@@ -350,7 +350,7 @@ export default function HomePage() {
                   {flashSale.map((p) => (
                     <CarouselItem key={p._id} className="pl-3 basis-[48%] md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                       <div className="relative">
-                        <Badge className="absolute top-2 left-2 z-10 bg-yellow-400 text-black font-black text-xs">
+                        <Badge className="absolute top-2 left-2 z-10 bg-[#F38508] text-black font-black text-xs">
                           {Math.round(((p.originalPrice! - p.price) / p.originalPrice!) * 100)}% OFF
                         </Badge>
                         <ProductCard product={p} />
@@ -375,9 +375,9 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link href="/products?category=Men" className="group relative h-36 md:h-44 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900 flex items-center px-8">
               <div>
-                <p className="text-yellow-400 text-xs font-bold uppercase tracking-widest mb-1">For Him</p>
+                <p className="text-[#F38508] text-xs font-bold uppercase tracking-widest mb-1">For Him</p>
                 <h3 className="text-white text-2xl font-black uppercase leading-tight">Men's<br />Collection</h3>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-yellow-400 transition-colors font-semibold">
+                <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-[#F38508] transition-colors font-semibold">
                   Shop Now <ChevronRight className="w-3 h-3" />
                 </span>
               </div>
@@ -385,9 +385,9 @@ export default function HomePage() {
             </Link>
             <Link href="/products?category=Women" className="group relative h-36 md:h-44 rounded-2xl overflow-hidden bg-gradient-to-br from-pink-600 to-rose-700 flex items-center px-8">
               <div>
-                <p className="text-yellow-300 text-xs font-bold uppercase tracking-widest mb-1">For Her</p>
+                <p className="text-[#F38508]/80 text-xs font-bold uppercase tracking-widest mb-1">For Her</p>
                 <h3 className="text-white text-2xl font-black uppercase leading-tight">Women's<br />Edit</h3>
-                <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-yellow-300 transition-colors font-semibold">
+                <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-[#F38508] transition-colors font-semibold">
                   Shop Now <ChevronRight className="w-3 h-3" />
                 </span>
               </div>
@@ -406,10 +406,10 @@ export default function HomePage() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <Gift className="w-6 h-6 text-yellow-500" />
-                <h2 className="text-lg md:text-2xl font-black text-gray-900 uppercase tracking-wide">Offers &amp; Coupons</h2>
+                <Gift className="w-6 h-6 text-[#F38508]" />
+                <h2 className="section-header text-lg md:text-2xl font-black text-[#111827] uppercase tracking-wide">Offers &amp; Coupons</h2>
               </div>
-              <Link href="/offers" className="text-xs font-semibold text-yellow-600 hover:underline flex items-center gap-1">
+              <Link href="/offers" className="text-xs font-semibold text-[#F38508] hover:underline flex items-center gap-1">
                 View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -429,13 +429,13 @@ export default function HomePage() {
                   return (
                     <div
                       key={c.id}
-                      className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-dashed border-yellow-300 p-4 flex flex-col gap-2 hover:shadow-md transition-shadow"
+                      className="bg-gradient-to-br from-orange-50 to-orange-50 rounded-xl border-2 border-dashed border-[#F38508]/40 p-4 flex flex-col gap-2 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center gap-2">
                         {c.type === "percentage" ? <Percent className="w-5 h-5 text-orange-500" /> : <Tag className="w-5 h-5 text-orange-500" />}
                         <span className="text-2xl font-black text-orange-600">{discountLabel}</span>
                       </div>
-                      <div className="bg-white rounded-lg px-3 py-1.5 flex items-center justify-between border border-yellow-200">
+                      <div className="bg-white rounded-lg px-3 py-1.5 flex items-center justify-between border border-orange-200">
                         <span className="text-xs text-gray-500 font-medium">Code:</span>
                         <span className="font-black text-gray-900 text-sm tracking-widest">{c.code}</span>
                       </div>
@@ -454,8 +454,8 @@ export default function HomePage() {
         <section className="py-8 md:py-12 bg-gradient-to-br from-purple-50 to-pink-50">
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-2 mb-6">
-              <Heart className="w-6 h-6 text-pink-500 fill-pink-200" />
-              <h2 className="text-lg md:text-2xl font-black text-gray-900 uppercase tracking-wide">Recommended For You</h2>
+              <Heart className="w-6 h-6 text-[#F38508] fill-orange-100" />
+              <h2 className="section-header text-lg md:text-2xl font-black text-[#111827] uppercase tracking-wide">Recommended For You</h2>
             </div>
             {loading ? (
               <div className="flex gap-3 overflow-hidden">
@@ -488,18 +488,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 12. App Download Banner ──────────────────────────────── */}
-      <section className="py-8 bg-gray-900">
+      {/* ── 12. App Download Banner — Navy bg like Robu.in ────────────────── */}
+      <section className="py-8 bg-[#111827]">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h3 className="text-2xl font-black text-white uppercase">Get the App</h3>
             <p className="text-gray-400 text-sm mt-1">Shop on the go — exclusive app-only deals every day</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
-            <Link href="/apps" className="flex items-center gap-2 bg-white text-gray-900 px-5 py-3 rounded-xl font-bold text-sm hover:bg-yellow-400 transition-colors">
+            <Link href="/apps" className="flex items-center gap-2 bg-white text-gray-900 px-5 py-3 rounded-xl font-bold text-sm hover:bg-[#F38508] transition-colors">
               <span className="text-xl">🍎</span> App Store
             </Link>
-            <Link href="/apps" className="flex items-center gap-2 bg-white text-gray-900 px-5 py-3 rounded-xl font-bold text-sm hover:bg-yellow-400 transition-colors">
+            <Link href="/apps" className="flex items-center gap-2 bg-white text-gray-900 px-5 py-3 rounded-xl font-bold text-sm hover:bg-[#F38508] transition-colors">
               <span className="text-xl">🤖</span> Google Play
             </Link>
           </div>
@@ -518,9 +518,9 @@ function ProductSlider({ title, products, link, loading }: { title: string; prod
     <section className="py-8 md:py-12 bg-white">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-4 md:mb-6">
-          <h2 className="text-lg md:text-2xl font-black text-gray-900 uppercase tracking-wide">{title}</h2>
+          <h2 className="text-lg md:text-2xl font-black text-[#111827] uppercase tracking-wide">{title}</h2>
           {link && (
-            <Link href={link} className="text-xs md:text-sm font-semibold text-yellow-600 hover:underline flex items-center gap-1">
+            <Link href={link} className="text-xs md:text-sm font-semibold text-[#F38508] hover:underline flex items-center gap-1">
               View All <ChevronRight className="w-4 h-4" />
             </Link>
           )}

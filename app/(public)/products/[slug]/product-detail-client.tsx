@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star, ShoppingBag, Heart, Truck, Shield, RotateCcw, MapPin, Ruler, Loader2 } from "lucide-react"
+import { Star, ShoppingBag, Heart, Truck, Shield, RotateCcw, MapPin, Ruler, Loader2, Share2, GitCompare } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ReviewSection } from "@/components/product/review-section"
 import { ProductCard } from "@/components/product/product-card"
@@ -33,6 +33,12 @@ interface ProductDetailClientProps {
     questions?: QnaQuestion[]
 }
 
+type MediaType = "image" | "video" | "360"
+interface MediaItem {
+    type: MediaType
+    url: string
+}
+
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/hooks/use-wishlist"
 import * as checkoutApi from "@/lib/api/checkout"
@@ -42,7 +48,7 @@ import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed"
 
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
-    const [selectedImage, setSelectedImage] = useState(0)
+    const [selectedMedia, setSelectedMedia] = useState(0)
     const [selectedSize, setSelectedSize] = useState("")
     const [selectedColor, setSelectedColor] = useState("")
     const [quantity, setQuantity] = useState(1)
@@ -135,6 +141,44 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
         }
     }
 
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: product.name,
+                    text: `Check out ${product.name} on Baefikra!`,
+                    url: window.location.href,
+                })
+            } catch (err) {
+                console.log("Error sharing", err)
+            }
+        } else {
+            navigator.clipboard.writeText(window.location.href)
+            toast({ title: "Link copied to clipboard!" })
+        }
+    }
+
+    const handleCompare = () => {
+        const existingStr = localStorage.getItem("bf_compare") || "[]"
+        let existing: any[] = []
+        try { existing = JSON.parse(existingStr) } catch {}
+        if (!existing.find(p => p.id === productId)) {
+            existing.push({ id: productId, name: product.name, image: product.images?.[0], price: product.price })
+            localStorage.setItem("bf_compare", JSON.stringify(existing))
+            toast({
+                title: "Added to compare",
+                description: "You can view comparison from the compare page.",
+                action: (
+                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/compare'}>
+                        Compare Now
+                    </Button>
+                )
+            })
+        } else {
+            toast({ title: "Already in comparison list" })
+        }
+    }
+
     const handleWishlist = async () => {
         if (!session) {
             toast({
@@ -182,7 +226,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
         ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
         : 0
 
-    const images = product.images && product.images.length > 0 ? product.images : ["/placeholder.svg"]
+    const media: MediaItem[] = [
+        ...(product.images && product.images.length > 0 ? product.images : ["/placeholder.svg"]).map((url: string) => ({ type: "image" as MediaType, url })),
+        ...(product.videos || []).map((url: string) => ({ type: "video" as MediaType, url })),
+        ...(product.view360Images || []).length > 0 ? [{ type: "360" as MediaType, url: product.view360Images[0] }] : [] // For now, just represent 360 as a single item
+    ]
+    const activeMedia = media[selectedMedia] || media[0]
 
     // Parse variant options from optionsJson (JSON string like {"size":"M","color":"Blue"})
     const parsedVariantOptions: Array<Record<string, string>> = (product.variants ?? []).map((v: any) => {
@@ -200,26 +249,41 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 <div className="w-full lg:w-[58%] flex flex-col-reverse lg:flex-row gap-4 h-fit lg:sticky lg:top-24">
                     {/* Thumbnails (Vertical on Desktop) */}
                     <div className="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0 h-[600px] overflow-y-auto scrollbar-hide">
-                        {images.map((img: string, idx: number) => (
+                        {media.map((item, idx) => (
                             <div
                                 key={idx}
-                                className={`aspect-[3/4] relative cursor-pointer border-2 rounded transition-all ${selectedImage === idx ? 'border-yellow-400' : 'border-transparent hover:border-gray-300'}`}
-                                onMouseEnter={() => setSelectedImage(idx)}
+                                className={`aspect-[3/4] relative cursor-pointer border-2 rounded transition-all flex items-center justify-center bg-gray-100 ${selectedMedia === idx ? 'border-[#F38508]' : 'border-transparent hover:border-gray-300'}`}
+                                onMouseEnter={() => setSelectedMedia(idx)}
                             >
-                                <Image src={img} alt={`Thumb ${idx}`} fill className="object-cover rounded-sm" />
+                                {item.type === "image" && <Image src={item.url} alt={`Thumb ${idx}`} fill className="object-cover rounded-sm" />}
+                                {item.type === "video" && <span className="text-xs font-bold text-gray-500">VIDEO</span>}
+                                {item.type === "360" && <span className="text-xs font-bold text-gray-500">360°</span>}
                             </div>
                         ))}
                     </div>
 
                     {/* Main Image */}
-                    <div className="flex-1 relative aspect-[3/4] lg:h-[600px] bg-gray-50 rounded-lg overflow-hidden">
-                        <Image
-                            src={images[selectedImage]}
-                            alt={product.name}
-                            fill
-                            className="object-contain lg:object-cover transition-opacity duration-300"
-                            priority
-                        />
+                    <div className="flex-1 relative aspect-[3/4] lg:h-[600px] bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+                        {activeMedia.type === "image" && (
+                            <Image
+                                src={activeMedia.url}
+                                alt={product.name}
+                                fill
+                                className="object-contain lg:object-cover transition-opacity duration-300"
+                                priority
+                            />
+                        )}
+                        {activeMedia.type === "video" && (
+                            <video src={activeMedia.url} controls autoPlay muted loop className="w-full h-full object-contain" />
+                        )}
+                        {activeMedia.type === "360" && (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100">
+                                <span className="text-gray-500 text-lg font-bold mb-4">360° View Interaction</span>
+                                {/* Normally we'd use a 360 viewer component here like react-360-view */}
+                                <Image src={activeMedia.url} alt="360 base" width={300} height={300} className="object-contain opacity-50" />
+                                <p className="text-xs text-gray-400 mt-2">Interactive 360 view enabled</p>
+                            </div>
+                        )}
 
                         {discountPercentage > 0 && (
                             <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
@@ -228,19 +292,21 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                         )}
 
                         <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded flex items-center gap-1 text-sm font-semibold shadow-sm">
-                            {product.rating?.toFixed(1) || "4.0"} <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> | {product.reviewCount || 0}
+                            {product.rating?.toFixed(1) || "4.0"} <Star className="w-3 h-3 fill-[#F38508] text-[#F38508]" /> | {product.reviewCount || 0}
                         </div>
                     </div>
 
                     {/* Mobile Thumbnails (Horizontal) */}
                     <div className="flex lg:hidden gap-2 overflow-x-auto scrollbar-hide">
-                        {images.map((img: string, idx: number) => (
+                        {media.map((item, idx) => (
                             <div
                                 key={idx}
-                                className={`relative w-16 h-20 flex-shrink-0 border-2 rounded ${selectedImage === idx ? 'border-yellow-400' : 'border-gray-200'}`}
-                                onClick={() => setSelectedImage(idx)}
+                                className={`relative w-16 h-20 flex-shrink-0 border-2 rounded flex items-center justify-center bg-gray-100 ${selectedMedia === idx ? 'border-[#F38508]' : 'border-gray-200'}`}
+                                onClick={() => setSelectedMedia(idx)}
                             >
-                                <Image src={img} alt={`Thumb ${idx}`} fill className="object-cover rounded-sm" />
+                                {item.type === "image" && <Image src={item.url} alt={`Thumb ${idx}`} fill className="object-cover rounded-sm" />}
+                                {item.type === "video" && <span className="text-[10px] font-bold text-gray-500">VID</span>}
+                                {item.type === "360" && <span className="text-[10px] font-bold text-gray-500">360°</span>}
                             </div>
                         ))}
                     </div>
@@ -343,7 +409,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             </Button>
                         ) : (
                             <Button
-                                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold h-12 text-sm uppercase tracking-wider"
+                                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-12 text-sm uppercase tracking-wider"
                                 onClick={handleAddToCart}
                                 disabled={loading}
                             >
@@ -367,6 +433,22 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                 <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                             )}
                             <span className="ml-2 font-semibold uppercase text-sm hidden sm:inline">Wishlist</span>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black transition-colors"
+                            onClick={handleShare}
+                            title="Share Product"
+                        >
+                            <Share2 className="w-5 h-5" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black transition-colors"
+                            onClick={handleCompare}
+                            title="Compare Product"
+                        >
+                            <GitCompare className="w-5 h-5" />
                         </Button>
                     </div>
 
@@ -432,23 +514,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     <div className="mt-8">
                         <Tabs defaultValue="desc" className="w-full">
                             <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6 overflow-x-auto">
-                                <TabsTrigger value="desc" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                <TabsTrigger value="desc" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Description
                                 </TabsTrigger>
                                 {product.highlights && product.highlights.length > 0 && (
-                                    <TabsTrigger value="highlights" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                    <TabsTrigger value="highlights" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                         Highlights
                                     </TabsTrigger>
                                 )}
                                 {product.specificationsJson && (
-                                    <TabsTrigger value="specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                    <TabsTrigger value="specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                         Specifications
                                     </TabsTrigger>
                                 )}
-                                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Reviews ({product.reviews?.length ?? product.reviewCount ?? 0})
                                 </TabsTrigger>
-                                <TabsTrigger value="qna" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                <TabsTrigger value="qna" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Q&amp;A ({questions.length})
                                 </TabsTrigger>
                             </TabsList>
@@ -475,7 +557,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                     <ul className="space-y-2">
                                         {product.highlights.map((h: string, i: number) => (
                                             <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0" />
+                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#F38508] flex-shrink-0" />
                                                 {h}
                                             </li>
                                         ))}

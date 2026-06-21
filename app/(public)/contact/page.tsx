@@ -118,12 +118,12 @@ export default function ContactPage() {
         </div>
 
         {session && (
-          <Alert className="mb-8 border-yellow-200 bg-yellow-50">
-            <MessageCircle className="h-4 w-4 text-yellow-600" />
-            <AlertTitle className="text-yellow-700">Have an account?</AlertTitle>
-            <AlertDescription className="text-yellow-600">
+          <Alert className="mb-8 border-orange-200 bg-orange-50">
+            <MessageCircle className="h-4 w-4 text-[#F38508]" />
+            <AlertTitle className="text-[#D97706]">Have an account?</AlertTitle>
+            <AlertDescription className="text-[#F38508]">
               For better tracking of your inquiries, please use our{" "}
-              <Link href="/account/support" className="font-bold underline hover:text-yellow-800">
+              <Link href="/account/support" className="font-bold underline hover:text-orange-800">
                 Support Ticket Portal
               </Link>{" "}
               in your account section.

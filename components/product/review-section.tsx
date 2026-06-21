@@ -8,11 +8,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Star, ThumbsUp, User } from "lucide-react"
+import { Star, ThumbsUp, User, ImageIcon, X } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import * as reviewsApi from "@/lib/api/reviews"
+import { MediaUploader } from "@/components/ui/media-uploader"
 
 interface ReviewSectionProps {
   productId: string
@@ -30,6 +31,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
   const [rating, setRating] = useState(0)
   const [title, setTitle] = useState("")
   const [comment, setComment] = useState("")
+  const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [localReviews, setLocalReviews] = useState<any[]>(reviews ?? [])
 
@@ -59,6 +61,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
         rating,
         title: title.trim(),
         body: comment.trim(),
+        images: uploadedImages,
       })
       toast({
         title: "Review submitted",
@@ -76,6 +79,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
             comment: created.body ?? "",
             verified: created.verifiedPurchase,
             helpful: 0,
+            images: created.images ?? [],
             createdAt: new Date().toISOString(),
             user: { name: session?.user?.name ?? "You" },
           },
@@ -85,6 +89,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
       setRating(0)
       setTitle("")
       setComment("")
+      setUploadedImages([])
     } catch (error) {
       toast({
         title: "Error submitting review",
@@ -121,7 +126,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   <Star
                     key={i}
                     className={`h-5 w-5 ${
-                      i < Math.floor(averageRating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                      i < Math.floor(averageRating) ? "fill-[#F38508] text-[#F38508]" : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -135,7 +140,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   <span className="text-sm w-8">{star}★</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                      className="bg-[#F38508] h-2 rounded-full transition-all duration-300"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -160,7 +165,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                     <button key={star} type="button" onClick={() => setRating(star)} className="p-1">
                       <Star
                         className={`h-6 w-6 transition-colors ${
-                          star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300 hover:text-yellow-400"
+                          star <= rating ? "fill-[#F38508] text-[#F38508]" : "text-gray-300 hover:text-[#F38508]"
                         }`}
                       />
                     </button>
@@ -189,6 +194,35 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   rows={4}
                   maxLength={1000}
                 />
+              </div>
+
+              <div>
+                <Label>Customer Photos (optional)</Label>
+                <div className="mt-2 space-y-4">
+                  {uploadedImages.length > 0 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {uploadedImages.map((url, i) => (
+                        <div key={i} className="relative w-20 h-20 border rounded-md overflow-hidden group">
+                          <Image src={url} alt={`Upload ${i}`} fill className="object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={() => setUploadedImages(prev => prev.filter((_, idx) => idx !== i))}
+                            className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {uploadedImages.length < 5 && (
+                    <MediaUploader 
+                      kind="image" 
+                      maxFiles={1} 
+                      onUploadComplete={(url) => setUploadedImages(prev => [...prev, url])} 
+                    />
+                  )}
+                </div>
               </div>
 
               <Button type="submit" disabled={submitting}>
@@ -242,7 +276,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                           <Star
                             key={i}
                             className={`h-4 w-4 ${
-                              i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                              i < review.rating ? "fill-[#F38508] text-[#F38508]" : "text-gray-300"
                             }`}
                           />
                         ))}
@@ -252,6 +286,17 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
 
                     {review.title && <h4 className="font-medium mb-2">{review.title}</h4>}
                     {review.comment && <p className="text-gray-700 mb-3 whitespace-pre-line">{review.comment}</p>}
+
+                    {/* Customer Photos */}
+                    {review.images && review.images.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {review.images.map((img: string, idx: number) => (
+                          <div key={idx} className="relative w-16 h-16 border rounded overflow-hidden">
+                            <Image src={img} alt={`Review photo ${idx + 1}`} fill className="object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-4">
                       <Button variant="ghost" size="sm" disabled>

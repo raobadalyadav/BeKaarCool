@@ -90,7 +90,7 @@ export default function AdminDashboard() {
           title="Revenue"
           value={`₹${minorToRupees(stats?.totalRevenueMinor ?? "0").toLocaleString("en-IN")}`}
           icon={TrendingUp}
-          color="bg-yellow-500"
+          color="bg-[#D97706]"
           sub="From delivered orders"
         />
         <StatCard

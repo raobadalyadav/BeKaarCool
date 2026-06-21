@@ -54,17 +54,43 @@ const config = {
   				foreground: 'hsl(var(--card-foreground))'
   			},
   			brand: {
-  				'50': '#eff6ff',
-  				'100': '#dbeafe',
-  				'200': '#bfdbfe',
-  				'300': '#93c5fd',
-  				'400': '#60a5fa',
-  				'500': '#3b82f6',
-  				'600': '#2563eb',
-  				'700': '#1d4ed8',
-  				'800': '#1e40af',
-  				'900': '#1e3a8a'
-  			},
+				'50':  '#FFF7ED',
+				'100': '#FFEDD5',
+				'200': '#FED7AA',
+				'300': '#FDBA74',
+				'400': '#FB923C',
+				'500': '#F38508',
+				'600': '#D97706',
+				'700': '#B45309',
+				'800': '#92400E',
+				'900': '#78350F',
+			},
+			// Blue accent
+			accent: {
+				'50':  '#EFF6FF',
+				'100': '#DBEAFE',
+				'200': '#BFDBFE',
+				'300': '#93C5FD',
+				'400': '#60A5FA',
+				'500': '#5AA1E3',
+				'600': '#3B82C8',
+				'700': '#2563EB',
+				'800': '#1D4ED8',
+				'900': '#1E3A8A',
+			},
+			// Charcoal dark
+			charcoal: {
+				'50':  '#F9FAFB',
+				'100': '#F3F4F6',
+				'200': '#E5E7EB',
+				'300': '#D1D5DB',
+				'400': '#9CA3AF',
+				'500': '#6B7280',
+				'600': '#4B5563',
+				'700': '#374151',
+				'800': '#1F2937',
+				'900': '#111827',
+			},
   			success: {
   				'50': '#f0fdf4',
   				'100': '#dcfce7',
@@ -189,12 +215,19 @@ const config = {
   			'bounce-in': 'bounce-in 0.6s ease-out'
   		},
   		fontFamily: {
-  			sans: [
-  				'Inter',
-  				'system-ui',
-  				'sans-serif'
-  			]
-  		},
+				sans: [
+					'Inter',
+					'var(--font-inter)',
+					'system-ui',
+					'sans-serif',
+				],
+				heading: [
+					'Playfair Display',
+					'var(--font-playfair)',
+					'Georgia',
+					'serif',
+				],
+			},
   		spacing: {
   			'18': '4.5rem',
   			'88': '22rem'

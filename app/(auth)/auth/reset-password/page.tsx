@@ -117,7 +117,7 @@ function ResetPasswordContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-yellow-400 mx-auto mb-4" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#F38508] mx-auto mb-4" />
           <p className="text-gray-600">Verifying reset link...</p>
         </div>
       </div>
@@ -141,11 +141,11 @@ function ResetPasswordContent() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <Link href="/auth/forgot-password">
-              <Button className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+              <Button className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
                 Request New Reset Link
               </Button>
             </Link>
-            <Link href="/auth/login" className="block mt-4 text-gray-600 hover:text-yellow-600">
+            <Link href="/auth/login" className="block mt-4 text-gray-600 hover:text-[#F38508]">
               Back to login
             </Link>
           </div>
@@ -160,7 +160,7 @@ function ResetPasswordContent() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <div className="w-16 h-16 bg-yellow-400 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[#F38508] rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-black font-bold text-2xl">B</span>
             </div>
           </Link>
@@ -200,7 +200,7 @@ function ResetPasswordContent() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
-                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
                   {...register("password")}
                 />
                 <button
@@ -216,7 +216,7 @@ function ResetPasswordContent() {
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">Password strength</span>
                     <span className={`font-medium ${passwordStrength < 50 ? 'text-red-500' :
-                        passwordStrength < 75 ? 'text-yellow-500' : 'text-green-500'
+                        passwordStrength < 75 ? 'text-[#F38508]' : 'text-green-500'
                       }`}>
                       {passwordStrength < 50 ? 'Weak' : passwordStrength < 75 ? 'Medium' : 'Strong'}
                     </span>
@@ -235,7 +235,7 @@ function ResetPasswordContent() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
-                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
                   {...register("confirmPassword")}
                 />
                 <button
@@ -251,7 +251,7 @@ function ResetPasswordContent() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-base"
+              className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold text-base"
               disabled={loading}
             >
               {loading ? (
@@ -265,7 +265,7 @@ function ResetPasswordContent() {
             </Button>
 
             <div className="text-center pt-4">
-              <Link href="/auth/login" className="text-gray-600 hover:text-yellow-600 text-sm">
+              <Link href="/auth/login" className="text-gray-600 hover:text-[#F38508] text-sm">
                 Back to login
               </Link>
             </div>
@@ -281,7 +281,7 @@ export default function ResetPasswordPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin text-yellow-400 mx-auto mb-4" />
+          <Loader2 className="h-10 w-10 animate-spin text-[#F38508] mx-auto mb-4" />
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>

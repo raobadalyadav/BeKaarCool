@@ -1,7 +1,7 @@
 import { gql } from "./client";
 import type { ReviewDto } from "./types";
 
-const FIELDS = `id rating title body verifiedPurchase status helpfulCount notHelpfulCount`;
+const FIELDS = `id rating title body verifiedPurchase status helpfulCount notHelpfulCount images reviewerName createdAt`;
 
 export async function createReview(input: {
   productId: string;
@@ -9,6 +9,7 @@ export async function createReview(input: {
   title?: string;
   body?: string;
   mediaIds?: string[];
+  images?: string[];
 }): Promise<ReviewDto> {
   const data = await gql<{ createReview: ReviewDto }>({
     query: `mutation C($input: CreateReviewInput!) { createReview(input: $input) { ${FIELDS} } }`,

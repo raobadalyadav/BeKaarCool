@@ -7,6 +7,8 @@ import * as adminApi from "@/lib/api/admin"
 import * as productsApi from "@/lib/api/products"
 import type { ProductDto, VariantDto } from "@/lib/api/types"
 import { minorToRupees } from "@/lib/api/config"
+import { MediaUploader } from "@/components/ui/media-uploader"
+import Image from "next/image"
 
 interface VariantForm {
   id?: string
@@ -41,7 +43,9 @@ export function ProductForm({ product }: Props) {
   const [shortDescription, setShortDescription] = useState(product?.shortDescription ?? "")
 
   // Extended fields
-  const [imagesText, setImagesText] = useState((product?.images ?? []).join("\n"))
+  const [images, setImages] = useState<string[]>(product?.images ?? [])
+  const [videos, setVideos] = useState<string[]>(product?.videos ?? [])
+  const [view360, setView360] = useState<string[]>(product?.view360Images ?? [])
   const [highlightsText, setHighlightsText] = useState((product?.highlights ?? []).join("\n"))
   const [tagsText, setTagsText] = useState((product?.tags ?? []).join(", "))
   const [specificationsText, setSpecificationsText] = useState(() => {
@@ -93,7 +97,6 @@ export function ProductForm({ product }: Props) {
     setSaving(true)
     setMsg(null)
     try {
-      const images = imagesText.split("\n").map((s) => s.trim()).filter(Boolean)
       const highlights = highlightsText.split("\n").map((s) => s.trim()).filter(Boolean)
       const tags = tagsText.split(",").map((s) => s.trim()).filter(Boolean)
       const specifications: Record<string, string> = {}
@@ -113,6 +116,8 @@ export function ProductForm({ product }: Props) {
         tagsJson: tags.length ? JSON.stringify(tags) : undefined,
         specificationsJson: Object.keys(specifications).length ? JSON.stringify(specifications) : undefined,
         imagesJson: images.length ? JSON.stringify(images) : undefined,
+        videosJson: videos.length ? JSON.stringify(videos) : undefined,
+        view360Json: view360.length ? JSON.stringify(view360) : undefined,
       }
 
       let savedProduct: ProductDto
@@ -186,7 +191,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="e.g. Premium Cotton T-Shirt"
                 />
               </div>
@@ -195,7 +200,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="premium-cotton-t-shirt"
                 />
               </div>
@@ -204,7 +209,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={shortDescription}
                   onChange={(e) => setShortDescription(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="One-line summary shown below the product title"
                 />
               </div>
@@ -214,7 +219,7 @@ export function ProductForm({ product }: Props) {
                   value={descriptionHtml}
                   onChange={(e) => setDescriptionHtml(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="<p>Full product description...</p>"
                 />
               </div>
@@ -223,22 +228,48 @@ export function ProductForm({ product }: Props) {
 
           {/* Images */}
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Product Images</h2>
-            <p className="text-xs text-gray-400 mb-2">One image URL per line. First image is the main image.</p>
-            <textarea
-              value={imagesText}
-              onChange={(e) => setImagesText(e.target.value)}
-              rows={5}
-              className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              placeholder={"https://example.com/image1.jpg\nhttps://example.com/image2.jpg"}
-            />
-            {imagesText && (
-              <div className="flex gap-2 mt-3 flex-wrap">
-                {imagesText.split("\n").filter(Boolean).slice(0, 5).map((url, i) => (
-                  <img key={i} src={url.trim()} alt="" className="w-16 h-16 object-cover rounded border" />
-                ))}
+            <h2 className="font-semibold text-gray-900 mb-4">Product Media (Images, Video, 360)</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Images</label>
+                <div className="flex gap-2 flex-wrap mb-3">
+                  {images.map((url, i) => (
+                    <div key={i} className="relative w-24 h-24 border rounded overflow-hidden group">
+                      <Image src={url} alt={`Image ${i}`} fill className="object-cover" />
+                      <button type="button" onClick={() => setImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
+                    </div>
+                  ))}
+                </div>
+                <MediaUploader kind="image" maxFiles={5} onUploadComplete={(url) => setImages(prev => [...prev, url])} />
               </div>
-            )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Videos</label>
+                <div className="flex gap-2 flex-wrap mb-3">
+                  {videos.map((url, i) => (
+                    <div key={i} className="relative w-24 h-24 border rounded overflow-hidden group bg-gray-100 flex items-center justify-center">
+                      <video src={url} className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setVideos(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 z-10"><Trash2 className="w-3 h-3" /></button>
+                    </div>
+                  ))}
+                </div>
+                <MediaUploader kind="video" maxFiles={2} onUploadComplete={(url) => setVideos(prev => [...prev, url])} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">360-Degree Views (Images)</label>
+                <div className="flex gap-2 flex-wrap mb-3">
+                  {view360.map((url, i) => (
+                    <div key={i} className="relative w-24 h-24 border rounded overflow-hidden group">
+                      <Image src={url} alt={`360 ${i}`} fill className="object-cover" />
+                      <button type="button" onClick={() => setView360(prev => prev.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100"><Trash2 className="w-3 h-3" /></button>
+                    </div>
+                  ))}
+                </div>
+                <MediaUploader kind="image" maxFiles={10} onUploadComplete={(url) => setView360(prev => [...prev, url])} />
+              </div>
+            </div>
           </div>
 
           {/* Highlights & Specs */}
@@ -252,7 +283,7 @@ export function ProductForm({ product }: Props) {
                   value={highlightsText}
                   onChange={(e) => setHighlightsText(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder={"100% Pure Cotton\nMachine Washable\nOversized Fit"}
                 />
               </div>
@@ -263,7 +294,7 @@ export function ProductForm({ product }: Props) {
                   value={specificationsText}
                   onChange={(e) => setSpecificationsText(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder={"Material: 100% Cotton\nFit: Regular\nSleeve: Half Sleeve\nPattern: Solid"}
                 />
               </div>
@@ -273,7 +304,7 @@ export function ProductForm({ product }: Props) {
               <input
                 value={tagsText}
                 onChange={(e) => setTagsText(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                 placeholder="cotton, summer, casual, t-shirt (comma separated)"
               />
             </div>
@@ -307,7 +338,7 @@ export function ProductForm({ product }: Props) {
                       <input
                         value={v.sku}
                         onChange={(e) => updateVariant(i, "sku", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder="TSHIRT-BLK-M"
                       />
                     </div>
@@ -317,7 +348,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.priceMinor}
                         onChange={(e) => updateVariant(i, "priceMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder="999"
                       />
                     </div>
@@ -327,7 +358,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.compareAtMinor}
                         onChange={(e) => updateVariant(i, "compareAtMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder="1999"
                       />
                     </div>
@@ -337,7 +368,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.costMinor}
                         onChange={(e) => updateVariant(i, "costMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder="500"
                       />
                     </div>
@@ -347,7 +378,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.weightGrams}
                         onChange={(e) => updateVariant(i, "weightGrams", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder="250"
                       />
                     </div>
@@ -356,7 +387,7 @@ export function ProductForm({ product }: Props) {
                       <input
                         value={v.optionsJson}
                         onChange={(e) => updateVariant(i, "optionsJson", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                        className="w-full border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#F38508]"
                         placeholder='{"size":"M","color":"Black"}'
                       />
                     </div>
@@ -375,7 +406,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
@@ -384,7 +415,7 @@ export function ProductForm({ product }: Props) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="w-full mt-4 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 text-black font-semibold py-2.5 rounded-lg text-sm transition-colors"
+              className="w-full mt-4 bg-[#F38508] hover:bg-[#D97706] disabled:opacity-50 text-black font-semibold py-2.5 rounded-lg text-sm transition-colors"
             >
               {saving ? "Saving..." : product ? "Update Product" : "Create Product"}
             </button>
@@ -396,7 +427,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
             >
               <option value="">— Select Category —</option>
               {topCats.map((c) => (
@@ -421,7 +452,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
             >
               <option value="">— Select Brand —</option>
               {brands.map((b) => (

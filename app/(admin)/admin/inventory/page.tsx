@@ -124,7 +124,7 @@ export default function AdminInventoryPage() {
                   type="number"
                   value={adjDelta}
                   onChange={(e) => setAdjDelta(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="e.g. 10 or -5"
                 />
               </div>
@@ -133,7 +133,7 @@ export default function AdminInventoryPage() {
                 <input
                   value={adjReason}
                   onChange={(e) => setAdjReason(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
                   placeholder="e.g. New stock received"
                 />
               </div>
@@ -142,7 +142,7 @@ export default function AdminInventoryPage() {
               <button
                 onClick={handleAdjust}
                 disabled={adjSaving}
-                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
+                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
               >
                 {adjSaving ? "Saving..." : "Apply"}
               </button>
@@ -162,7 +162,7 @@ export default function AdminInventoryPage() {
             placeholder="Search by product or SKU..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
           />
         </div>
       </div>
@@ -186,7 +186,7 @@ export default function AdminInventoryPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map((e) => (
-                  <tr key={e.variantId} className={`hover:bg-gray-50 ${e.available < 5 ? "bg-red-50" : e.available < 10 ? "bg-yellow-50" : ""}`}>
+                  <tr key={e.variantId} className={`hover:bg-gray-50 ${e.available < 5 ? "bg-red-50" : e.available < 10 ? "bg-orange-50" : ""}`}>
                     <td className="px-4 py-3">
                       <p className="font-medium text-gray-900 line-clamp-1">{e.productTitle}</p>
                       <p className="text-xs text-gray-500 font-mono">
@@ -196,7 +196,7 @@ export default function AdminInventoryPage() {
                     <td className="px-4 py-3 text-center text-gray-700">{e.onHand}</td>
                     <td className="px-4 py-3 text-center text-gray-500">{e.reserved}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={`font-semibold ${e.available < 5 ? "text-red-600" : e.available < 10 ? "text-yellow-600" : "text-green-600"}`}>
+                      <span className={`font-semibold ${e.available < 5 ? "text-red-600" : e.available < 10 ? "text-[#F38508]" : "text-green-600"}`}>
                         {e.available}
                       </span>
                     </td>

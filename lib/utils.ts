@@ -43,7 +43,7 @@ export function getStatusColor(status: string): string {
       return "bg-red-100 text-red-800"
     case "pending":
     case "processing":
-      return "bg-yellow-100 text-yellow-800"
+      return "bg-orange-100 text-orange-800"
     case "shipped":
       return "bg-blue-100 text-blue-800"
     case "refunded":

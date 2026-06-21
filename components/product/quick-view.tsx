@@ -123,7 +123,7 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
                                     <button
                                         key={idx}
                                         onClick={() => setCurrentImage(idx)}
-                                        className={`w-16 h-16 relative rounded border-2 flex-shrink-0 ${currentImage === idx ? "border-yellow-400" : "border-gray-200"
+                                        className={`w-16 h-16 relative rounded border-2 flex-shrink-0 ${currentImage === idx ? "border-[#F38508]" : "border-gray-200"
                                             }`}
                                     >
                                         <Image src={img} alt="" fill className="object-cover rounded" />
@@ -178,7 +178,7 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
                                             className={`px-4 py-2 border rounded-lg text-sm font-medium transition-colors ${selectedSize === size
-                                                    ? "border-yellow-400 bg-yellow-50"
+                                                    ? "border-[#F38508] bg-orange-50"
                                                     : "border-gray-200 hover:border-gray-300"
                                                 }`}
                                         >
@@ -199,7 +199,7 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
                                             key={color.name}
                                             onClick={() => setSelectedColor(color.name)}
                                             className={`w-8 h-8 rounded-full border-2 ${selectedColor === color.name
-                                                    ? "border-yellow-400 ring-2 ring-yellow-200"
+                                                    ? "border-[#F38508] ring-2 ring-orange-200"
                                                     : "border-gray-200"
                                                 }`}
                                             style={{ backgroundColor: color.code }}
@@ -222,7 +222,7 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
                             <Button
                                 onClick={addToCart}
                                 disabled={adding || (product.stock !== undefined && product.stock <= 0)}
-                                className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold"
+                                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
                             >
                                 <ShoppingCart className="w-4 h-4 mr-2" />
                                 {adding ? "Adding..." : "Add to Cart"}
@@ -234,7 +234,7 @@ export function QuickView({ product, isOpen, onClose }: QuickViewProps) {
 
                         {/* View Full Details */}
                         <Link href={`/products/${product.slug}`}>
-                            <Button variant="link" className="w-full text-yellow-600">
+                            <Button variant="link" className="w-full text-[#F38508]">
                                 View Full Details <ExternalLink className="w-4 h-4 ml-1" />
                             </Button>
                         </Link>

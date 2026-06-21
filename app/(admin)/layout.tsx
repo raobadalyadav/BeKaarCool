@@ -72,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-700">
           <Link href="/admin/dashboard" className="text-xl font-bold tracking-tight">
-            Baefikra <span className="text-yellow-400 text-sm font-normal">Admin</span>
+            Baefikra <span className="text-[#F38508] text-sm font-normal">Admin</span>
           </Link>
           <button className="lg:hidden" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
@@ -90,7 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-yellow-400/10 text-yellow-400 border-r-2 border-yellow-400"
+                    ? "bg-[#F38508]/10 text-[#F38508] border-r-2 border-[#F38508]"
                     : "text-gray-400 hover:text-white hover:bg-gray-800"
                 }`}
               >
@@ -105,7 +105,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* User / Logout */}
         <div className="border-t border-gray-700 px-6 py-4">
           <p className="text-xs text-gray-400 mb-1">{(session.user as any)?.email}</p>
-          <p className="text-xs text-yellow-400 font-medium uppercase mb-3">{role}</p>
+          <p className="text-xs text-[#F38508] font-medium uppercase mb-3">{role}</p>
           <button
             onClick={() => signOut({ callbackUrl: "/auth/admin-login" })}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-white"
