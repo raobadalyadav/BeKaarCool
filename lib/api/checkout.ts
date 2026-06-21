@@ -154,3 +154,20 @@ export async function checkPincode(
   });
   return data.checkPincode;
 }
+
+export async function setGuestDetails(
+  sessionId: string,
+  email: string,
+  phone?: string,
+  name?: string
+): Promise<CheckoutSessionDto> {
+  const data = await gql<{ setGuestDetails: CheckoutSessionDto }>({
+    query: `
+      mutation Guest($sessionId: String!, $email: String!, $phone: String, $name: String) {
+        setGuestDetails(sessionId: $sessionId, email: $email, phone: $phone, name: $name) { ${CHECKOUT_FIELDS} }
+      }
+    `,
+    variables: { sessionId, email, phone, name },
+  });
+  return data.setGuestDetails;
+}

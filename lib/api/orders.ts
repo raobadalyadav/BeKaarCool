@@ -36,6 +36,15 @@ export async function getOrder(number: string): Promise<OrderDto | null> {
   return data.order;
 }
 
+export async function trackGuestOrder(number: string, email: string): Promise<OrderDto | null> {
+  const data = await gql<{ trackGuestOrder: OrderDto | null }>({
+    query: `query O($number: String!, $email: String!) { trackGuestOrder(number: $number, email: $email) { ${ORDER_FIELDS} } }`,
+    variables: { number, email },
+    cache: "no-store",
+  });
+  return data.trackGuestOrder;
+}
+
 export async function cancelOrder(args: {
   number: string;
   reason: string;

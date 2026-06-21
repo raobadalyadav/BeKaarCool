@@ -60,8 +60,13 @@ export default function TrackOrderPage() {
     setError("")
 
     try {
-      const { getOrder, shipmentForOrder } = await import("@/lib/api/orders")
-      const data = await getOrder(trackingInput.trim())
+      const { getOrder, trackGuestOrder, shipmentForOrder } = await import("@/lib/api/orders")
+      let data;
+      if (emailInput.trim()) {
+        data = await trackGuestOrder(trackingInput.trim(), emailInput.trim())
+      } else {
+        data = await getOrder(trackingInput.trim())
+      }
       if (!data) throw new Error("Order not found")
       const ship = await shipmentForOrder(data.id).catch(() => null)
       const order: any = {

@@ -59,6 +59,7 @@ export default function CheckoutPage() {
 
   const [newAddress, setNewAddress] = useState({
     name: session?.user?.name ?? "",
+    email: session?.user?.email ?? "",
     phone: "",
     line1: "",
     line2: "",
@@ -69,19 +70,19 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login?redirect=/checkout");
-    }
+    // Removed forced redirect, allowing guest checkout
   }, [status, router]);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (status === "loading") return;
     (async () => {
       try {
-        const list = await usersApi.myAddresses();
-        setAddresses(list);
-        const def = list.find((a) => a.isDefault) ?? list[0];
-        if (def) setSelectedAddressId(def.id);
+        if (status === "authenticated") {
+            const list = await usersApi.myAddresses();
+            setAddresses(list);
+            const def = list.find((a) => a.isDefault) ?? list[0];
+            if (def) setSelectedAddressId(def.id);
+        }
         const sess = await checkoutApi.startCheckout();
         setSession2(sess);
       } catch (e) {
@@ -111,6 +112,10 @@ export default function CheckoutPage() {
       return;
     }
     try {
+      if (status === "unauthenticated") {
+          // If unauthenticated, save guest details first
+          await checkoutApi.setGuestDetails(sessionId, newAddress.email || "guest@example.com", newAddress.phone, newAddress.name);
+      }
       await checkoutApi.setCheckoutAddress(sessionId, selectedAddressId);
       const shipped = await checkoutApi.setCheckoutShipping(sessionId, "standard");
       setSession2((prev) => ({ ...(prev ?? { sessionId }), ...shipped }));
@@ -318,6 +323,21 @@ export default function CheckoutPage() {
                           }
                         />
                       </div>
+                      {status === "unauthenticated" && (
+                          <div className="space-y-2">
+                            <Label>Email (for order updates)</Label>
+                            <Input
+                              type="email"
+                              value={newAddress.email}
+                              onChange={(e) =>
+                                setNewAddress({
+                                  ...newAddress,
+                                  email: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                      )}
                       <div className="space-y-2">
                         <Label>Phone</Label>
                         <Input
@@ -384,14 +404,26 @@ export default function CheckoutPage() {
                         <Label>Pincode</Label>
                         <Input
                           value={newAddress.pincode}
-                          onChange={(e) =>
-                            setNewAddress({
-                              ...newAddress,
-                              pincode: e.target.value
-                                .replace(/\D/g, "")
-                                .slice(0, 6),
-                            })
-                          }
+                          onChange={async (e) => {
+                            const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                            setNewAddress((prev) => ({ ...prev, pincode: val }));
+                            
+                            if (val.length === 6) {
+                                try {
+                                    const res = await usersApi.resolvePincode(val);
+                                    if (res) {
+                                        setNewAddress((prev) => ({
+                                            ...prev,
+                                            city: res.city,
+                                            state: res.state
+                                        }));
+                                        toast({ title: "Pincode verified" });
+                                    }
+                                } catch(e) {
+                                    console.error("Failed to resolve pincode:", e);
+                                }
+                            }
+                          }}
                         />
                       </div>
                       <div className="md:col-span-2">

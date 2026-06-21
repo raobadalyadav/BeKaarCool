@@ -118,3 +118,16 @@ export async function requestAccountDeletion(): Promise<boolean> {
   });
   return data.requestAccountDeletion;
 }
+
+export async function resolvePincode(pincode: string): Promise<{ city: string; state: string } | null> {
+  const data = await gql<{ resolvePincode: { city: string; state: string } | null }>({
+    query: `
+      query R($pincode: String!) {
+        resolvePincode(pincode: $pincode) { city state }
+      }
+    `,
+    variables: { pincode },
+    cache: "no-store",
+  });
+  return data.resolvePincode;
+}
