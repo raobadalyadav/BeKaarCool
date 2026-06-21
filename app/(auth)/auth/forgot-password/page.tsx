@@ -8,12 +8,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, ArrowLeft, Loader2, CheckCircle, KeyRound } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useToast } from "@/hooks/use-toast"
 import { requestPasswordResetAction } from "@/lib/auth-actions"
-
-interface ForgotPasswordForm {
-  email: string
-}
+import { forgotPasswordSchema, type ForgotPasswordFormValues } from "@/lib/validations/auth"
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false)
@@ -25,9 +23,11 @@ export default function ForgotPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordForm>()
+  } = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+  })
 
-  const onSubmit = async (data: ForgotPasswordForm) => {
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
     setLoading(true)
     setError("")
     setSuccess("")
@@ -100,13 +100,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   placeholder="Enter your email"
                   className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
+                  {...register("email")}
                 />
               </div>
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}

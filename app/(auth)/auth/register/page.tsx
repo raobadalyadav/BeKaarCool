@@ -12,17 +12,10 @@ import { Progress } from "@/components/ui/progress"
 import { Eye, EyeOff, User, Mail, Lock, Phone, Loader2, Chrome, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useToast } from "@/hooks/use-toast"
 import { registerAction } from "@/lib/auth-actions"
-
-interface RegisterForm {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-  phone: string
-  agreeToTerms: boolean
-}
+import { registerSchema, type RegisterFormValues } from "@/lib/validations/auth"
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -40,7 +33,9 @@ export default function RegisterPage() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<RegisterForm>()
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  })
 
   const password = watch("password")
 
@@ -59,7 +54,7 @@ export default function RegisterPage() {
     }
   }, [password])
 
-  const onSubmit = async (data: RegisterForm) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     setLoading(true)
     setError("")
     setSuccess("")
@@ -177,13 +172,7 @@ export default function RegisterPage() {
                   type="text"
                   placeholder="Enter your full name"
                   className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("name", {
-                    required: "Name is required",
-                    minLength: {
-                      value: 2,
-                      message: "Name must be at least 2 characters",
-                    },
-                  })}
+                  {...register("name")}
                 />
               </div>
               {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
@@ -198,13 +187,7 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="Enter your email"
                   className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
+                  {...register("email")}
                 />
               </div>
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
@@ -219,13 +202,7 @@ export default function RegisterPage() {
                   type="tel"
                   placeholder="Enter your phone number"
                   className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("phone", {
-                    required: "Phone number is required",
-                    pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Please enter a valid 10-digit phone number",
-                    },
-                  })}
+                  {...register("phone")}
                 />
               </div>
               {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
@@ -240,13 +217,7 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -281,10 +252,7 @@ export default function RegisterPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) => value === password || "Passwords do not match",
-                  })}
+                  {...register("confirmPassword")}
                 />
                 <button
                   type="button"
@@ -301,9 +269,7 @@ export default function RegisterPage() {
               <Checkbox
                 id="agreeToTerms"
                 className="mt-1"
-                {...register("agreeToTerms", {
-                  required: "You must agree to the terms and conditions",
-                })}
+                {...register("agreeToTerms")}
               />
               <Label htmlFor="agreeToTerms" className="text-sm text-gray-600 font-normal leading-tight">
                 I agree to the{" "}

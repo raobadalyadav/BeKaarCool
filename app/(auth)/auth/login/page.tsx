@@ -10,12 +10,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Mail, Lock, Loader2, Chrome, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useToast } from "@/hooks/use-toast"
-
-interface LoginForm {
-  email: string
-  password: string
-}
+import { loginSchema, type LoginFormValues } from "@/lib/validations/auth"
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -32,7 +29,9 @@ function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>()
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  })
 
   useEffect(() => {
     if (session) {
@@ -57,7 +56,7 @@ function LoginForm() {
     }
   }, [session, router, searchParams])
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data: LoginFormValues) => {
     setLoading(true)
     setError("")
     setSuccess("")
@@ -180,13 +179,7 @@ function LoginForm() {
                   type="email"
                   placeholder="Enter your email"
                   className="pl-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
+                  {...register("email")}
                 />
               </div>
               {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
@@ -201,13 +194,7 @@ function LoginForm() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
+                  {...register("password")}
                 />
                 <button
                   type="button"

@@ -215,7 +215,7 @@ export function Header() {
           {/* Sub-Header / Mega Menu Categories Mockup (Optional) */}
           <div className="w-full border-t hidden md:block">
             <div className="container mx-auto px-4">
-              <div className="flex items-center space-x-6 h-10 text-xs font-medium text-muted-foreground overflow-x-auto no-scrollbar">
+              <div className="flex items-center space-x-6 h-10 text-xs font-medium text-muted-foreground overflow-x-auto scrollbar-hide">
                 <Link suppressHydrationWarning href="/products?sort=trending" className="whitespace-nowrap hover:text-foreground">LIVE NOW</Link>
                 <Link suppressHydrationWarning href="/products?category=Men" className="whitespace-nowrap hover:text-foreground">MEN</Link>
                 <Link suppressHydrationWarning href="/products?category=Women" className="whitespace-nowrap hover:text-foreground">WOMEN</Link>

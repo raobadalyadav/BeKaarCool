@@ -10,13 +10,10 @@ import { Progress } from "@/components/ui/progress"
 import { Eye, EyeOff, Lock, Loader2, CheckCircle, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useToast } from "@/hooks/use-toast"
 import { resetPasswordAction, verifyResetTokenAction } from "@/lib/auth-actions"
-
-interface ResetPasswordForm {
-  password: string
-  confirmPassword: string
-}
+import { resetPasswordSchema, type ResetPasswordFormValues } from "@/lib/validations/auth"
 
 function ResetPasswordContent() {
   const [showPassword, setShowPassword] = useState(false)
@@ -38,7 +35,9 @@ function ResetPasswordContent() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<ResetPasswordForm>()
+  } = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
+  })
 
   const password = watch("password")
 
@@ -82,7 +81,7 @@ function ResetPasswordContent() {
     verifyToken()
   }, [token])
 
-  const onSubmit = async (data: ResetPasswordForm) => {
+  const onSubmit = async (data: ResetPasswordFormValues) => {
     setLoading(true)
     setError("")
 
@@ -202,13 +201,7 @@ function ResetPasswordContent() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
                   className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Password must be at least 6 characters",
-                    },
-                  })}
+                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -243,10 +236,7 @@ function ResetPasswordContent() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
                   className="pl-11 pr-11 h-12 border-gray-300 focus:border-yellow-400 focus:ring-yellow-400"
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) => value === password || "Passwords do not match",
-                  })}
+                  {...register("confirmPassword")}
                 />
                 <button
                   type="button"

@@ -26,7 +26,7 @@ export function RecentlyViewedStrip({
   return (
     <section className="mt-12">
       <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
-      <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+      <div className="flex gap-4 overflow-x-auto scrollbar-hide">
         {products.map((product) => {
           const discount =
             product.originalPrice && product.originalPrice > product.price

@@ -199,7 +199,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 {/* Left Column: Image Gallery */}
                 <div className="w-full lg:w-[58%] flex flex-col-reverse lg:flex-row gap-4 h-fit lg:sticky lg:top-24">
                     {/* Thumbnails (Vertical on Desktop) */}
-                    <div className="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0 h-[600px] overflow-y-auto no-scrollbar">
+                    <div className="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0 h-[600px] overflow-y-auto scrollbar-hide">
                         {images.map((img: string, idx: number) => (
                             <div
                                 key={idx}
@@ -233,7 +233,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     </div>
 
                     {/* Mobile Thumbnails (Horizontal) */}
-                    <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <div className="flex lg:hidden gap-2 overflow-x-auto scrollbar-hide">
                         {images.map((img: string, idx: number) => (
                             <div
                                 key={idx}

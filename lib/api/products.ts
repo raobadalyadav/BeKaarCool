@@ -37,12 +37,12 @@ export async function listProducts(args?: {
     `,
     variables: {
       first: args?.first ?? 20,
-      after: args?.after ?? null,
+      after: args?.after ?? undefined,
       filter:
         args?.categoryId || args?.brandId
           ? { categoryId: args?.categoryId, brandId: args?.brandId }
-          : null,
-      status: args?.status ?? null,
+          : {},
+      status: args?.status ?? undefined,
     },
     next: { revalidate: 60, tags: ["products"] },
   });
@@ -135,8 +135,8 @@ export async function search(args: {
     variables: {
       q: args.q,
       first: args.first ?? 24,
-      filter: args.filter ?? null,
-      sort: args.sort ?? null,
+      filter: args.filter ?? {},
+      sort: args.sort ?? undefined,
     },
     cache: "no-store",
   });
