@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   ShoppingCart,
   Plus,
@@ -22,6 +24,10 @@ import {
   RotateCcw,
   Bookmark,
   ArrowUp,
+  Tag,
+  Gift,
+  FileText,
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/cart-context";
@@ -41,7 +47,24 @@ export default function CartPage() {
     removeFromCart,
     saveForLater,
     moveToCart,
+    cart,
+    updateMeta,
+    applyCoupon,
+    removeCoupon,
   } = useCart();
+
+  const [notes, setNotes] = useState(cart?.notes ?? "");
+  const [giftMessage, setGiftMessage] = useState(cart?.giftMessage ?? "");
+  const [couponCode, setCouponCode] = useState("");
+  const [savingMeta, setSavingMeta] = useState(false);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
+
+  useEffect(() => {
+    if (cart) {
+      setNotes(cart.notes ?? "");
+      setGiftMessage(cart.giftMessage ?? "");
+    }
+  }, [cart?.notes, cart?.giftMessage]);
 
   const items = allItems.filter((it) => !it.savedForLater);
   const savedItems = allItems.filter((it) => it.savedForLater);
@@ -55,7 +78,8 @@ export default function CartPage() {
 
   const shipping = subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 99;
   const tax = Math.round(subtotal * 0.18);
-  const finalTotal = subtotal + shipping + tax;
+  const discountMinor = cart?.discountMinor ? Number(cart.discountMinor) / 100 : 0;
+  const finalTotal = Math.max(0, subtotal + shipping + tax - discountMinor);
   const remainingForFreeShip = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
   const handleUpdate = async (itemId: string, qty: number) => {
@@ -119,6 +143,42 @@ export default function CartPage() {
       });
     } finally {
       setUpdating(null);
+    }
+  };
+
+  const handleSaveMeta = async () => {
+    setSavingMeta(true);
+    try {
+      await updateMeta(notes, giftMessage);
+      toast({ title: "Saved successfully" });
+    } catch (e) {
+      toast({ title: "Error", variant: "destructive" });
+    } finally {
+      setSavingMeta(false);
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setApplyingCoupon(true);
+    try {
+      await applyCoupon(couponCode);
+      toast({ title: "Coupon Applied" });
+      setCouponCode("");
+    } catch (e) {
+      toast({ title: "Invalid Coupon", variant: "destructive" });
+    } finally {
+      setApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = async () => {
+    setApplyingCoupon(true);
+    try {
+      await removeCoupon();
+      toast({ title: "Coupon Removed" });
+    } finally {
+      setApplyingCoupon(false);
     }
   };
 
@@ -406,6 +466,12 @@ export default function CartPage() {
                   <span className="text-gray-600">Tax (18% GST)</span>
                   <span>₹{tax.toLocaleString()}</span>
                 </div>
+                {discountMinor > 0 && (
+                  <div className="flex justify-between text-sm text-green-600 font-medium">
+                    <span>Discount</span>
+                    <span>-₹{discountMinor.toLocaleString()}</span>
+                  </div>
+                )}
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
@@ -441,6 +507,70 @@ export default function CartPage() {
                 Continue Shopping
               </Button>
             </Link>
+
+            {/* Coupons */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Tag className="w-4 h-4" /> Apply Coupon
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {cart?.couponCode ? (
+                  <div className="flex items-center justify-between bg-green-50 text-green-700 px-3 py-2 rounded border border-green-200">
+                    <span className="font-bold text-sm">{cart.couponCode} applied</span>
+                    <Button variant="ghost" size="sm" onClick={handleRemoveCoupon} disabled={applyingCoupon} className="h-6 w-6 p-0 hover:bg-green-100">
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input placeholder="Enter code" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())} className="h-9" />
+                    <Button onClick={handleApplyCoupon} disabled={!couponCode || applyingCoupon} className="h-9 px-4">Apply</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Cart Notes & Gift */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <FileText className="w-4 h-4" /> Order Notes & Gift
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-700">Special Instructions</label>
+                  <Textarea 
+                    placeholder="Any special requests for your order?" 
+                    className="text-sm min-h-[60px]" 
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-gray-700 flex items-center gap-1">
+                    <Gift className="w-3 h-3 text-[#F38508]" /> Gift Message
+                  </label>
+                  <Textarea 
+                    placeholder="Adding a gift? Write a message here..." 
+                    className="text-sm min-h-[60px]" 
+                    value={giftMessage}
+                    onChange={(e) => setGiftMessage(e.target.value)}
+                  />
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs h-8" 
+                  onClick={handleSaveMeta}
+                  disabled={savingMeta || (notes === (cart?.notes ?? "") && giftMessage === (cart?.giftMessage ?? ""))}
+                >
+                  {savingMeta ? "Saving..." : "Save Notes"}
+                </Button>
+              </CardContent>
+            </Card>
+
           </div>
         </div>
       </div>

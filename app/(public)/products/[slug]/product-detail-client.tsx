@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star, ShoppingBag, Heart, Truck, Shield, RotateCcw, MapPin, Ruler, Loader2, Share2, GitCompare } from "lucide-react"
+import { Star, ShoppingBag, Heart, Truck, Shield, RotateCcw, MapPin, Ruler, Loader2, Share2, GitCompare, Facebook, Twitter, MessageCircle, Copy, Tag, Plus } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { ReviewSection } from "@/components/product/review-section"
 import { ProductCard } from "@/components/product/product-card"
@@ -48,6 +50,7 @@ import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed"
 
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
+    const router = useRouter()
     const [selectedMedia, setSelectedMedia] = useState(0)
     const [selectedSize, setSelectedSize] = useState("")
     const [selectedColor, setSelectedColor] = useState("")
@@ -57,11 +60,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
     const [wishlistLoading, setWishlistLoading] = useState(false)
     const [pincode, setPincode] = useState("")
     const [deliveryInfo, setDeliveryInfo] = useState<string | null>(null)
+    const [isShareOpen, setIsShareOpen] = useState(false)
     const [notifyLoading, setNotifyLoading] = useState(false)
     const [notifySubscribed, setNotifySubscribed] = useState(false)
 
     const { toast } = useToast()
-    const { addToCart } = useCart()
+    const { addToCart, clearCart } = useCart()
     const { has: isInWishlist, toggle: toggleWishlist } = useWishlist()
     const { data: session } = useSession()
     const { add: addRecentlyViewed } = useRecentlyViewed()
@@ -79,8 +83,8 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [product.id])
 
-    const productId = product.id ?? product._id
-    const variantId = (() => {
+    const productId = product.id ?? product._id;
+    const currentVariant = (() => {
         const variants = product.variants ?? []
         // Try to find exact match by parsed options
         const match = variants.find((v: any) => {
@@ -90,8 +94,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
             const colorOk = !selectedColor || opts.color === selectedColor
             return sizeOk && colorOk
         })
-        return match?.id ?? variants[0]?.id ?? product.defaultVariantId
+        return match ?? variants[0]
     })()
+    const variantId = currentVariant?.id ?? product.defaultVariantId
+    
+    let tierPricing: Array<{minQuantity: number, discountPercent: number}> = []
+    try {
+        if (currentVariant?.tierPricingJson) {
+            tierPricing = JSON.parse(currentVariant.tierPricingJson)
+        }
+    } catch { }
+
+    const activeDiscount = tierPricing
+        .filter(t => quantity >= t.minQuantity)
+        .sort((a, b) => b.minQuantity - a.minQuantity)[0];
+
+    const bundles = product.productRelations?.filter((r: any) => r.relationType === "BUNDLE") ?? [];
+    const recommended = product.productRelations?.filter((r: any) => r.relationType === "CROSS_SELL" || r.relationType === "UPSELL") ?? [];
 
     const handleAddToCart = async () => {
         if (!variantId) {
@@ -112,6 +131,26 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 variant: "destructive",
             })
         } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleBuyNow = async () => {
+        if (!variantId) {
+            toast({ title: "No variant available", variant: "destructive" })
+            return
+        }
+        setLoading(true)
+        try {
+            await clearCart()
+            await addToCart({ variantId, quantity })
+            router.push('/checkout')
+        } catch (error) {
+            toast({
+                title: "Failed to process",
+                description: error instanceof Error ? error.message : "",
+                variant: "destructive",
+            })
             setLoading(false)
         }
     }
@@ -142,7 +181,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
     }
 
     const handleShare = async () => {
-        if (navigator.share) {
+        if (navigator.share && window.innerWidth < 768) {
             try {
                 await navigator.share({
                     title: product.name,
@@ -153,15 +192,20 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 console.log("Error sharing", err)
             }
         } else {
-            navigator.clipboard.writeText(window.location.href)
-            toast({ title: "Link copied to clipboard!" })
+            setIsShareOpen(true)
         }
+    }
+
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href)
+        toast({ title: "Link copied to clipboard!" })
+        setIsShareOpen(false)
     }
 
     const handleCompare = () => {
         const existingStr = localStorage.getItem("bf_compare") || "[]"
         let existing: any[] = []
-        try { existing = JSON.parse(existingStr) } catch {}
+        try { existing = JSON.parse(existingStr) } catch { }
         if (!existing.find(p => p.id === productId)) {
             existing.push({ id: productId, name: product.name, image: product.images?.[0], price: product.price })
             localStorage.setItem("bf_compare", JSON.stringify(existing))
@@ -244,7 +288,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
                 {/* Left Column: Image Gallery */}
                 <div className="w-full lg:w-[58%] flex flex-col-reverse lg:flex-row gap-4 h-fit lg:sticky lg:top-24">
                     {/* Thumbnails (Vertical on Desktop) */}
@@ -332,6 +376,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             )}
                         </div>
                         <p className="text-xs text-gray-500 mt-1">inclusive of all taxes</p>
+                        
+                        {/* Tier Pricing */}
+                        {tierPricing.length > 0 && (
+                            <div className="mt-4 bg-orange-50 border border-orange-100 p-3 rounded-md">
+                                <h4 className="text-xs font-bold text-orange-800 uppercase tracking-wide mb-2 flex items-center gap-1">
+                                    <Tag className="w-3 h-3" /> Buy More, Save More
+                                </h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                    {tierPricing.map((tier, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            className={`border rounded px-2 py-1.5 text-center text-xs transition-colors cursor-pointer ${
+                                                activeDiscount?.minQuantity === tier.minQuantity 
+                                                ? 'border-[#F38508] bg-white ring-1 ring-[#F38508]' 
+                                                : 'border-orange-200 bg-white/60 hover:bg-white'
+                                            }`}
+                                            onClick={() => setQuantity(Math.max(quantity, tier.minQuantity))}
+                                        >
+                                            <div className="font-semibold text-gray-900">Buy {tier.minQuantity}+</div>
+                                            <div className="text-[#F38508] font-bold">Extra {tier.discountPercent}% OFF</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded border border-dashed border-gray-300">
@@ -353,8 +422,8 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                         key={color}
                                         onClick={() => setSelectedColor(color)}
                                         className={`px-3 h-8 rounded border-2 text-sm transition-all ${selectedColor === color
-                                                ? 'border-black bg-black text-white'
-                                                : 'border-gray-300 text-gray-600 hover:border-black'
+                                            ? 'border-black bg-black text-white'
+                                            : 'border-gray-300 text-gray-600 hover:border-black'
                                             }`}
                                     >
                                         {color}
@@ -379,8 +448,8 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                     key={size}
                                     onClick={() => setSelectedSize(size)}
                                     className={`w-12 h-12 rounded-md flex items-center justify-center border font-medium transition-all ${selectedSize === size
-                                            ? 'border-black bg-white text-black ring-1 ring-black shadow-sm'
-                                            : 'border-gray-300 text-gray-600 hover:border-black'
+                                        ? 'border-black bg-white text-black ring-1 ring-black shadow-sm'
+                                        : 'border-gray-300 text-gray-600 hover:border-black'
                                         }`}
                                 >
                                     {size}
@@ -391,6 +460,30 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             <p className="text-xs text-red-500 mt-2">Please select a size</p>
                         )}
                     </div>
+
+                    {/* Quantity */}
+                    {(product.stock ?? 100) > 0 && (
+                        <div className="flex items-center gap-4 mt-6">
+                            <h3 className="font-semibold text-sm uppercase tracking-wide">Quantity</h3>
+                            <div className="flex items-center border border-gray-300 rounded-md h-10">
+                                <button 
+                                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 h-full flex items-center justify-center transition-colors rounded-l-md"
+                                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                                    disabled={quantity <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className="px-4 py-1 font-medium text-sm min-w-[2.5rem] text-center">{quantity}</span>
+                                <button 
+                                    className="px-3 py-1 text-gray-600 hover:bg-gray-100 h-full flex items-center justify-center transition-colors rounded-r-md"
+                                    onClick={() => setQuantity(q => Math.min(product.stock ?? 10, q + 1))}
+                                    disabled={quantity >= (product.stock ?? 10)}
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Actions */}
                     <div className="flex gap-2 pt-4">
@@ -422,8 +515,15 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             </Button>
                         )}
                         <Button
+                            className="flex-1 bg-black hover:bg-gray-800 text-white font-bold h-12 text-sm uppercase tracking-wider"
+                            onClick={handleBuyNow}
+                            disabled={loading || (product.stock ?? 100) <= 0}
+                        >
+                            Buy Now
+                        </Button>
+                        <Button
                             variant="outline"
-                            className={`h-12 px-6 border-gray-300 ${isWishlisted ? 'text-red-500 border-red-200 bg-red-50' : 'text-gray-600'}`}
+                            className={`h-12 px-6 border-gray-300 ${isWishlisted ? 'text-[#F38508] border-[#F38508]/30 bg-orange-50' : 'text-gray-600'}`}
                             onClick={handleWishlist}
                             disabled={wishlistLoading}
                         >
@@ -432,7 +532,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             ) : (
                                 <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                             )}
-                            <span className="ml-2 font-semibold uppercase text-sm hidden sm:inline">Wishlist</span>
                         </Button>
                         <Button
                             variant="outline"
@@ -451,6 +550,57 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                             <GitCompare className="w-5 h-5" />
                         </Button>
                     </div>
+
+                    <Separator className="bg-gray-100" />
+
+                    {/* Frequently Bought Together (Bundles) */}
+                    {bundles.length > 0 && (
+                        <div className="space-y-4">
+                            <h3 className="font-semibold text-sm uppercase flex items-center gap-2">
+                                <ShoppingBag className="w-4 h-4" /> Frequently Bought Together
+                            </h3>
+                            <div className="space-y-3">
+                                {bundles.map((bundle: any) => (
+                                    <div key={bundle.id} className="border rounded-md p-3 flex flex-col sm:flex-row items-center gap-4 bg-gray-50">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <div className="relative w-12 h-16 bg-white border rounded">
+                                                {product.images?.[0] && <Image src={product.images[0]} alt="Current" fill className="object-cover" />}
+                                            </div>
+                                            <Plus className="w-4 h-4 text-gray-400" />
+                                            <div className="relative w-12 h-16 bg-white border rounded">
+                                                {bundle.targetProduct?.images?.[0] && <Image src={bundle.targetProduct.images[0]} alt="Bundle" fill className="object-cover" />}
+                                            </div>
+                                            <div className="ml-2 flex-1">
+                                                <p className="text-xs font-semibold text-gray-900 line-clamp-1">{bundle.targetProduct?.title}</p>
+                                                <p className="text-xs text-[#F38508] font-bold">
+                                                    Bundle Price: ₹{bundle.bundlePriceMinor ? Number(bundle.bundlePriceMinor) / 100 : bundle.targetProduct?.priceMinor}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            className="w-full sm:w-auto bg-black text-white hover:bg-gray-800 text-xs h-8"
+                                            onClick={async () => {
+                                                setLoading(true);
+                                                try {
+                                                    if (variantId) await addToCart({ variantId, quantity: 1 });
+                                                    if (bundle.targetProduct?.variants?.[0]?.id) {
+                                                        await addToCart({ variantId: bundle.targetProduct.variants[0].id, quantity: 1 });
+                                                    }
+                                                    toast({ title: "Bundle Added", description: "Both items added to cart." });
+                                                } finally {
+                                                    setLoading(false);
+                                                }
+                                            }}
+                                            disabled={loading}
+                                        >
+                                            Add Both
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <Separator className="bg-gray-100" />
 
@@ -580,8 +730,33 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 </div>
             </div>
 
-            {/* Related Products Section */}
-            {relatedProducts.length > 0 && (
+            {/* Recommended Products via Relations */}
+            {recommended.length > 0 && (
+                <div className="mt-16">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Our Top Picks For You</h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
+                        {recommended.map((r: any) => {
+                            const p = r.targetProduct;
+                            if (!p) return null;
+                            // Map to format ProductCard expects
+                            const mappedProduct = {
+                                _id: p.id,
+                                id: p.id,
+                                slug: p.slug,
+                                title: p.title,
+                                name: p.title,
+                                images: p.images,
+                                price: p.variants?.[0]?.priceMinor ? Number(p.variants[0].priceMinor) / 100 : 0,
+                                originalPrice: p.variants?.[0]?.compareAtMinor ? Number(p.variants[0].compareAtMinor) / 100 : 0,
+                            };
+                            return <ProductCard key={r.id} product={mappedProduct} />;
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Related Products Section (Fallback) */}
+            {recommended.length === 0 && relatedProducts.length > 0 && (
                 <div className="mt-16">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
@@ -596,6 +771,40 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
             <div className="mt-4 border-t border-gray-100 pt-8">
                 <RecentlyViewedStrip excludeId={product.id ?? product._id} />
             </div>
+
+            <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Share this product</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex items-center justify-center gap-4 py-6">
+                        <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out ${product.name ?? product.title} on Baefikra! ` + (typeof window !== 'undefined' ? window.location.href : ''))}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 text-gray-600 hover:text-green-600">
+                            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+                                <MessageCircle className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-medium">WhatsApp</span>
+                        </a>
+                        <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 text-gray-600 hover:text-blue-600">
+                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                                <Facebook className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-medium">Facebook</span>
+                        </a>
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${product.name ?? product.title} on Baefikra!`)}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 text-gray-600 hover:text-sky-500">
+                            <div className="w-12 h-12 rounded-full bg-sky-50 flex items-center justify-center">
+                                <Twitter className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-medium">Twitter</span>
+                        </a>
+                        <button onClick={copyLink} className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                                <Copy className="w-6 h-6" />
+                            </div>
+                            <span className="text-xs font-medium">Copy</span>
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

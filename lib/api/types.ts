@@ -21,6 +21,16 @@ export interface VariantDto {
   /** JSON-stringified Record<string,string> */
   optionsJson: string;
   inStock: boolean;
+  tierPricingJson?: string;
+}
+
+export interface ProductRelationDto {
+  id: string;
+  sourceProductId: string;
+  targetProductId: string;
+  relationType: string;
+  bundlePriceMinor?: string;
+  targetProduct?: ProductDto;
 }
 
 export interface ProductDto {
@@ -37,6 +47,7 @@ export interface ProductDto {
   videos?: string[];
   view360Images?: string[];
   variants: VariantDto[];
+  productRelations?: ProductRelationDto[];
   createdAt: string;
   // Extended fields
   shortDescription?: string;
@@ -118,6 +129,10 @@ export interface CartDto {
   currency: string;
   items: CartItemDto[];
   subtotalMinor: string;
+  notes?: string;
+  giftMessage?: string;
+  couponCode?: string;
+  discountMinor?: string;
 }
 
 export interface AddressDto {

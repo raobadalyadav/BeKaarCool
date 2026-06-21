@@ -34,6 +34,24 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [localReviews, setLocalReviews] = useState<any[]>(reviews ?? [])
+  const [votingOn, setVotingOn] = useState<Record<string, boolean>>({})
+
+  const handleVote = async (reviewId: string) => {
+    if (!session) {
+      toast({ title: "Please login to vote", variant: "destructive" })
+      return
+    }
+    setVotingOn(prev => ({ ...prev, [reviewId]: true }))
+    try {
+      await reviewsApi.voteReview(reviewId, true)
+      setLocalReviews(prev => prev.map(r => r.id === reviewId || r._id === reviewId ? { ...r, helpfulCount: (r.helpfulCount || r.helpful || 0) + 1 } : r))
+      toast({ title: "Thanks for your feedback!" })
+    } catch (e: any) {
+      toast({ title: "Failed to vote", description: e.message, variant: "destructive" })
+    } finally {
+      setVotingOn(prev => ({ ...prev, [reviewId]: false }))
+    }
+  }
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -299,9 +317,15 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                     )}
 
                     <div className="flex items-center gap-4">
-                      <Button variant="ghost" size="sm" disabled>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleVote(review.id || review._id)}
+                        disabled={votingOn[review.id || review._id]}
+                        className={votingOn[review.id || review._id] ? "opacity-50" : ""}
+                      >
                         <ThumbsUp className="h-4 w-4 mr-1" />
-                        Helpful ({review.helpful || 0})
+                        Helpful ({review.helpfulCount || review.helpful || 0})
                       </Button>
                     </div>
                   </div>

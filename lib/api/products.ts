@@ -13,7 +13,15 @@ const PRODUCT_FIELDS = `
   ratingAvg ratingCount brandId categoryId
   images createdAt
   shortDescription highlights tags specificationsJson attributesJson
-  variants { id sku priceMinor compareAtMinor costMinor weightGrams optionsJson inStock }
+  variants { id sku priceMinor compareAtMinor costMinor weightGrams optionsJson inStock tierPricingJson }
+  productRelations {
+    id sourceProductId targetProductId relationType bundlePriceMinor
+    targetProduct {
+      id slug title createdAt
+      images
+      variants { id sku priceMinor compareAtMinor inStock }
+    }
+  }
 `;
 
 export async function listProducts(args?: {

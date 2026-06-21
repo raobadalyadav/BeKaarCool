@@ -2,7 +2,7 @@ import { gql } from "./client";
 import type { CartDto } from "./types";
 
 const CART_FIELDS = `
-  id currency subtotalMinor
+  id currency subtotalMinor notes giftMessage couponCode discountMinor
   items {
     id variantId quantity priceMinor
     productId productSlug productTitle productImage
@@ -94,4 +94,39 @@ export async function mergeAnonymousCart(anonymousId: string): Promise<CartDto> 
     variables: { anonymousId },
   });
   return data.mergeAnonymousCart;
+}
+
+export async function updateCartMeta(notes?: string, giftMessage?: string): Promise<CartDto> {
+  const data = await gql<{ updateCartMeta: CartDto }>({
+    query: `
+      mutation UpdateMeta($notes: String, $giftMessage: String) {
+        updateCartMeta(notes: $notes, giftMessage: $giftMessage) { ${CART_FIELDS} }
+      }
+    `,
+    variables: { notes, giftMessage },
+  });
+  return data.updateCartMeta;
+}
+
+export async function applyCartCoupon(code: string): Promise<CartDto> {
+  const data = await gql<{ applyCartCoupon: CartDto }>({
+    query: `
+      mutation ApplyCoupon($code: String!) {
+        applyCartCoupon(code: $code) { ${CART_FIELDS} }
+      }
+    `,
+    variables: { code },
+  });
+  return data.applyCartCoupon;
+}
+
+export async function removeCartCoupon(): Promise<CartDto> {
+  const data = await gql<{ removeCartCoupon: CartDto }>({
+    query: `
+      mutation RemoveCoupon {
+        removeCartCoupon { ${CART_FIELDS} }
+      }
+    `,
+  });
+  return data.removeCartCoupon;
 }

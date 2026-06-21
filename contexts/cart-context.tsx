@@ -48,6 +48,10 @@ interface CartContextType {
   refresh: () => Promise<void>;
   saveForLater: (id: string) => Promise<void>;
   moveToCart: (id: string) => Promise<void>;
+  updateMeta: (notes?: string, giftMessage?: string) => Promise<void>;
+  applyCoupon: (code: string) => Promise<void>;
+  removeCoupon: () => Promise<void>;
+  cart: CartDto | null;
   loading: boolean;
 }
 
@@ -182,6 +186,36 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     await Promise.all(cart.items.map((it) => removeFromCart(it.id)));
   }, [cart, removeFromCart]);
 
+  const updateMeta = useCallback(async (notes?: string, giftMessage?: string) => {
+    setLoading(true);
+    try {
+      const next = await cartApi.updateCartMeta(notes, giftMessage);
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const applyCoupon = useCallback(async (code: string) => {
+    setLoading(true);
+    try {
+      const next = await cartApi.applyCartCoupon(code);
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const removeCoupon = useCallback(async () => {
+    setLoading(true);
+    try {
+      const next = await cartApi.removeCartCoupon();
+      setCart(next);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <CartContext.Provider
       value={{
@@ -195,6 +229,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         refresh,
         saveForLater,
         moveToCart,
+        updateMeta,
+        applyCoupon,
+        removeCoupon,
+        cart,
         loading,
       }}
     >
