@@ -42,7 +42,7 @@ import { QnaSection } from "@/components/product/qna-section"
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
     const [selectedImage, setSelectedImage] = useState(0)
     const [selectedSize, setSelectedSize] = useState("")
-    const [selectedColor, setSelectedColor] = useState(product.variations?.colors?.[0]?.name || "")
+    const [selectedColor, setSelectedColor] = useState("")
     const [quantity, setQuantity] = useState(1)
     const [isWishlisted, setIsWishlisted] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -58,10 +58,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
     const { data: session } = useSession()
 
     const productId = product.id ?? product._id
-    const variantId =
-        product.variants?.find((v: any) => v.optionsJson?.size === selectedSize && v.optionsJson?.color === selectedColor)?.id ??
-        product.variants?.[0]?.id ??
-        product.defaultVariantId
+    const variantId = (() => {
+        const variants = product.variants ?? []
+        // Try to find exact match by parsed options
+        const match = variants.find((v: any) => {
+            let opts: Record<string, string> = {}
+            try { opts = JSON.parse(v.optionsJson || "{}") } catch { /* */ }
+            const sizeOk = !selectedSize || opts.size === selectedSize
+            const colorOk = !selectedColor || opts.color === selectedColor
+            return sizeOk && colorOk
+        })
+        return match?.id ?? variants[0]?.id ?? product.defaultVariantId
+    })()
 
     const handleAddToCart = async () => {
         if (!variantId) {
@@ -159,9 +167,15 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
         : 0
 
     const images = product.images && product.images.length > 0 ? product.images : ["/placeholder.svg"]
-    const sizes = product.variations?.sizes || ["S", "M", "L", "XL", "XXL"]
-    const colors = product.variations?.colors || []
-    const categoryName = typeof product.category === 'object' ? product.category.name : product.category
+
+    // Parse variant options from optionsJson (JSON string like {"size":"M","color":"Blue"})
+    const parsedVariantOptions: Array<Record<string, string>> = (product.variants ?? []).map((v: any) => {
+        try { return JSON.parse(v.optionsJson || "{}") } catch { return {} }
+    })
+    const sizes: string[] = [...new Set(parsedVariantOptions.map((o) => o.size).filter(Boolean))]
+    const colors: string[] = [...new Set(parsedVariantOptions.map((o) => o.color).filter(Boolean))]
+
+    const categoryName = product.categoryName || (typeof product.category === 'object' ? product.category.name : "")
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -219,7 +233,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 {/* Right Column: Product Details */}
                 <div className="w-full lg:w-[42%] space-y-6">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brand || "Baefikra"}</h3>
+                        <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brandName || (product.brand && !/^[0-9a-f-]{36}$/i.test(product.brand) ? product.brand : "") || "Baefikra"}</h3>
                         <h1 className="text-xl md:text-2xl font-normal text-gray-800 leading-snug mb-2">{product.name}</h1>
 
                         {/* Price Section */}
@@ -249,17 +263,17 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                         <div>
                             <h3 className="font-semibold text-sm uppercase tracking-wide mb-3">Select Color</h3>
                             <div className="flex flex-wrap gap-3">
-                                {colors.map((color: any) => (
+                                {colors.map((color: string) => (
                                     <button
-                                        key={color.name}
-                                        onClick={() => setSelectedColor(color.name)}
-                                        className={`w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color.name
-                                                ? 'border-black ring-2 ring-offset-2 ring-black'
-                                                : 'border-gray-300 hover:border-gray-400'
+                                        key={color}
+                                        onClick={() => setSelectedColor(color)}
+                                        className={`px-3 h-8 rounded border-2 text-sm transition-all ${selectedColor === color
+                                                ? 'border-black bg-black text-white'
+                                                : 'border-gray-300 text-gray-600 hover:border-black'
                                             }`}
-                                        style={{ backgroundColor: color.code }}
-                                        title={color.name}
-                                    />
+                                    >
+                                        {color}
+                                    </button>
                                 ))}
                             </div>
                             {selectedColor && <p className="text-sm text-gray-600 mt-2">{selectedColor}</p>}
@@ -404,14 +418,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                 {product.description}
 
                                 <div className="grid grid-cols-2 gap-4 mt-6 bg-gray-50 p-4 rounded">
-                                    <div>
-                                        <b className="text-gray-900 block mb-1">Product Details</b>
-                                        <p className="text-xs">{categoryName} | {product.brand || "Baefikra"}</p>
-                                    </div>
-                                    <div>
-                                        <b className="text-gray-900 block mb-1">Material</b>
-                                        <p className="text-xs">100% Cotton</p>
-                                    </div>
+                                    {categoryName && (
+                                        <div>
+                                            <b className="text-gray-900 block mb-1">Category</b>
+                                            <p className="text-xs">{categoryName}</p>
+                                        </div>
+                                    )}
+                                    {(product.brandName || product.brand) && !/^[0-9a-f-]{36}$/i.test(product.brandName || product.brand) && (
+                                        <div>
+                                            <b className="text-gray-900 block mb-1">Brand</b>
+                                            <p className="text-xs">{product.brandName || product.brand}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </TabsContent>
                             <TabsContent value="reviews" className="pt-4">

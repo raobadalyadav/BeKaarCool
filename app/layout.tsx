@@ -7,6 +7,8 @@ import { env } from "@/lib/env";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // Primary font for headings - Modern, geometric, fashion-forward
 const outfit = Outfit({
@@ -28,11 +30,12 @@ export const metadata: Metadata = generateSEOMetadata({
   keywords: ["oversized t-shirts", "streetwear", "urban fashion", "unisex apparel", "graphic tees", "lifestyle brand", "india fashion"]
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en" suppressHydrationWarning className={`${outfit.variable} ${plusJakarta.variable}`}>
       <head>
@@ -42,7 +45,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={plusJakarta.className}>
-        <Providers>
+        <Providers session={session}>
           {children}
           <Script
             src="https://checkout.razorpay.com/v1/checkout.js"

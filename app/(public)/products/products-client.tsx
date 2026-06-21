@@ -66,36 +66,19 @@ export default function ProductsPageClient() {
     sizes: [],
     priceRange: { min: 0, max: 10000 }
   })
+  // name → id maps for resolving filter selections to API IDs
+  const categoryIdMapRef = useRef<Record<string, string>>({})
+  const brandIdMapRef = useRef<Record<string, string>>({})
 
   const searchParams = useSearchParams()
   const debouncedSearch = useDebounce(searchQuery, 500)
 
-  // Initialize filters from URL parameters
-  useEffect(() => {
-    if (!initialized) {
-      const categoryParam = searchParams.get('category')
-      const searchParam = searchParams.get('search')
-      const sortParam = searchParams.get('sort')
-      const featuredParam = searchParams.get('featured')
-
-      if (categoryParam) {
-        setSelectedCategories([categoryParam])
-      }
-      if (searchParam) {
-        setSearchQuery(searchParam)
-      }
-      if (sortParam && ['featured', 'price-low', 'price-high', 'rating', 'newest', 'trending'].includes(sortParam)) {
-        setSortBy(sortParam)
-      }
-      if (featuredParam === 'true') {
-        // Could add featured filter
-      }
-
-      setInitialized(true)
-    }
-  }, [searchParams, initialized])
+  const fetchingRef = useRef(false)
+  const filterOptionsFetchedRef = useRef(false)
 
   const fetchProducts = useCallback(async () => {
+    if (fetchingRef.current) return
+    fetchingRef.current = true
     setLoading(true)
     setError(null)
 
@@ -130,9 +113,17 @@ export default function ProductsPageClient() {
         }))
         total = result.estimatedTotalHits
       } else {
+        const categoryId = selectedCategories.length > 0
+          ? categoryIdMapRef.current[selectedCategories[0]] ?? undefined
+          : undefined
+        const brandId = selectedBrands.length > 0
+          ? brandIdMapRef.current[selectedBrands[0]] ?? undefined
+          : undefined
         const conn = await productsApi.listProducts({
           first: pagination.limit,
           status: "published",
+          categoryId,
+          brandId,
         })
         mapped = conn.edges.map((e) => {
           const v = e.node.variants[0]
@@ -161,15 +152,21 @@ export default function ProductsPageClient() {
       setError("Failed to load products. Please try again.")
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
-  }, [pagination.limit, sortBy, debouncedSearch])
+  }, [pagination.limit, sortBy, debouncedSearch, selectedCategories, selectedBrands])
 
   const fetchFilterOptions = async () => {
     try {
-      const cats = await productsApi.listCategories()
+      const [cats, brands] = await Promise.all([
+        productsApi.listCategories(),
+        productsApi.listBrands(),
+      ])
+      categoryIdMapRef.current = Object.fromEntries(cats.map((c) => [c.name, c.id]))
+      brandIdMapRef.current = Object.fromEntries(brands.map((b) => [b.name, b.id]))
       setFilterOptions({
         categories: cats.map((c) => ({ name: c.name, count: 0 })),
-        brands: [],
+        brands: brands.map((b) => b.name),
         sizes: [],
         priceRange: { min: 0, max: 10000 },
       })
@@ -178,12 +175,23 @@ export default function ProductsPageClient() {
     }
   }
 
-  const filterOptionsFetchedRef = useRef(false)
+  // Fetch filter options BEFORE marking initialized so the first fetchProducts
+  // call always has categoryIdMapRef/brandIdMapRef populated.
   useEffect(() => {
     if (filterOptionsFetchedRef.current) return
     filterOptionsFetchedRef.current = true
-    fetchFilterOptions()
-  }, [])
+
+    const categoryParam = searchParams.get('category')
+    const searchParam = searchParams.get('search')
+    const sortParam = searchParams.get('sort')
+    if (categoryParam) setSelectedCategories([categoryParam])
+    if (searchParam) setSearchQuery(searchParam)
+    if (sortParam && ['featured', 'price-low', 'price-high', 'rating', 'newest', 'trending'].includes(sortParam)) {
+      setSortBy(sortParam)
+    }
+
+    fetchFilterOptions().finally(() => setInitialized(true))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!initialized) return

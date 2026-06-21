@@ -15,7 +15,11 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-const toUiProduct = (p: ProductDto) => {
+const toUiProduct = (
+  p: ProductDto,
+  categoryName?: string,
+  brandName?: string
+) => {
   const v = p.variants?.[0];
   return {
     _id: p.id,
@@ -28,7 +32,9 @@ const toUiProduct = (p: ProductDto) => {
     originalPrice: v?.compareAtMinor ? minorToRupees(v.compareAtMinor) : undefined,
     images: p.images ?? [],
     category: p.categoryId ?? "",
+    categoryName: categoryName ?? "",
     brand: p.brandId ?? "",
+    brandName: brandName ?? "",
     rating: p.ratingAvg ?? 0,
     reviewCount: p.ratingCount ?? 0,
     variants: p.variants ?? [],
@@ -41,8 +47,15 @@ const toUiProduct = (p: ProductDto) => {
 async function getProduct(slug: string) {
   if (!slug || slug === "undefined" || slug === "null") return null;
   try {
-    const product = await productsApi.getProductBySlug(slug);
-    return product ? toUiProduct(product) : null;
+    const [product, categories, brands] = await Promise.all([
+      productsApi.getProductBySlug(slug),
+      productsApi.listCategories().catch(() => []),
+      productsApi.listBrands().catch(() => []),
+    ]);
+    if (!product) return null;
+    const categoryName = categories.find((c) => c.id === product.categoryId)?.name;
+    const brandName = brands.find((b) => b.id === product.brandId)?.name;
+    return toUiProduct(product, categoryName, brandName);
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
@@ -82,7 +95,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return generateSEOMetadata({
     title: `${product.name} | Baefikra`,
     description: product.description?.substring(0, 160) || `Shop ${product.name} at Baefikra`,
-    keywords: [product.category, product.brand].filter(Boolean) as string[],
+    keywords: [product.categoryName, product.brandName].filter(Boolean) as string[],
     image: product.images?.[0],
     url: `${process.env.NEXTAUTH_URL}/products/${product.slug}`,
     type: "product",
@@ -126,6 +139,9 @@ export default async function ProductPage({ params }: Props) {
   const breadcrumbItems = [
     { name: "Home", url: "/" },
     { name: "Products", url: "/products" },
+    ...(product.categoryName
+      ? [{ name: product.categoryName, url: `/products?category=${encodeURIComponent(product.categoryName)}` }]
+      : []),
     { name: product.name, url: `/products/${product.slug}` },
   ];
 

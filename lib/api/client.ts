@@ -116,12 +116,19 @@ export async function rest<T>(opts: RequestOpts): Promise<T> {
   try {
     return await rawRequest<T>(opts);
   } catch (e) {
-    if (e instanceof ApiError && e.status === 401 && isServer) {
-      const refreshed = await refreshAccessTokenServer();
-      if (refreshed) {
-        return await rawRequest<T>({ ...opts, token: refreshed.accessToken });
+    if (e instanceof ApiError && e.status === 401) {
+      if (isServer) {
+        const refreshed = await refreshAccessTokenServer();
+        if (refreshed) {
+          return await rawRequest<T>({ ...opts, token: refreshed.accessToken });
+        }
+        await clearServerTokens();
+      } else {
+        const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
+        if (refreshRes.ok) {
+          return await rawRequest<T>(opts);
+        }
       }
-      await clearServerTokens();
     }
     throw e;
   }
@@ -179,12 +186,21 @@ export async function gql<T>(args: {
   try {
     return await exec(args.token);
   } catch (e) {
-    if (e instanceof ApiError && e.status === 401 && isServer) {
-      const refreshed = await refreshAccessTokenServer();
-      if (refreshed) {
-        return await exec(refreshed.accessToken);
+    if (e instanceof ApiError && e.status === 401) {
+      if (isServer) {
+        const refreshed = await refreshAccessTokenServer();
+        if (refreshed) {
+          return await exec(refreshed.accessToken);
+        }
+        await clearServerTokens();
+      } else {
+        // Browser: ask the Next.js API route to refresh the HttpOnly cookies
+        const refreshRes = await fetch("/api/auth/refresh-tokens", { method: "POST" });
+        if (refreshRes.ok) {
+          // Cookies are now updated server-side; browser sends them automatically
+          return await exec(args.token);
+        }
       }
-      await clearServerTokens();
     }
     throw e;
   }

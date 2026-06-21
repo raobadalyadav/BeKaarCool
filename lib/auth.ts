@@ -25,8 +25,38 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         totpCode: { label: "2FA code", type: "text" },
+        accessToken: { label: "Access Token", type: "text" },
       },
       async authorize(credentials) {
+        // Google OAuth bridge: token already verified by backend, fetch profile with it
+        if (credentials?.accessToken) {
+          try {
+            const data = await gql<{
+              me: {
+                id: string;
+                email: string;
+                firstName?: string;
+                lastName?: string;
+                role: string;
+                emailVerified: boolean;
+              };
+            }>({
+              query: `query { me { id email firstName lastName role emailVerified } }`,
+              token: credentials.accessToken,
+            });
+            const u = data.me;
+            return {
+              id: u.id,
+              email: u.email,
+              name: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+              role: u.role,
+              emailVerified: u.emailVerified,
+            };
+          } catch {
+            return null;
+          }
+        }
+
         if (!credentials?.email || !credentials?.password) return null;
         try {
           const data = await gql<{ loginWithEmail: AuthPayload }>({
