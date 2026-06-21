@@ -235,6 +235,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     <div>
                         <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brandName || (product.brand && !/^[0-9a-f-]{36}$/i.test(product.brand) ? product.brand : "") || "Baefikra"}</h3>
                         <h1 className="text-xl md:text-2xl font-normal text-gray-800 leading-snug mb-2">{product.name}</h1>
+                        {product.shortDescription && (
+                            <p className="text-sm text-gray-500 leading-relaxed">{product.shortDescription}</p>
+                        )}
 
                         {/* Price Section */}
                         <div className="flex items-baseline gap-3 mt-4">
@@ -400,17 +403,36 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                         </div>
                     </div>
 
+                    {/* Tags */}
+                    {product.tags && product.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pt-2">
+                            {product.tags.map((tag: string) => (
+                                <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{tag}</span>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Description Tabs */}
                     <div className="mt-8">
                         <Tabs defaultValue="desc" className="w-full">
-                            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6">
-                                <TabsTrigger value="desc" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500">
+                            <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent gap-6 overflow-x-auto">
+                                <TabsTrigger value="desc" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Description
                                 </TabsTrigger>
-                                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500">
+                                {product.highlights && product.highlights.length > 0 && (
+                                    <TabsTrigger value="highlights" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                        Highlights
+                                    </TabsTrigger>
+                                )}
+                                {product.specificationsJson && (
+                                    <TabsTrigger value="specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                        Specifications
+                                    </TabsTrigger>
+                                )}
+                                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Reviews ({product.reviews?.length ?? product.reviewCount ?? 0})
                                 </TabsTrigger>
-                                <TabsTrigger value="qna" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500">
+                                <TabsTrigger value="qna" className="rounded-none border-b-2 border-transparent data-[state=active]:border-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                     Q&amp;A ({questions.length})
                                 </TabsTrigger>
                             </TabsList>
@@ -432,6 +454,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                     )}
                                 </div>
                             </TabsContent>
+                            {product.highlights && product.highlights.length > 0 && (
+                                <TabsContent value="highlights" className="pt-4">
+                                    <ul className="space-y-2">
+                                        {product.highlights.map((h: string, i: number) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0" />
+                                                {h}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </TabsContent>
+                            )}
+                            {product.specificationsJson && (
+                                <TabsContent value="specs" className="pt-4">
+                                    <SpecificationsTable json={product.specificationsJson} />
+                                </TabsContent>
+                            )}
                             <TabsContent value="reviews" className="pt-4">
                                 <ReviewSection productId={product._id} reviews={product.reviews || []} />
                             </TabsContent>
@@ -460,4 +499,25 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
 
 function Separator({ className }: { className?: string }) {
     return <div className={`h-[1px] w-full ${className}`} />
+}
+
+function SpecificationsTable({ json }: { json: string }) {
+    let specs: Record<string, string> = {}
+    try { specs = JSON.parse(json) } catch { return null }
+    const entries = Object.entries(specs)
+    if (entries.length === 0) return null
+    return (
+        <div className="overflow-hidden rounded-lg border">
+            <table className="w-full text-sm">
+                <tbody>
+                    {entries.map(([key, val], i) => (
+                        <tr key={key} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                            <td className="px-4 py-2.5 font-medium text-gray-700 w-2/5 capitalize">{key.replace(/_/g, " ")}</td>
+                            <td className="px-4 py-2.5 text-gray-600">{val}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    )
 }

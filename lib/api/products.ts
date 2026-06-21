@@ -11,9 +11,9 @@ import type {
 const PRODUCT_FIELDS = `
   id slug title descriptionHtml status
   ratingAvg ratingCount brandId categoryId
-  images
-  createdAt
-  variants { id sku priceMinor compareAtMinor weightGrams optionsJson inStock }
+  images createdAt
+  shortDescription highlights tags specificationsJson attributesJson
+  variants { id sku priceMinor compareAtMinor costMinor weightGrams optionsJson inStock }
 `;
 
 export async function listProducts(args?: {

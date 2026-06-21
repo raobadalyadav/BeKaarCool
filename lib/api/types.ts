@@ -16,6 +16,7 @@ export interface VariantDto {
   /** money in minor units (paise) as string */
   priceMinor: string;
   compareAtMinor?: string | null;
+  costMinor?: string | null;
   weightGrams?: number | null;
   /** JSON-stringified Record<string,string> */
   optionsJson: string;
@@ -35,6 +36,21 @@ export interface ProductDto {
   images: string[];
   variants: VariantDto[];
   createdAt: string;
+  // Extended fields
+  shortDescription?: string;
+  highlights: string[];
+  tags: string[];
+  specificationsJson?: string;
+  attributesJson?: string;
+}
+
+export interface AdminDashboardStats {
+  totalProducts: number;
+  totalOrders: number;
+  totalCustomers: number;
+  totalRevenueMinor: string;
+  pendingOrders: number;
+  lowStockVariants: number;
 }
 
 export interface ProductEdge {
