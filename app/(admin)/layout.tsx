@@ -7,7 +7,7 @@ import Link from "next/link"
 import {
   LayoutDashboard, Package, Tags, Award, ShoppingBag,
   Warehouse, TicketPercent, Users, LogOut, Menu, X, ChevronRight,
-  Layers, Star, FileText,
+  Layers, Star, FileText, BarChart2,
 } from "lucide-react"
 import { useState } from "react"
 import { signOut } from "next-auth/react"
@@ -24,6 +24,7 @@ const NAV = [
   { href: "/admin/coupons", label: "Coupons", icon: TicketPercent },
   { href: "/admin/content", label: "Content", icon: FileText },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart2 },
 ]
 
 const ADMIN_ROLES = new Set(["admin", "manager", "support", "finance", "content"])

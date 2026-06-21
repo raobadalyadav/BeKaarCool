@@ -12,6 +12,10 @@ import { useToast } from "@/hooks/use-toast"
 import { ReviewSection } from "@/components/product/review-section"
 import { ProductCard } from "@/components/product/product-card"
 import { useSession } from "next-auth/react"
+import { ReviewSummary } from "@/components/ai/review-summary"
+import { FitGuide } from "@/components/product/fit-guide"
+import { RingSizeGuide } from "@/components/product/ring-size-guide"
+import { DeviceCompatibility } from "@/components/product/device-compatibility"
 
 interface QnaAnswer {
     id: string
@@ -48,6 +52,7 @@ import * as alertsApi from "@/lib/api/alerts"
 import { QnaSection } from "@/components/product/qna-section"
 import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed"
+import { aiProductRecommendations } from "@/lib/api/ai"
 
 export default function ProductDetailClient({ product, relatedProducts = [], questions = [] }: ProductDetailClientProps) {
     const router = useRouter()
@@ -286,11 +291,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
 
     const categoryName = product.categoryName || (typeof product.category === 'object' ? product.category.name : "")
 
+    const brandName = product.brandName || (product.brand && !/^[0-9a-f-]{36}$/i.test(product.brand) ? product.brand : "") || "Baefikra"
+
+    // Fashion & jewellery attributes parsed from attributesJson
+    let fashionAttrs: Record<string, unknown> = {}
+    try {
+        if (product.attributesJson) fashionAttrs = JSON.parse(product.attributesJson)
+    } catch { /* */ }
+    const fitGuide = fashionAttrs.fitGuide as { columns: string[]; rows: Record<string, string>[] } | undefined
+    const careInstructions: string[] = Array.isArray(fashionAttrs.careInstructions) ? fashionAttrs.careInstructions as string[] : []
+    const compatibility: string[] = Array.isArray(fashionAttrs.compatibility) ? fashionAttrs.compatibility as string[] : []
+    const showRingSizeGuide = !!fashionAttrs.ringSizeGuide
+    const hasSizeFitTab = !!(fitGuide || careInstructions.length > 0)
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-            <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
+            {/* Mobile-only: title shown above the image */}
+            <div className="lg:hidden mb-3">
+                <p className="text-sm font-semibold text-gray-500 mb-0.5">{brandName}</p>
+                <h1 className="text-lg font-normal text-gray-800 leading-snug">{product.name}</h1>
+            </div>
+
+            {/* flex-col on mobile so image comes after title, flex-row on desktop */}
+            <div className="flex flex-col lg:flex-row gap-6 lg:gap-12">
                 {/* Left Column: Image Gallery */}
-                <div className="w-full lg:w-[58%] flex flex-col-reverse lg:flex-row gap-4 h-fit lg:sticky lg:top-24">
+                <div className="w-full lg:w-[58%] flex flex-col lg:flex-row gap-4 h-fit lg:sticky lg:top-24">
                     {/* Thumbnails (Vertical on Desktop) */}
                     <div className="hidden lg:flex flex-col gap-4 w-20 flex-shrink-0 h-[600px] overflow-y-auto scrollbar-hide">
                         {media.map((item, idx) => (
@@ -357,12 +382,19 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 </div>
 
                 {/* Right Column: Product Details */}
-                <div className="w-full lg:w-[42%] space-y-6">
+                <div className="w-full lg:w-[42%] space-y-5">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-500 mb-1">{product.brandName || (product.brand && !/^[0-9a-f-]{36}$/i.test(product.brand) ? product.brand : "") || "Baefikra"}</h3>
-                        <h1 className="text-xl md:text-2xl font-normal text-gray-800 leading-snug mb-2">{product.name}</h1>
+                        {/* Desktop-only title (on mobile it's shown above the image) */}
+                        <div className="hidden lg:block">
+                            <h3 className="text-lg font-semibold text-gray-500 mb-1">{brandName}</h3>
+                            <h1 className="text-xl md:text-2xl font-normal text-gray-800 leading-snug mb-2">{product.name}</h1>
+                            {product.shortDescription && (
+                                <p className="text-sm text-gray-500 leading-relaxed">{product.shortDescription}</p>
+                            )}
+                        </div>
+                        {/* Mobile: short description only (title already shown above) */}
                         {product.shortDescription && (
-                            <p className="text-sm text-gray-500 leading-relaxed">{product.shortDescription}</p>
+                            <p className="lg:hidden text-sm text-gray-500 leading-relaxed mb-2">{product.shortDescription}</p>
                         )}
 
                         {/* Price Section */}
@@ -438,9 +470,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     <div>
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="font-semibold text-sm uppercase tracking-wide">Select Size</h3>
-                            <Link href="/size-guide" className="text-teal-600 text-sm font-semibold flex items-center gap-1 hover:underline">
-                                <Ruler className="w-4 h-4" /> Size Guide
-                            </Link>
+                            <div className="flex items-center gap-3">
+                                {showRingSizeGuide && <RingSizeGuide />}
+                                <Link href="/size-guide" className="text-teal-600 text-sm font-semibold flex items-center gap-1 hover:underline">
+                                    <Ruler className="w-4 h-4" /> Size Guide
+                                </Link>
+                            </div>
                         </div>
                         <div className="flex flex-wrap gap-3">
                             {sizes.map((size: string) => (
@@ -486,69 +521,80 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-2 pt-4">
-                        {(product.stock ?? 100) <= 0 ? (
-                            <Button
-                                className="flex-1 bg-gray-900 hover:bg-black text-white font-bold h-12 text-sm uppercase tracking-wider"
-                                onClick={handleNotifyMe}
-                                disabled={notifyLoading || notifySubscribed}
-                            >
-                                {notifyLoading ? (
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                ) : null}
-                                {notifySubscribed
-                                    ? "We'll notify you"
-                                    : "Notify me when in stock"}
-                            </Button>
-                        ) : (
-                            <Button
-                                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-12 text-sm uppercase tracking-wider"
-                                onClick={handleAddToCart}
-                                disabled={loading}
-                            >
-                                {loading ? (
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                ) : (
-                                    <ShoppingBag className="w-4 h-4 mr-2" />
-                                )}
-                                {loading ? "Adding..." : "Add to Bag"}
-                            </Button>
-                        )}
-                        <Button
-                            className="flex-1 bg-black hover:bg-gray-800 text-white font-bold h-12 text-sm uppercase tracking-wider"
-                            onClick={handleBuyNow}
-                            disabled={loading || (product.stock ?? 100) <= 0}
-                        >
-                            Buy Now
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className={`h-12 px-6 border-gray-300 ${isWishlisted ? 'text-[#F38508] border-[#F38508]/30 bg-orange-50' : 'text-gray-600'}`}
-                            onClick={handleWishlist}
-                            disabled={wishlistLoading}
-                        >
-                            {wishlistLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                    <div className="space-y-2 pt-4">
+                        {/* Row 1: Primary CTAs */}
+                        <div className="flex gap-2">
+                            {(product.stock ?? 100) <= 0 ? (
+                                <Button
+                                    className="flex-1 bg-gray-900 hover:bg-black text-white font-bold h-12 text-sm uppercase tracking-wider"
+                                    onClick={handleNotifyMe}
+                                    disabled={notifyLoading || notifySubscribed}
+                                >
+                                    {notifyLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                                    {notifySubscribed ? "We'll notify you" : "Notify me when in stock"}
+                                </Button>
                             ) : (
-                                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                                <Button
+                                    className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-12 text-sm uppercase tracking-wider"
+                                    onClick={handleAddToCart}
+                                    disabled={loading}
+                                >
+                                    {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShoppingBag className="w-4 h-4 mr-2" />}
+                                    {loading ? "Adding..." : "Add to Bag"}
+                                </Button>
                             )}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black transition-colors"
-                            onClick={handleShare}
-                            title="Share Product"
-                        >
-                            <Share2 className="w-5 h-5" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black transition-colors"
-                            onClick={handleCompare}
-                            title="Compare Product"
-                        >
-                            <GitCompare className="w-5 h-5" />
-                        </Button>
+                            <Button
+                                className="flex-1 bg-black hover:bg-gray-800 text-white font-bold h-12 text-sm uppercase tracking-wider"
+                                onClick={handleBuyNow}
+                                disabled={loading || (product.stock ?? 100) <= 0}
+                            >
+                                Buy Now
+                            </Button>
+                            {/* Desktop: icon buttons inline with CTAs */}
+                            <Button
+                                variant="outline"
+                                className={`hidden lg:flex h-12 px-4 border-gray-300 ${isWishlisted ? 'text-[#F38508] border-[#F38508]/30 bg-orange-50' : 'text-gray-600'}`}
+                                onClick={handleWishlist}
+                                disabled={wishlistLoading}
+                            >
+                                {wishlistLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />}
+                            </Button>
+                            <Button variant="outline" className="hidden lg:flex h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black" onClick={handleShare}>
+                                <Share2 className="w-5 h-5" />
+                            </Button>
+                            <Button variant="outline" className="hidden lg:flex h-12 w-12 px-0 border-gray-300 text-gray-600 hover:text-black hover:border-black" onClick={handleCompare}>
+                                <GitCompare className="w-5 h-5" />
+                            </Button>
+                        </div>
+
+                        {/* Row 2: Mobile-only secondary actions */}
+                        <div className="flex lg:hidden gap-2">
+                            <Button
+                                variant="outline"
+                                className={`flex-1 h-11 border-gray-300 flex items-center justify-center gap-2 text-sm font-medium ${isWishlisted ? 'text-[#F38508] border-[#F38508]/40 bg-orange-50' : 'text-gray-700'}`}
+                                onClick={handleWishlist}
+                                disabled={wishlistLoading}
+                            >
+                                {wishlistLoading
+                                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                                    : <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />}
+                                Wishlist
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="flex-1 h-11 border-gray-300 text-gray-700 flex items-center justify-center gap-2 text-sm font-medium hover:border-black"
+                                onClick={handleShare}
+                            >
+                                <Share2 className="w-4 h-4" /> Share
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="flex-1 h-11 border-gray-300 text-gray-700 flex items-center justify-center gap-2 text-sm font-medium hover:border-black"
+                                onClick={handleCompare}
+                            >
+                                <GitCompare className="w-4 h-4" /> Compare
+                            </Button>
+                        </div>
                     </div>
 
                     <Separator className="bg-gray-100" />
@@ -660,6 +706,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                         </div>
                     )}
 
+                    {/* Device Compatibility */}
+                    {compatibility.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                            <h3 className="font-semibold text-sm uppercase tracking-wide">Compatible Devices</h3>
+                            <DeviceCompatibility devices={compatibility} />
+                        </div>
+                    )}
+
                     {/* Description Tabs */}
                     <div className="mt-8">
                         <Tabs defaultValue="desc" className="w-full">
@@ -675,6 +729,11 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                 {product.specificationsJson && (
                                     <TabsTrigger value="specs" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
                                         Specifications
+                                    </TabsTrigger>
+                                )}
+                                {hasSizeFitTab && (
+                                    <TabsTrigger value="sizefit" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
+                                        Size &amp; Fit
                                     </TabsTrigger>
                                 )}
                                 <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#F38508] data-[state=active]:text-black data-[state=active]:shadow-none px-0 py-3 text-gray-500 whitespace-nowrap">
@@ -719,7 +778,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                                     <SpecificationsTable json={product.specificationsJson} />
                                 </TabsContent>
                             )}
+                            {hasSizeFitTab && (
+                                <TabsContent value="sizefit" className="pt-4 space-y-6">
+                                    {fitGuide && (
+                                        <div>
+                                            <h4 className="font-semibold text-sm mb-3">Size Chart</h4>
+                                            <FitGuide fitGuide={fitGuide} />
+                                        </div>
+                                    )}
+                                    {careInstructions.length > 0 && (
+                                        <div>
+                                            <h4 className="font-semibold text-sm mb-2">Care Instructions</h4>
+                                            <ul className="space-y-1.5">
+                                                {careInstructions.map((c, i) => (
+                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#F38508] flex-shrink-0" />
+                                                        {c}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </TabsContent>
+                            )}
                             <TabsContent value="reviews" className="pt-4">
+                                <ReviewSummary productId={product.id ?? product._id} />
                                 <ReviewSection productId={product._id} reviews={product.reviews || []} />
                             </TabsContent>
                             <TabsContent value="qna" className="pt-4">
@@ -767,6 +850,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                 </div>
             )}
 
+            {/* AI Recommendations */}
+            <AiProductRecs productId={product.id ?? product._id} />
+
             {/* Recently Viewed */}
             <div className="mt-4 border-t border-gray-100 pt-8">
                 <RecentlyViewedStrip excludeId={product.id ?? product._id} />
@@ -805,6 +891,32 @@ export default function ProductDetailClient({ product, relatedProducts = [], que
                     </div>
                 </DialogContent>
             </Dialog>
+        </div>
+    )
+}
+
+function AiProductRecs({ productId }: { productId: string }) {
+    const [recs, setRecs] = useState<any[]>([])
+    useEffect(() => {
+        aiProductRecommendations(productId).then(setRecs).catch(() => undefined)
+    }, [productId])
+    if (recs.length === 0) return null
+    return (
+        <div className="mt-12">
+            <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <span className="text-[#F38508]">✨</span> AI Picks For You
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {recs.map((p: any) => {
+                    const mapped = {
+                        _id: p.id, id: p.id, slug: p.slug, title: p.title, name: p.title,
+                        images: p.images,
+                        price: p.variants?.[0]?.priceMinor ? Number(p.variants[0].priceMinor) / 100 : 0,
+                        originalPrice: p.variants?.[0]?.compareAtMinor ? Number(p.variants[0].compareAtMinor) / 100 : 0,
+                    }
+                    return <ProductCard key={p.id} product={mapped} />
+                })}
+            </div>
         </div>
     )
 }

@@ -156,16 +156,18 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
             ₹{Math.floor(product.price * 0.9)} for TriBe Members
           </div>
 
-          {/* Add to Cart - List View Only or Desktop Hover (Optional - keeping clean for mobile-first grid) */}
-          {viewMode === "list" && (
-            <Button
-              onClick={handleAddToCart}
-              className="mt-3 w-full bg-[#F38508] hover:bg-[#D97706] text-white font-bold h-8 text-xs"
-              disabled={isOutOfStock || isLoading}
-            >
-              {isOutOfStock ? "Out of Stock" : isLoading ? "Adding..." : "ADD TO BAG"}
-            </Button>
-          )}
+          {/* Add to Cart — always visible */}
+          <Button
+            onClick={handleAddToCart}
+            className={`mt-3 w-full font-bold h-9 text-xs tracking-wide transition-colors ${
+              isOutOfStock
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100"
+                : "bg-[#F38508] hover:bg-[#D97706] text-white"
+            }`}
+            disabled={isOutOfStock || isLoading}
+          >
+            {isOutOfStock ? "Out of Stock" : isLoading ? "Adding..." : "ADD TO BAG"}
+          </Button>
         </CardContent>
       </Card>
     </Link>

@@ -9,6 +9,7 @@ import Script from "next/script";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Chatbot } from "@/components/ai/chatbot";
 
 // Body font — Inter: modern, clean, highly readable
 const inter = Inter({
@@ -98,6 +99,7 @@ export default async function RootLayout({
             }}
           />
           <SonnerToaster />
+          <Chatbot />
         </Providers>
       </body>
     </html>

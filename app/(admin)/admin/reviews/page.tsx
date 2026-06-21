@@ -11,6 +11,7 @@ type Review = {
   rating: number
   title?: string
   body?: string
+  images?: string[]
   verifiedPurchase: boolean
   status: string
   helpfulCount: number
@@ -166,6 +167,18 @@ export default function AdminReviewsPage() {
                     )}
                     {review.body && (
                       <p className="text-sm text-gray-600 line-clamp-3">{review.body}</p>
+                    )}
+                    {review.images && review.images.length > 0 && (
+                      <div className="flex gap-1.5 mt-2 flex-wrap">
+                        {review.images.map((src, i) => (
+                          <img
+                            key={i}
+                            src={src}
+                            alt={`Review image ${i + 1}`}
+                            className="object-cover w-12 h-16 rounded border"
+                          />
+                        ))}
+                      </div>
                     )}
                     <p className="text-xs text-gray-400 mt-1">
                       Helpful: {review.helpfulCount} · Not helpful: {review.notHelpfulCount}

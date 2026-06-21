@@ -62,6 +62,7 @@ export async function adminCreateProduct(input: {
   tagsJson?: string;
   specificationsJson?: string;
   imagesJson?: string;
+  fashionAttrsJson?: string;
 }): Promise<ProductDto> {
   const data = await gql<{ adminCreateProduct: ProductDto }>({
     query: `
@@ -91,6 +92,7 @@ export async function adminUpdateProduct(
     tagsJson?: string;
     specificationsJson?: string;
     imagesJson?: string;
+    fashionAttrsJson?: string;
   }
 ): Promise<ProductDto> {
   const data = await gql<{ adminUpdateProduct: ProductDto }>({
@@ -439,6 +441,7 @@ export async function adminListReviews(args?: { first?: number; status?: string;
       rating: number;
       title?: string;
       body?: string;
+      images?: string[];
       verifiedPurchase: boolean;
       status: string;
       helpfulCount: number;
@@ -450,7 +453,7 @@ export async function adminListReviews(args?: { first?: number; status?: string;
     query: `
       query AdminListReviews($first: Int, $status: String, $productId: String) {
         adminListReviews(first: $first, status: $status, productId: $productId) {
-          id productId productTitle rating title body
+          id productId productTitle rating title body images
           verifiedPurchase status helpfulCount notHelpfulCount createdAt reviewerName
         }
       }
@@ -485,6 +488,121 @@ export async function adminDeleteReview(id: string): Promise<boolean> {
     cache: "no-store",
   });
   return data.adminDeleteReview;
+}
+
+// ─── Inventory Ledger & Low Stock ─────────────────────────────────────────
+
+export async function adminInventoryLedger(variantId?: string, limit = 100) {
+  const data = await gql<{
+    adminInventoryLedger: Array<{
+      id: string;
+      variantId: string;
+      sku?: string;
+      productTitle?: string;
+      delta: number;
+      field: string;
+      reason: string;
+      referenceType?: string;
+      referenceId?: string;
+      createdAt: string;
+    }>;
+  }>({
+    query: `
+      query AdminInventoryLedger($variantId: String, $limit: Int) {
+        adminInventoryLedger(variantId: $variantId, limit: $limit) {
+          id variantId sku productTitle delta field reason referenceType referenceId createdAt
+        }
+      }
+    `,
+    variables: { variantId: variantId ?? null, limit },
+    cache: "no-store",
+  });
+  return data.adminInventoryLedger;
+}
+
+export async function adminLowStockVariants(threshold = 10) {
+  const data = await gql<{
+    adminLowStockVariants: Array<{
+      variantId: string;
+      available: number;
+      sku?: string;
+      productTitle?: string;
+      optionsLabel?: string;
+      onHand: number;
+      reserved: number;
+    }>;
+  }>({
+    query: `
+      query AdminLowStockVariants($threshold: Int) {
+        adminLowStockVariants(threshold: $threshold) {
+          variantId available sku productTitle optionsLabel onHand reserved
+        }
+      }
+    `,
+    variables: { threshold },
+    cache: "no-store",
+  });
+  return data.adminLowStockVariants;
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────
+
+export async function adminSalesReport(days = 30) {
+  const data = await gql<{
+    adminSalesReport: Array<{
+      date: string;
+      totalMinor: string;
+      orderCount: number;
+    }>;
+  }>({
+    query: `
+      query AdminSalesReport($days: Int) {
+        adminSalesReport(days: $days) { date totalMinor orderCount }
+      }
+    `,
+    variables: { days },
+    cache: "no-store",
+  });
+  return data.adminSalesReport;
+}
+
+export async function adminProductAnalytics(limit = 10) {
+  const data = await gql<{
+    adminProductAnalytics: Array<{
+      productId: string;
+      productTitle: string;
+      unitsSold: number;
+      revenueMinor: string;
+    }>;
+  }>({
+    query: `
+      query AdminProductAnalytics($limit: Int) {
+        adminProductAnalytics(limit: $limit) { productId productTitle unitsSold revenueMinor }
+      }
+    `,
+    variables: { limit },
+    cache: "no-store",
+  });
+  return data.adminProductAnalytics;
+}
+
+export async function adminCustomerAnalytics() {
+  const data = await gql<{
+    adminCustomerAnalytics: {
+      totalCustomers: number;
+      newThisMonth: number;
+      returningCount: number;
+      ordersThisMonth: number;
+    };
+  }>({
+    query: `
+      query AdminCustomerAnalytics {
+        adminCustomerAnalytics { totalCustomers newThisMonth returningCount ordersThisMonth }
+      }
+    `,
+    cache: "no-store",
+  });
+  return data.adminCustomerAnalytics;
 }
 
 // ─── Customers ────────────────────────────────────────────────────────────

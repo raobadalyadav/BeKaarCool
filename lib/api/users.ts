@@ -119,6 +119,22 @@ export async function requestAccountDeletion(): Promise<boolean> {
   return data.requestAccountDeletion;
 }
 
+export async function myNotificationPreferences(): Promise<Array<{ purpose: string; granted: boolean }>> {
+  const data = await gql<{ myNotificationPreferences: Array<{ purpose: string; granted: boolean }> }>({
+    query: `query { myNotificationPreferences { purpose granted } }`,
+    cache: "no-store",
+  });
+  return data.myNotificationPreferences;
+}
+
+export async function updateNotificationPreference(purpose: string, granted: boolean): Promise<boolean> {
+  const data = await gql<{ updateNotificationPreference: boolean }>({
+    query: `mutation U($purpose: String!, $granted: Boolean!) { updateNotificationPreference(purpose: $purpose, granted: $granted) }`,
+    variables: { purpose, granted },
+  });
+  return data.updateNotificationPreference;
+}
+
 export async function resolvePincode(pincode: string): Promise<{ city: string; state: string } | null> {
   const data = await gql<{ resolvePincode: { city: string; state: string } | null }>({
     query: `

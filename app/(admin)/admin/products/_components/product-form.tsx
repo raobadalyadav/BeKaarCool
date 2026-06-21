@@ -56,6 +56,26 @@ export function ProductForm({ product }: Props) {
     } catch { return "" }
   })
 
+  // Fashion / Jewellery / Mobile Accessories attributes
+  const [fashionFabric, setFashionFabric] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); return (a.fabric as string) ?? "" } catch { return "" }
+  })
+  const [fashionFitType, setFashionFitType] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); return (a.fitType as string) ?? "" } catch { return "" }
+  })
+  const [fashionCareText, setFashionCareText] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); const c = a.careInstructions; return Array.isArray(c) ? c.join("\n") : "" } catch { return "" }
+  })
+  const [fashionFitGuideJson, setFashionFitGuideJson] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); return a.fitGuide ? JSON.stringify(a.fitGuide, null, 2) : "" } catch { return "" }
+  })
+  const [fashionRingSizeGuide, setFashionRingSizeGuide] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); return !!a.ringSizeGuide } catch { return false }
+  })
+  const [fashionCompatibilityText, setFashionCompatibilityText] = useState(() => {
+    try { const a = JSON.parse(product?.attributesJson ?? "{}"); const c = a.compatibility; return Array.isArray(c) ? c.join("\n") : "" } catch { return "" }
+  })
+
   // Variants
   const [variants, setVariants] = useState<VariantForm[]>(() =>
     product?.variants?.map((v) => ({
@@ -107,6 +127,19 @@ export function ProductForm({ product }: Props) {
         }
       })
 
+      // Build fashion attributes JSON
+      const fashionAttrs: Record<string, unknown> = {}
+      if (fashionFabric.trim()) fashionAttrs.fabric = fashionFabric.trim()
+      if (fashionFitType.trim()) fashionAttrs.fitType = fashionFitType.trim()
+      const careArr = fashionCareText.split("\n").map((s) => s.trim()).filter(Boolean)
+      if (careArr.length) fashionAttrs.careInstructions = careArr
+      if (fashionFitGuideJson.trim()) {
+        try { fashionAttrs.fitGuide = JSON.parse(fashionFitGuideJson) } catch { /* skip invalid */ }
+      }
+      if (fashionRingSizeGuide) fashionAttrs.ringSizeGuide = true
+      const compatArr = fashionCompatibilityText.split("\n").map((s) => s.trim()).filter(Boolean)
+      if (compatArr.length) fashionAttrs.compatibility = compatArr
+
       const productInput = {
         slug, title, status,
         brandId: brandId || undefined,
@@ -118,6 +151,7 @@ export function ProductForm({ product }: Props) {
         imagesJson: images.length ? JSON.stringify(images) : undefined,
         videosJson: videos.length ? JSON.stringify(videos) : undefined,
         view360Json: view360.length ? JSON.stringify(view360) : undefined,
+        fashionAttrsJson: Object.keys(fashionAttrs).length ? JSON.stringify(fashionAttrs) : undefined,
       }
 
       let savedProduct: ProductDto
@@ -394,6 +428,86 @@ export function ProductForm({ product }: Props) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Fashion / Jewellery / Mobile Accessories */}
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <h2 className="font-semibold text-gray-900 mb-1">Fashion, Jewellery & Mobile Details</h2>
+            <p className="text-xs text-gray-400 mb-4">Category-specific fields — leave blank if not applicable</p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Fabric / Material</label>
+                  <input
+                    value={fashionFabric}
+                    onChange={(e) => setFashionFabric(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                    placeholder="e.g. 100% Cotton, 925 Sterling Silver"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Fit Type</label>
+                  <select
+                    value={fashionFitType}
+                    onChange={(e) => setFashionFitType(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  >
+                    <option value="">— Select Fit —</option>
+                    <option>Regular Fit</option>
+                    <option>Slim Fit</option>
+                    <option>Oversized Fit</option>
+                    <option>Relaxed Fit</option>
+                    <option>Loose Fit</option>
+                    <option>Skinny Fit</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Care Instructions</label>
+                <p className="text-xs text-gray-400 mb-1">One instruction per line</p>
+                <textarea
+                  value={fashionCareText}
+                  onChange={(e) => setFashionCareText(e.target.value)}
+                  rows={3}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  placeholder={"Machine wash cold\nDo not bleach\nTumble dry low"}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Size Chart (JSON)</label>
+                <p className="text-xs text-gray-400 mb-1">{'{"columns":["Size","Chest"],"rows":[{"Size":"S","Chest":"36"}]}'}</p>
+                <textarea
+                  value={fashionFitGuideJson}
+                  onChange={(e) => setFashionFitGuideJson(e.target.value)}
+                  rows={4}
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  placeholder='{"columns":["Size","Chest (in)","Waist (in)"],"rows":[{"Size":"S","Chest (in)":"36","Waist (in)":"30"}]}'
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="ringSizeGuide"
+                  checked={fashionRingSizeGuide}
+                  onChange={(e) => setFashionRingSizeGuide(e.target.checked)}
+                  className="w-4 h-4 accent-[#F38508]"
+                />
+                <label htmlFor="ringSizeGuide" className="text-sm font-medium text-gray-700">
+                  Show Ring Size Guide on product page (Jewellery)
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Compatible Devices (Mobile Accessories)</label>
+                <p className="text-xs text-gray-400 mb-1">One device per line</p>
+                <textarea
+                  value={fashionCompatibilityText}
+                  onChange={(e) => setFashionCompatibilityText(e.target.value)}
+                  rows={4}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  placeholder={"iPhone 15 Pro Max\niPhone 15 Pro\nSamsung Galaxy S24 Ultra\nOnePlus 12"}
+                />
+              </div>
             </div>
           </div>
         </div>
