@@ -50,7 +50,7 @@ function AvatarInitials({ name, email }: { name?: string; email?: string }) {
     : (email?.[0] ?? "?").toUpperCase()
   return (
     <div className="relative group">
-      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#F38508] to-[#D97706] flex items-center justify-center text-3xl font-black text-black shadow-lg">
+      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-3xl font-black text-black shadow-lg">
         {initials}
       </div>
       <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
@@ -210,7 +210,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <User className="w-4 h-4 text-[#F38508]" /> Personal Information
+            <User className="w-4 h-4 text-brand-500" /> Personal Information
           </CardTitle>
           <CardDescription>Update your name and phone number</CardDescription>
         </CardHeader>
@@ -274,7 +274,7 @@ export default function ProfilePage() {
             <Button
               type="submit"
               disabled={savingProfile || !profileDirty}
-              className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+              className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
             >
               {savingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {savingProfile ? "Saving…" : "Save Changes"}
@@ -287,7 +287,7 @@ export default function ProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Lock className="w-4 h-4 text-[#F38508]" /> Change Password
+            <Lock className="w-4 h-4 text-brand-500" /> Change Password
           </CardTitle>
           <CardDescription>Choose a strong password to secure your account</CardDescription>
         </CardHeader>

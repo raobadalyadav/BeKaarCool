@@ -15,7 +15,7 @@ type Order = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-orange-100 text-[#D97706]",
+  pending: "bg-orange-100 text-brand-600",
   confirmed: "bg-blue-100 text-blue-700",
   processing: "bg-purple-100 text-purple-700",
   shipped: "bg-indigo-100 text-indigo-700",
@@ -99,13 +99,13 @@ export default function AdminOrdersPage() {
             placeholder="Search by order number or user ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="all">All Status</option>
           {Object.keys(STATUS_COLORS).map((s) => (

@@ -99,10 +99,10 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#F38508] items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-brand-500 items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="w-24 h-24 bg-black rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <span className="text-[#F38508] font-bold text-4xl">B</span>
+            <span className="text-brand-500 font-bold text-4xl">B</span>
           </div>
           <h1 className="text-4xl font-bold text-black mb-4">Baefikra</h1>
           <p className="text-xl text-black/80 mb-8">
@@ -138,7 +138,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md py-8">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-[#F38508] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-500 rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-black font-bold text-2xl">B</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Baefikra</h1>
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
-                  className="pl-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("name")}
                 />
               </div>
@@ -186,7 +186,7 @@ export default function RegisterPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("email")}
                 />
               </div>
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                   id="phone"
                   type="tel"
                   placeholder="Enter your phone number"
-                  className="pl-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("phone")}
                 />
               </div>
@@ -216,7 +216,7 @@ export default function RegisterPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
-                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("password")}
                 />
                 <button
@@ -232,7 +232,7 @@ export default function RegisterPage() {
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">Password strength</span>
                     <span className={`font-medium ${passwordStrength < 50 ? 'text-red-500' :
-                        passwordStrength < 75 ? 'text-[#F38508]' : 'text-green-500'
+                        passwordStrength < 75 ? 'text-brand-500' : 'text-green-500'
                       }`}>
                       {passwordStrength < 50 ? 'Weak' : passwordStrength < 75 ? 'Medium' : 'Strong'}
                     </span>
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("confirmPassword")}
                 />
                 <button
@@ -273,11 +273,11 @@ export default function RegisterPage() {
               />
               <Label htmlFor="agreeToTerms" className="text-sm text-gray-600 font-normal leading-tight">
                 I agree to the{" "}
-                <Link href="/terms" className="text-[#F38508] hover:text-[#D97706] font-medium">
+                <Link href="/terms" className="text-brand-500 hover:text-brand-600 font-medium">
                   Terms and Conditions
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-[#F38508] hover:text-[#D97706] font-medium">
+                <Link href="/privacy" className="text-brand-500 hover:text-brand-600 font-medium">
                   Privacy Policy
                 </Link>
               </Label>
@@ -286,7 +286,7 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold text-base mt-2"
+              className="w-full h-12 bg-brand-500 hover:bg-brand-600 text-black font-bold text-base mt-2"
               disabled={loading || googleLoading}
             >
               {loading ? (
@@ -325,7 +325,7 @@ export default function RegisterPage() {
 
             <p className="text-center text-gray-600 mt-6">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-[#F38508] hover:text-[#D97706] font-semibold">
+              <Link href="/auth/login" className="text-brand-500 hover:text-brand-600 font-semibold">
                 Sign in
               </Link>
             </p>

@@ -30,7 +30,7 @@ export default function GlobalError({
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <button
                                 onClick={reset}
-                                className="bg-[#F38508] hover:bg-[#D97706] text-black font-semibold px-6 py-3 rounded-lg inline-flex items-center justify-center"
+                                className="bg-brand-500 hover:bg-brand-600 text-black font-semibold px-6 py-3 rounded-lg inline-flex items-center justify-center"
                             >
                                 Try Again
                             </button>

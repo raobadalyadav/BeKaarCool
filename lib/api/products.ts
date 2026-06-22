@@ -182,6 +182,22 @@ export async function productReviews(
   return data.productReviews;
 }
 
+export async function publicCoupons(limit = 8): Promise<import("./types").CouponDto[]> {
+  const data = await gql<{ publicCoupons: import("./types").CouponDto[] }>({
+    query: `
+      query PublicCoupons($limit: Int!) {
+        publicCoupons(limit: $limit) {
+          id code type valueMinor percentBps usageCount usageLimit
+          isActive startsAt endsAt minOrderMinor maxDiscountMinor
+        }
+      }
+    `,
+    variables: { limit },
+    next: { revalidate: 300, tags: ["coupons"] },
+  });
+  return data.publicCoupons;
+}
+
 export async function productQuestions(productId: string) {
   const data = await gql<{
     productQuestions: Array<{

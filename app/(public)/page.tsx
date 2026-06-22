@@ -3,9 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
 import { ProductCard } from "@/components/product/product-card"
 import {
   Carousel,
@@ -13,6 +11,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel"
 import {
   ChevronRight,
@@ -21,18 +20,13 @@ import {
   ShieldCheck,
   Star,
   AlertCircle,
-  Clock,
-  Zap,
-  Heart,
-  ArrowRight,
 } from "lucide-react"
 import * as productsApi from "@/lib/api/products"
 import * as contentApi from "@/lib/api/content"
-import * as promotionsApi from "@/lib/api/promotions"
 import { minorToRupees } from "@/lib/api/config"
 import { RecentlyViewedStrip } from "@/components/product/recently-viewed-strip"
-import { useToast } from "@/hooks/use-toast"
-import type { ProductDto, ContentItemDto, CouponDto } from "@/lib/api/types"
+import { Button } from "@/components/ui/button"
+import type { ProductDto, ContentItemDto } from "@/lib/api/types"
 
 /* ─── helpers ─────────────────────────────────────────────────── */
 
@@ -60,99 +54,98 @@ function mapProduct(node: ProductDto) {
 
 type HP = ReturnType<typeof mapProduct>
 
-const CATEGORY_COLORS = [
-  "from-pink-100 to-rose-100 ring-pink-300",
-  "from-blue-100 to-indigo-100 ring-blue-300",
-  "from-amber-100 to-orange-100 ring-amber-300",
-  "from-green-100 to-emerald-100 ring-green-300",
-  "from-purple-100 to-violet-100 ring-purple-300",
-  "from-teal-100 to-cyan-100 ring-teal-300",
-  "from-red-100 to-pink-100 ring-red-300",
-  "from-yellow-100 to-amber-100 ring-yellow-300",
+/* ─── Category circle color palette ─────────────────────────── */
+const CAT_PALETTES = [
+  { bg: "#FDF4F0", fg: "#9A5E49" },
+  { bg: "#FFF8E6", fg: "#8A6820" },
+  { bg: "#EFF4FF", fg: "#3B52A0" },
+  { bg: "#F0FDF4", fg: "#16653A" },
+  { bg: "#FDF0F8", fg: "#9D174D" },
+  { bg: "#F5F0FD", fg: "#6D28D9" },
+  { bg: "#FFF0F0", fg: "#991B1B" },
+  { bg: "#F0FDFD", fg: "#0E7490" },
 ]
-const CATEGORY_EMOJI: Record<string, string> = {
-  men: "👕", women: "👗", "t-shirts": "👕", tshirts: "👕", hoodies: "🧥",
-  accessories: "👒", "mobile covers": "📱", mobile: "📱", footwear: "👟",
-  shoes: "👟", bags: "👜", caps: "🧢", joggers: "👖", jeans: "👖",
-  kurta: "🥻", ethnic: "🥻", watches: "⌚", sunglasses: "🕶️",
+function catPalette(name: string) {
+  const h = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0)
+  return CAT_PALETTES[h % CAT_PALETTES.length]
 }
 
-const HERO_SLIDES = [
-  {
-    gradient: "from-gray-900 via-gray-800 to-gray-900",
-    tag: "NEW COLLECTION",
-    headline: "Style That\nSpeaks Louder",
-    sub: "Oversized fits, bold graphics & more",
-    cta: "Shop Men",
-    link: "/products?category=Men",
-    badge: "UP TO 50% OFF",
-    emoji: "👕",
-  },
-  {
-    gradient: "from-rose-600 via-pink-600 to-fuchsia-700",
-    tag: "WOMEN'S EDIT",
-    headline: "Wear Your\nConfidence",
-    sub: "Trending silhouettes for every occasion",
-    cta: "Shop Women",
-    link: "/products?category=Women",
-    badge: "FREE DELIVERY",
-    emoji: "👗",
-  },
-  {
-    gradient: "from-[#F38508] via-orange-500 to-amber-500",
-    tag: "FLASH DEALS",
-    headline: "Unbeatable\nPrices Today",
-    sub: "Limited-time offers on fan favourites",
-    cta: "Explore Deals",
-    link: "/products?sort=trending",
-    badge: "ENDS TONIGHT",
-    emoji: "⚡",
-  },
-]
-
-/* ─── Section header component ─────────────────────────────────── */
-function SectionHeader({ title, link }: { title: string; link?: string }) {
+/* ─── Section header — GIVA style ───────────────────────────── */
+function SectionHeader({
+  title,
+  eyebrow,
+  link,
+}: {
+  title: string
+  eyebrow?: string
+  link?: string
+}) {
   return (
-    <div className="flex items-center justify-between mb-5 md:mb-6">
-      <div className="flex items-center gap-3">
-        <div className="w-1 h-6 bg-[#F38508] rounded-full flex-shrink-0" />
-        <h2 className="text-lg md:text-xl font-black text-gray-900 uppercase tracking-wide">{title}</h2>
+    <div className="flex items-end justify-between mb-10 md:mb-12">
+      <div>
+        {eyebrow && (
+          <p className="text-brand-500 text-[11px] font-bold uppercase tracking-[0.25em] mb-2">
+            {eyebrow}
+          </p>
+        )}
+        <h2 className="font-heading text-[26px] md:text-[34px] font-bold text-gray-900 leading-tight tracking-tight">
+          {title}
+        </h2>
+        <div className="mt-3 h-[3px] w-10 bg-brand-500 rounded-full" />
       </div>
       {link && (
-        <Link href={link} className="text-xs font-semibold text-[#F38508] hover:underline flex items-center gap-0.5">
-          View All <ChevronRight className="w-3.5 h-3.5" />
+        <Link
+          href={link}
+          className="flex items-center gap-0.5 text-[11px] font-semibold uppercase tracking-wide text-gray-400 hover:text-brand-500 transition-colors mb-1"
+        >
+          View All <ChevronRight className="w-3 h-3" />
         </Link>
       )}
     </div>
   )
 }
 
-/* ─── Product slider sub-component ─────────────────────────────── */
-function ProductSlider({ title, products, link, loading, bg = "bg-white" }: {
-  title: string; products: HP[]; link?: string; loading: boolean; bg?: string
+/* ─── Product carousel section ───────────────────────────────── */
+function ProductSection({
+  title,
+  eyebrow,
+  products,
+  link,
+  loading,
+  bg = "bg-[#FAF8F6]",
+}: {
+  title: string
+  eyebrow?: string
+  products: HP[]
+  link?: string
+  loading: boolean
+  bg?: string
 }) {
   if (!loading && products.length === 0) return null
   return (
-    <section className={`py-8 md:py-10 ${bg}`}>
-      <div className="container mx-auto px-4">
-        <SectionHeader title={title} link={link} />
+    <section className={`py-14 md:py-20 ${bg}`}>
+      <div className="container">
+        <SectionHeader title={title} eyebrow={eyebrow} link={link} />
         {loading ? (
-          <div className="flex gap-3 overflow-hidden">
+          <div className="flex gap-4 overflow-hidden">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="w-[160px] md:w-[200px] h-[280px] flex-shrink-0 rounded-xl" />
+              <Skeleton key={i} className="w-[160px] md:w-[210px] h-[300px] flex-shrink-0 rounded-xl" />
             ))}
           </div>
         ) : (
           <Carousel opts={{ align: "start", dragFree: true }}>
-            <CarouselContent className="-ml-3">
+            <CarouselContent className="-ml-4">
               {products.map((p) => (
-                <CarouselItem key={p._id} className="pl-3 basis-[47%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-[16.66%]">
+                <CarouselItem
+                  key={p._id}
+                  className="pl-4 basis-[48%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
+                >
                   <ProductCard product={p} />
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-4 bg-white shadow-md border" />
-            <CarouselNext className="hidden md:flex -right-4 bg-white shadow-md border" />
+            <CarouselPrevious className="hidden md:flex -left-5 bg-white border border-gray-200 hover:border-brand-500 shadow-sm" />
+            <CarouselNext className="hidden md:flex -right-5 bg-white border border-gray-200 hover:border-brand-500 shadow-sm" />
           </Carousel>
         )}
       </div>
@@ -160,60 +153,43 @@ function ProductSlider({ title, products, link, loading, bg = "bg-white" }: {
   )
 }
 
-/* ─── Main component ─────────────────────────────────────────────── */
+/* ─── Main page ──────────────────────────────────────────────── */
 export default function HomePage() {
   const [products, setProducts] = useState<HP[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
   const [banners, setBanners] = useState<ContentItemDto[]>([])
-  const [coupons, setCoupons] = useState<CouponDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [heroSlide, setHeroSlide] = useState(0)
-  const [copiedCode, setCopiedCode] = useState<string | null>(null)
-  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
+
+  const [heroApi, setHeroApi] = useState<CarouselApi>()
+  const [activeSlide, setActiveSlide] = useState(0)
+
   const fetchedRef = useRef(false)
-  const { toast } = useToast()
 
   useEffect(() => {
     if (fetchedRef.current) return
     fetchedRef.current = true
     void fetchHomeData()
-
-    const midnight = new Date()
-    midnight.setHours(23, 59, 59, 999)
-    const tick = () => {
-      const diff = midnight.getTime() - Date.now()
-      if (diff <= 0) { setTimeLeft({ hours: 0, minutes: 0, seconds: 0 }); return }
-      setTimeLeft({
-        hours: Math.floor(diff / 3_600_000),
-        minutes: Math.floor((diff % 3_600_000) / 60_000),
-        seconds: Math.floor((diff % 60_000) / 1000),
-      })
-    }
-    tick()
-    const t = setInterval(tick, 1000)
-    return () => clearInterval(t)
   }, [])
 
   useEffect(() => {
-    const t = setInterval(() => setHeroSlide((s) => (s + 1) % HERO_SLIDES.length), 5000)
-    return () => clearInterval(t)
-  }, [])
+    if (!heroApi) return
+    setActiveSlide(heroApi.selectedScrollSnap())
+    heroApi.on("select", () => setActiveSlide(heroApi.selectedScrollSnap()))
+  }, [heroApi])
 
   const fetchHomeData = async () => {
     try {
       setLoading(true)
       setError(null)
-      const [conn, cats, bans, cpns] = await Promise.all([
+      const [conn, cats, bans] = await Promise.all([
         productsApi.listProducts({ first: 60, status: "published" }),
         productsApi.listCategories(),
         contentApi.banners(),
-        promotionsApi.publicCoupons(8),
       ])
       setProducts(conn.edges.map((e) => mapProduct(e.node)))
       setCategories(cats.map((c) => ({ id: c.id, name: c.name, slug: c.slug })))
       setBanners(bans)
-      setCoupons(cpns.filter((c) => c.isActive))
     } catch (err) {
       console.error(err)
       setError("Failed to load content. Please refresh the page.")
@@ -222,26 +198,15 @@ export default function HomePage() {
     }
   }
 
-  const copyCode = async (code: string) => {
-    try {
-      await navigator.clipboard.writeText(code)
-      setCopiedCode(code)
-      toast({ title: `Code "${code}" copied!`, description: "Paste it at checkout." })
-      setTimeout(() => setCopiedCode(null), 2500)
-    } catch {
-      toast({ title: "Copy failed", description: "Please copy the code manually.", variant: "destructive" })
-    }
-  }
-
-  const newArrivals = [...products].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 12)
+  const newArrivals = [...products]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 12)
   const trending = [...products].sort((a, b) => b.sold - a.sold).slice(0, 12)
-  const flashSale = products.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 12)
-  const featured = products.filter((p) => p.featured).slice(0, 12)
-  const recommended = products.filter((p) => p.recommended || Number(p.rating) >= 4).slice(0, 12)
+  const featured = products.filter((p) => p.featured || Number(p.rating) >= 4).slice(0, 8)
 
   if (error && !loading && products.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF8F6]">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <p className="text-gray-500 mb-4">{error}</p>
@@ -251,28 +216,49 @@ export default function HomePage() {
     )
   }
 
-  const slide = HERO_SLIDES[heroSlide]!
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#FAF8F6]">
 
-      {/* ── 1. Hero — full-width slider ──────────────────────── */}
-      {banners.length > 0 && banners[0]?.imageUrl ? (
-        <div className="relative w-full overflow-hidden bg-gray-900">
-          <Carousel opts={{ align: "center", loop: true }} className="w-full">
+      {/* ── 1. Hero carousel with dot navigation ─────────────── */}
+      {loading ? (
+        <Skeleton className="w-full aspect-[21/8] md:aspect-[16/5]" />
+      ) : banners.length > 0 && banners[0]?.imageUrl ? (
+        <div className="relative w-full bg-gray-100">
+          <Carousel
+            opts={{ align: "center", loop: true }}
+            setApi={setHeroApi}
+            className="w-full"
+          >
             <CarouselContent>
               {banners.map((b) => (
                 <CarouselItem key={b.id} className="basis-full">
-                  <Link href={b.ctaUrl || "#"} className="block relative w-full aspect-[21/8] md:aspect-[16/5] overflow-hidden">
-                    <Image src={b.imageUrl!} alt={b.title} fill className="object-cover" priority />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent flex flex-col justify-center px-8 md:px-16">
-                      <h2 className="text-white text-2xl md:text-4xl font-black uppercase leading-tight tracking-tight max-w-lg">
+                  <Link
+                    href={b.ctaUrl || "#"}
+                    className="block relative w-full aspect-[21/8] md:aspect-[16/5] overflow-hidden"
+                  >
+                    <Image
+                      src={b.imageUrl!}
+                      alt={b.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/15 to-transparent" />
+                    <div className="absolute inset-0 flex flex-col justify-center px-8 md:px-20">
+                      <p className="text-white/60 text-[11px] font-semibold uppercase tracking-[0.25em] mb-3">
+                        New Collection
+                      </p>
+                      <h2 className="font-heading text-white text-3xl md:text-6xl font-bold leading-tight tracking-tight max-w-xl">
                         {b.title}
                       </h2>
-                      {b.excerpt && <p className="text-white/80 text-sm md:text-base mt-2 max-w-sm">{b.excerpt}</p>}
+                      {b.excerpt && (
+                        <p className="text-white/75 text-sm md:text-base mt-3 max-w-sm leading-relaxed">
+                          {b.excerpt}
+                        </p>
+                      )}
                       {b.ctaText && (
-                        <span className="mt-4 inline-block text-sm font-bold text-black bg-[#F38508] px-6 py-2.5 rounded-full w-fit hover:bg-[#D97706] transition-colors">
-                          {b.ctaText}
+                        <span className="mt-7 inline-flex items-center gap-2 text-sm font-semibold bg-brand-500 text-white px-8 py-3.5 rounded-full w-fit hover:bg-brand-600 transition-colors">
+                          {b.ctaText} <ChevronRight className="w-4 h-4" />
                         </span>
                       )}
                     </div>
@@ -280,260 +266,253 @@ export default function HomePage() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="left-4 z-10 bg-white/80 hover:bg-white border-0 shadow-lg" />
-            <CarouselNext className="right-4 z-10 bg-white/80 hover:bg-white border-0 shadow-lg" />
+            {banners.length > 1 && (
+              <>
+                <CarouselPrevious className="left-4 md:left-6 bg-white/20 hover:bg-white/40 border-0 text-white backdrop-blur-sm" />
+                <CarouselNext className="right-4 md:right-6 bg-white/20 hover:bg-white/40 border-0 text-white backdrop-blur-sm" />
+              </>
+            )}
           </Carousel>
-        </div>
-      ) : (
-        /* Fallback gradient hero — full width */
-        <div className={`relative w-full bg-gradient-to-br ${slide.gradient} transition-all duration-700 overflow-hidden`}>
-          <div className="container mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-1 text-white">
-              <span className="text-xs font-bold tracking-[0.25em] text-[#F38508] uppercase mb-3 block">{slide.tag}</span>
-              <h1 className="text-4xl md:text-6xl font-black uppercase leading-none tracking-tighter whitespace-pre-line text-white">
-                {slide.headline}
-              </h1>
-              <p className="mt-4 text-sm md:text-base text-white/80">{slide.sub}</p>
-              <div className="mt-6 flex items-center gap-3 flex-wrap">
-                <Link href={slide.link}>
-                  <Button size="lg" className="bg-white text-gray-900 hover:bg-[#F38508] hover:text-black font-bold px-7 transition-colors">
-                    {slide.cta} <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-                <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-black/30 text-white backdrop-blur-sm">
-                  {slide.badge}
-                </span>
-              </div>
-            </div>
-            <div className="text-[120px] md:text-[180px] opacity-20 select-none leading-none">
-              {slide.emoji}
-            </div>
-          </div>
-          {/* Slide dots */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {HERO_SLIDES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setHeroSlide(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 bg-[#F38508]" : "w-2 bg-white/40"}`}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* ── 2. Trust bar — clean white ───────────────────────── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 py-2.5">
-          <div className="flex items-center justify-around gap-2 text-gray-600 text-[11px] font-semibold uppercase tracking-wide flex-wrap">
-            <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5 text-[#F38508]" /> Fast Delivery</span>
-            <span className="hidden sm:flex items-center gap-1.5 text-gray-200">|</span>
-            <span className="flex items-center gap-1.5"><RefreshCcw className="w-3.5 h-3.5 text-[#F38508]" /> 7-Day Returns</span>
-            <span className="hidden sm:flex items-center gap-1.5 text-gray-200">|</span>
-            <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-[#F38508]" /> Secure Payments</span>
-            <span className="hidden sm:flex items-center gap-1.5 text-gray-200">|</span>
-            <span className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5 text-[#F38508]" /> 100% Genuine</span>
+          {/* Dot indicators */}
+          {banners.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => heroApi?.scrollTo(i)}
+                  className={`rounded-full transition-all duration-300 ${
+                    i === activeSlide
+                      ? "w-6 h-2 bg-white"
+                      : "w-2 h-2 bg-white/50 hover:bg-white/80"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {/* ── 2. Trust bar ─────────────────────────────────────── */}
+      <div className="bg-white border-b border-[#E7E5E4]">
+        <div className="container py-3.5">
+          <div className="flex items-center justify-around text-[11px] font-semibold text-gray-500 uppercase tracking-wider flex-wrap gap-3">
+            <span className="flex items-center gap-2">
+              <Truck className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+              Free Delivery ₹499+
+            </span>
+            <span className="hidden sm:block text-gray-200">|</span>
+            <span className="flex items-center gap-2">
+              <RefreshCcw className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+              7-Day Returns
+            </span>
+            <span className="hidden sm:block text-gray-200">|</span>
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+              Secure Payments
+            </span>
+            <span className="hidden sm:block text-gray-200">|</span>
+            <span className="flex items-center gap-2">
+              <Star className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
+              100% Genuine
+            </span>
           </div>
         </div>
       </div>
 
-      {/* ── 3. Categories — circles ──────────────────────────── */}
-      <section className="py-8 md:py-10 bg-white">
-        <div className="container mx-auto px-4">
-          <SectionHeader title="Shop By Category" link="/products" />
-          {loading ? (
-            <div className="flex gap-4 overflow-hidden">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 flex-shrink-0">
-                  <Skeleton className="w-16 h-16 md:w-20 md:h-20 rounded-full" />
-                  <Skeleton className="w-14 h-3" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide md:grid md:grid-cols-8 md:overflow-visible">
-              {categories.slice(0, 12).map((cat, i) => {
-                const emoji = CATEGORY_EMOJI[cat.name.toLowerCase()] ?? "🛍️"
-                const colors = CATEGORY_COLORS[i % CATEGORY_COLORS.length]!
-                return (
-                  <Link
-                    key={cat.id}
-                    href={`/products?categoryId=${cat.id}`}
-                    className="flex flex-col items-center gap-2 group flex-shrink-0 md:flex-shrink"
-                  >
-                    <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br ${colors.split(" ").slice(0, 2).join(" ")} flex items-center justify-center text-2xl md:text-3xl ring-2 ring-transparent group-hover:ring-[#F38508] transition-all duration-200 group-hover:scale-105 shadow-sm`}>
-                      {emoji}
-                    </div>
-                    <span className="text-[10px] md:text-xs font-bold text-gray-600 text-center uppercase tracking-wide group-hover:text-[#F38508] transition-colors whitespace-nowrap">
-                      {cat.name}
-                    </span>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
+      {/* ── 3. Category circles — GIVA style ─────────────────── */}
+      <section className="py-12 md:py-16 bg-white">
+        <div className="container">
+          <div className="text-center mb-9">
+            <p className="text-brand-500 text-[11px] font-bold uppercase tracking-[0.25em] mb-2">Browse</p>
+            <h2 className="font-heading text-[26px] md:text-[32px] font-bold text-gray-900 tracking-tight">
+              Shop by Category
+            </h2>
+          </div>
+
+          <div className="flex gap-5 md:gap-8 overflow-x-auto pb-2 scrollbar-hide md:justify-center">
+            {/* All Products */}
+            <Link href="/products" className="flex-shrink-0 flex flex-col items-center gap-3 group">
+              <div
+                className="w-[72px] h-[72px] md:w-[88px] md:h-[88px] rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-brand-500 transition-all duration-200 shadow-sm"
+                style={{ backgroundColor: "#F0F0F0" }}
+              >
+                <span className="font-heading text-2xl md:text-3xl font-bold text-gray-500">✦</span>
+              </div>
+              <p className="text-[11px] md:text-xs font-semibold text-gray-600 group-hover:text-brand-500 transition-colors text-center leading-tight max-w-[72px]">
+                All
+              </p>
+            </Link>
+
+            {loading
+              ? Array.from({ length: 7 }).map((_, i) => (
+                  <div key={i} className="flex-shrink-0 flex flex-col items-center gap-3">
+                    <Skeleton className="w-[72px] h-[72px] md:w-[88px] md:h-[88px] rounded-full" />
+                    <Skeleton className="h-3 w-14 rounded" />
+                  </div>
+                ))
+              : categories.slice(0, 10).map((cat) => {
+                  const { bg, fg } = catPalette(cat.name)
+                  return (
+                    <Link
+                      key={cat.id}
+                      href={`/products?categoryId=${cat.id}`}
+                      className="flex-shrink-0 flex flex-col items-center gap-3 group"
+                    >
+                      <div
+                        className="w-[72px] h-[72px] md:w-[88px] md:h-[88px] rounded-full flex items-center justify-center border-2 border-transparent group-hover:border-brand-500 transition-all duration-200 shadow-sm"
+                        style={{ backgroundColor: bg }}
+                      >
+                        <span
+                          className="font-heading text-2xl md:text-3xl font-bold"
+                          style={{ color: fg }}
+                        >
+                          {cat.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-[11px] md:text-xs font-semibold text-gray-600 group-hover:text-brand-500 transition-colors text-center leading-tight max-w-[72px]">
+                        {cat.name}
+                      </p>
+                    </Link>
+                  )
+                })}
+          </div>
         </div>
       </section>
 
-      {/* ── 4. Flash Sale ───────────────────────────────────── */}
-      {(loading || flashSale.length > 0) && (
-        <section className="py-8 md:py-10 bg-gradient-to-r from-red-600 to-orange-500">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 gap-3">
-              <div className="flex items-center gap-2">
-                <Zap className="w-6 h-6 text-yellow-300 animate-pulse" />
-                <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-wide">Flash Sale</h2>
-              </div>
-              <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-1.5">
-                <Clock className="w-4 h-4 text-white" />
-                <span className="text-white text-xs font-semibold">Ends in:</span>
-                {(["hours", "minutes", "seconds"] as const).map((u, i) => (
-                  <span key={u} className="flex items-center gap-0.5">
-                    <span className="bg-white text-red-600 font-black px-2 py-0.5 rounded text-sm min-w-[32px] text-center tabular-nums">
-                      {String(timeLeft[u]).padStart(2, "0")}
-                    </span>
-                    {i < 2 && <span className="text-white font-bold">:</span>}
-                  </span>
-                ))}
-              </div>
-            </div>
-            {loading ? (
-              <div className="flex gap-3 overflow-hidden">
-                {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="w-[160px] h-[280px] flex-shrink-0 rounded-xl bg-white/20" />)}
-              </div>
-            ) : (
-              <Carousel opts={{ align: "start", dragFree: true }}>
-                <CarouselContent className="-ml-3">
-                  {flashSale.map((p) => (
-                    <CarouselItem key={p._id} className="pl-3 basis-[47%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-[16.66%]">
-                      <div className="relative">
-                        <Badge className="absolute top-2 left-2 z-10 bg-red-600 text-white font-black text-[10px] shadow">
-                          {Math.round(((p.originalPrice! - p.price) / p.originalPrice!) * 100)}% OFF
-                        </Badge>
-                        <ProductCard product={p} />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex -left-4 bg-white shadow-lg border-0" />
-                <CarouselNext className="hidden md:flex -right-4 bg-white shadow-lg border-0" />
-              </Carousel>
-            )}
-          </div>
-        </section>
-      )}
+      {/* ── 4. New Arrivals ──────────────────────────────────── */}
+      <ProductSection
+        title="New Arrivals"
+        eyebrow="Just Landed"
+        products={newArrivals}
+        link="/products?sort=newest"
+        loading={loading}
+      />
 
-      {/* ── 5. New Arrivals ──────────────────────────────────── */}
-      <ProductSlider title="New Arrivals" products={newArrivals} link="/products?sort=newest" loading={loading} />
-
-      {/* ── 6. Mid-banner strip ──────────────────────────────── */}
+      {/* ── 5. Men's & Women's editorial banners ─────────────── */}
       {!loading && (
-        <div className="py-4 md:py-6 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section className="pb-14 md:pb-20 bg-[#FAF8F6]">
+          <div className="container">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+
+              {/* Men's */}
               <Link
                 href="/products?category=Men"
-                className="group relative h-36 md:h-48 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="group relative overflow-hidden rounded-2xl"
+                style={{ aspectRatio: "4/3" }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700" />
-                <div className="absolute inset-0 flex flex-col justify-center px-8">
-                  <p className="text-[#F38508] text-xs font-bold uppercase tracking-widest mb-1">For Him</p>
-                  <h3 className="text-white text-2xl md:text-3xl font-black uppercase leading-tight">
-                    Men's<br />Collection
-                  </h3>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-[#F38508] transition-colors font-semibold">
-                    Shop Now <ArrowRight className="w-3 h-3" />
-                  </span>
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(145deg, #1C1C1E 0%, #2D2D2D 60%, #3D3D3D 100%)" }}
+                />
+                <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-between">
+                  <p className="text-brand-400 text-[11px] font-bold uppercase tracking-[0.25em]">
+                    For Him
+                  </p>
+                  <div>
+                    <h3 className="font-heading text-white text-4xl md:text-5xl font-bold leading-none mb-5">
+                      Men's<br />Collection
+                    </h3>
+                    <span className="inline-flex items-center gap-2 text-[13px] font-semibold bg-brand-500 text-white px-6 py-3 rounded-full group-hover:bg-brand-600 transition-colors">
+                      Shop Now <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
                 </div>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-8xl opacity-10 group-hover:opacity-20 transition-opacity select-none">👕</span>
               </Link>
+
+              {/* Women's */}
               <Link
                 href="/products?category=Women"
-                className="group relative h-36 md:h-48 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="group relative overflow-hidden rounded-2xl"
+                style={{ aspectRatio: "4/3" }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-600 to-rose-700" />
-                <div className="absolute inset-0 flex flex-col justify-center px-8">
-                  <p className="text-orange-200 text-xs font-bold uppercase tracking-widest mb-1">For Her</p>
-                  <h3 className="text-white text-2xl md:text-3xl font-black uppercase leading-tight">
-                    Women's<br />Edit
-                  </h3>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs text-white/70 group-hover:text-orange-200 transition-colors font-semibold">
-                    Shop Now <ArrowRight className="w-3 h-3" />
-                  </span>
+                <div
+                  className="absolute inset-0"
+                  style={{ background: "linear-gradient(145deg, #C98B74 0%, #B9755D 50%, #9A5E49 100%)" }}
+                />
+                <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-between">
+                  <p className="text-white/60 text-[11px] font-bold uppercase tracking-[0.25em]">
+                    For Her
+                  </p>
+                  <div>
+                    <h3 className="font-heading text-white text-4xl md:text-5xl font-bold leading-none mb-5">
+                      Women's<br />Edit
+                    </h3>
+                    <span className="inline-flex items-center gap-2 text-[13px] font-semibold bg-white text-gray-900 px-6 py-3 rounded-full group-hover:bg-gray-50 transition-colors">
+                      Shop Now <ChevronRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
                 </div>
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-8xl opacity-10 group-hover:opacity-20 transition-opacity select-none">👗</span>
               </Link>
+
             </div>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ── 7. Trending Now ──────────────────────────────────── */}
-      <ProductSlider title="Trending Now" products={trending} link="/products?sort=trending" loading={loading} bg="bg-gray-50" />
+      {/* ── 6. Trending Now ──────────────────────────────────── */}
+      <ProductSection
+        title="Trending Now"
+        eyebrow="Most Popular"
+        products={trending}
+        link="/products?sort=trending"
+        loading={loading}
+        bg="bg-white"
+      />
 
-      {/* ── 9. Recommended For You ───────────────────────────── */}
-      {(loading || recommended.length > 0) && (
-        <section className="py-8 md:py-10 bg-gradient-to-br from-orange-50 to-amber-50">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-6 bg-[#F38508] rounded-full flex-shrink-0" />
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-[#F38508]" />
-                  <h2 className="text-lg md:text-xl font-black text-gray-900 uppercase tracking-wide">Recommended For You</h2>
-                </div>
-              </div>
-            </div>
+      {/* ── 7. Editor's Picks 4-col grid ─────────────────────── */}
+      {(loading || featured.length > 0) && (
+        <section className="py-14 md:py-20 bg-[#FAF8F6]">
+          <div className="container">
+            <SectionHeader
+              title="Editor's Picks"
+              eyebrow="Curated For You"
+              link="/products?featured=true"
+            />
             {loading ? (
-              <div className="flex gap-3 overflow-hidden">
-                {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="w-[160px] h-[280px] flex-shrink-0 rounded-xl" />)}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[320px] rounded-xl" />
+                ))}
               </div>
             ) : (
-              <Carousel opts={{ align: "start", dragFree: true }}>
-                <CarouselContent className="-ml-3">
-                  {recommended.map((p) => (
-                    <CarouselItem key={p._id} className="pl-3 basis-[47%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-[16.66%]">
-                      <ProductCard product={p} />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex -left-4 bg-white shadow-md border" />
-                <CarouselNext className="hidden md:flex -right-4 bg-white shadow-md border" />
-              </Carousel>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+                {featured.map((p) => (
+                  <ProductCard key={p._id} product={p} />
+                ))}
+              </div>
             )}
           </div>
         </section>
       )}
 
-      {/* ── 10. Featured Products ────────────────────────────── */}
-      {featured.length > 0 && (
-        <ProductSlider title="Featured" products={featured} link="/products?featured=true" loading={false} />
-      )}
-
-      {/* ── 11. Recently Viewed ──────────────────────────────── */}
-      <section className="py-8 md:py-10 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <RecentlyViewedStrip />
-        </div>
-      </section>
-
-      {/* ── 12. App download — above footer ──────────────────── */}
-      <section className="bg-[#111827] py-8 md:py-10">
-        <div className="container mx-auto px-4">
+      {/* ── 8. Promo strip ───────────────────────────────────── */}
+      <div className="bg-[#1C1C1E] py-10 md:py-14">
+        <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-wide">Get the Baefikra App</h3>
-              <p className="text-gray-400 text-sm mt-1">Exclusive app-only deals • Faster checkout • Order tracking</p>
+              <p className="text-brand-400 text-[11px] font-bold uppercase tracking-[0.25em] mb-2">
+                Limited Offer
+              </p>
+              <h3 className="font-heading text-white text-2xl md:text-3xl font-bold leading-tight">
+                Use code <span className="text-brand-400">FIRST10</span> for 10% off
+              </h3>
+              <p className="text-gray-400 text-sm mt-2">On your first order. No minimum purchase.</p>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href="/apps" className="flex items-center gap-2.5 bg-white text-gray-900 hover:bg-[#F38508] hover:text-black px-5 py-3 rounded-xl font-bold text-sm transition-colors">
-                <span className="text-xl">🍎</span> App Store
-              </Link>
-              <Link href="/apps" className="flex items-center gap-2.5 bg-white text-gray-900 hover:bg-[#F38508] hover:text-black px-5 py-3 rounded-xl font-bold text-sm transition-colors">
-                <span className="text-xl">🤖</span> Google Play
-              </Link>
-            </div>
+            <Link
+              href="/products"
+              className="flex-shrink-0 inline-flex items-center gap-2 bg-brand-500 text-white text-sm font-semibold px-8 py-3.5 rounded-full hover:bg-brand-600 transition-colors"
+            >
+              Shop Now <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
+        </div>
+      </div>
+
+      {/* ── 9. Recently Viewed ───────────────────────────────── */}
+      <section className="py-12 md:py-16 bg-white">
+        <div className="container">
+          <RecentlyViewedStrip />
         </div>
       </section>
 

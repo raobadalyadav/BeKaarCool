@@ -22,7 +22,7 @@ type Review = {
 
 const STATUS_COLORS: Record<string, string> = {
   approved: "bg-green-100 text-green-700",
-  pending: "bg-orange-100 text-[#D97706]",
+  pending: "bg-orange-100 text-brand-600",
   rejected: "bg-red-100 text-red-600",
 }
 
@@ -78,7 +78,7 @@ export default function AdminReviewsPage() {
   const renderStars = (rating: number) => (
     <div className="flex">
       {[1, 2, 3, 4, 5].map((i) => (
-        <Star key={i} className={`w-3.5 h-3.5 ${i <= rating ? "fill-[#F38508] text-[#F38508]" : "text-gray-300"}`} />
+        <Star key={i} className={`w-3.5 h-3.5 ${i <= rating ? "fill-brand-500 text-brand-500" : "text-gray-300"}`} />
       ))}
     </div>
   )
@@ -112,7 +112,7 @@ export default function AdminReviewsPage() {
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === s
-                ? "bg-[#F38508] text-black"
+                ? "bg-brand-500 text-black"
                 : "bg-white border text-gray-600 hover:bg-gray-50"
             }`}
           >
@@ -129,7 +129,7 @@ export default function AdminReviewsPage() {
             placeholder="Search by product, reviewer, or review text..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
       </div>

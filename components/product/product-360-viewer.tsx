@@ -118,7 +118,7 @@ export function Product360Viewer({ images, productName }: Product360ViewerProps)
             >
                 {isLoading ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div className="w-12 h-12 border-4 border-[#F38508] border-t-transparent rounded-full animate-spin mb-2" />
+                        <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-2" />
                         <p className="text-sm text-gray-500">
                             Loading 360° view ({loadedCount}/{frameCount})
                         </p>
@@ -148,7 +148,7 @@ export function Product360Viewer({ images, productName }: Product360ViewerProps)
             <div className="mt-2 flex items-center justify-center gap-2">
                 <div className="h-1 bg-gray-200 rounded-full flex-1 max-w-xs">
                     <div
-                        className="h-1 bg-[#F38508] rounded-full transition-all"
+                        className="h-1 bg-brand-500 rounded-full transition-all"
                         style={{ width: `${((currentFrame + 1) / frameCount) * 100}%` }}
                     />
                 </div>

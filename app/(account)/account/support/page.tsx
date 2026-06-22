@@ -38,7 +38,7 @@ const quickLinks = [
     title: "Return or Exchange",
     description: "Start a return or request a size exchange.",
     href: "/account/orders",
-    color: "bg-orange-50 text-orange-600",
+    color: "bg-brand-50 text-orange-600",
   },
   {
     icon: CreditCard,
@@ -59,7 +59,7 @@ const quickLinks = [
     title: "Account Security",
     description: "Sessions, password, and two-factor auth.",
     href: "/account/security",
-    color: "bg-orange-50 text-[#F38508]",
+    color: "bg-brand-50 text-brand-500",
   },
   {
     icon: Truck,
@@ -109,7 +109,7 @@ export default function SupportPage() {
       {/* Quick Links */}
       <section>
         <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-[#F38508]" /> What do you need help with?
+          <HelpCircle className="w-5 h-5 text-brand-500" /> What do you need help with?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {quickLinks.map((link) => (
@@ -163,7 +163,7 @@ export default function SupportPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#F38508]" /> Email
+                <Mail className="w-4 h-4 text-brand-500" /> Email
               </CardTitle>
               <CardDescription>We reply within 24 hours</CardDescription>
             </CardHeader>
@@ -180,7 +180,7 @@ export default function SupportPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#F38508]" /> Phone
+                <Phone className="w-4 h-4 text-brand-500" /> Phone
               </CardTitle>
               <CardDescription>Mon–Sat, 10 AM–6 PM IST</CardDescription>
             </CardHeader>
@@ -197,7 +197,7 @@ export default function SupportPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="w-4 h-4 text-[#F38508]" /> Hours
+                <Clock className="w-4 h-4 text-brand-500" /> Hours
               </CardTitle>
               <CardDescription>When we're available</CardDescription>
             </CardHeader>

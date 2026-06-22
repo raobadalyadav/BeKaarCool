@@ -66,7 +66,7 @@ interface Order {
 }
 
 const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
-    pending: { color: "bg-orange-100 text-[#D97706]", icon: Clock, label: "Pending" },
+    pending: { color: "bg-orange-100 text-brand-600", icon: Clock, label: "Pending" },
     confirmed: { color: "bg-blue-100 text-blue-700", icon: CheckCircle, label: "Confirmed" },
     processing: { color: "bg-purple-100 text-purple-700", icon: Package, label: "Processing" },
     shipped: { color: "bg-indigo-100 text-indigo-700", icon: Truck, label: "Shipped" },
@@ -253,7 +253,7 @@ export default function OrderDetailPage() {
                             {/* Progress Line */}
                             <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 -z-10">
                                 <div
-                                    className="h-full bg-[#F38508] transition-all"
+                                    className="h-full bg-brand-500 transition-all"
                                     style={{ width: `${Math.max(0, currentStepIndex) / (timelineSteps.length - 1) * 100}%` }}
                                 />
                             </div>
@@ -265,9 +265,9 @@ export default function OrderDetailPage() {
                                     <div key={step} className="flex flex-col items-center">
                                         <div
                                             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isCompleted
-                                                    ? "bg-[#F38508] text-black"
+                                                    ? "bg-brand-500 text-black"
                                                     : "bg-gray-200 text-gray-500"
-                                                } ${isCurrent ? "ring-4 ring-orange-100" : ""}`}
+                                                } ${isCurrent ? "ring-4 ring-brand-100" : ""}`}
                                         >
                                             {isCompleted ? <CheckCircle className="w-5 h-5" /> : idx + 1}
                                         </div>
@@ -291,7 +291,7 @@ export default function OrderDetailPage() {
                                             href={order.shipment.trackingUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-[#F38508] font-semibold text-sm hover:underline"
+                                            className="text-brand-500 font-semibold text-sm hover:underline"
                                         >
                                             Track Package →
                                         </a>
@@ -327,7 +327,7 @@ export default function OrderDetailPage() {
                             </div>
                             <div className="flex-1">
                                 {item.product ? (
-                                    <Link href={`/products/${item.product.slug}`} className="font-semibold hover:text-[#F38508]">
+                                    <Link href={`/products/${item.product.slug}`} className="font-semibold hover:text-brand-500">
                                         {item.product.name}
                                     </Link>
                                 ) : (
@@ -440,7 +440,7 @@ export default function OrderDetailPage() {
                         {canReturn && (
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="outline" className="text-orange-600 border-orange-200 hover:bg-orange-50">
+                                    <Button variant="outline" className="text-orange-600 border-orange-200 hover:bg-brand-50">
                                         <RotateCcw className="w-4 h-4 mr-2" /> Return / Replace
                                     </Button>
                                 </AlertDialogTrigger>

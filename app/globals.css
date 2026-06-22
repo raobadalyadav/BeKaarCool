@@ -5,7 +5,7 @@
 /* ─────────────────────────────────────────────────────────────────────
    Baefikra — Premium Fashion & Jewellery Design System
    Fonts : Playfair Display (headings) · Inter (body)
-   Colors: Primary  #F38508  · Accent #5AA1E3 · Dark #111827
+   Colors: Primary  #C98B74 (rose gold) · Gold #D4AF37 · Dark #1C1C1E
    ───────────────────────────────────────────────────────────────────── */
 
 :root {
@@ -13,17 +13,19 @@
   --font-heading: var(--font-playfair), 'Playfair Display', ui-serif, Georgia, serif;
 
   /* ── Brand tokens ── */
-  --primary:         #F38508;
-  --primary-hover:   #D97706;
-  --secondary:       #111827;
+  --primary:         #C98B74;
+  --primary-hover:   #B9755D;
+  --secondary:       #1C1C1E;
   --accent:          #5AA1E3;
   --accent-hover:    #3B82C8;
+  --gold:            #D4AF37;
+  --gold-hover:      #B8932D;
 
-  --bg:              #FFFFFF;
-  --surface:         #F8FAFC;
-  --border:          #E5E7EB;
+  --bg:              #FAF8F6;
+  --surface:         #FFFFFF;
+  --border:          #E7E5E4;
 
-  --text-primary:    #111827;
+  --text-primary:    #1F2937;
   --text-secondary:  #6B7280;
 
   --success:         #22C55E;
@@ -49,24 +51,24 @@ body {
 /* ── Shadcn/ui CSS variable overrides ─────────────────────────────── */
 @layer base {
   :root {
-    --background:           0 0% 100%;           /* #FFFFFF */
-    --foreground:           221 39% 11%;          /* #111827 */
+    --background:           30 29% 97%;           /* #FAF8F6 */
+    --foreground:           215 28% 17%;          /* #1F2937 */
 
     --card:                 0 0% 100%;
-    --card-foreground:      221 39% 11%;
+    --card-foreground:      215 28% 17%;
 
     --popover:              0 0% 100%;
-    --popover-foreground:   221 39% 11%;
+    --popover-foreground:   215 28% 17%;
 
-    /* Primary = Brand Orange */
-    --primary:              30 95% 50%;           /* #F38508 */
-    --primary-foreground:   0 0% 100%;
+    /* Primary = Rose Gold */
+    --primary:              16 44% 62%;           /* #C98B74 */
+    --primary-foreground:   0 0% 10%;
 
-    /* Secondary = Charcoal Dark */
-    --secondary:            221 39% 11%;          /* #111827 */
+    /* Secondary = Near Black */
+    --secondary:            0 0% 10%;             /* #1A1A1A */
     --secondary-foreground: 0 0% 100%;
 
-    --muted:                210 20% 98%;          /* #F8FAFC */
+    --muted:                30 29% 97%;           /* #FAF8F6 */
     --muted-foreground:     220 9% 46%;           /* #6B7280 */
 
     /* Accent = Brand Blue */
@@ -76,51 +78,52 @@ body {
     --destructive:          0 84% 60%;            /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:               220 13% 91%;          /* #E5E7EB */
-    --input:                220 13% 91%;
-    --ring:                 30 95% 50%;           /* Orange focus ring */
+    --border:               30 6% 90%;            /* #E7E5E4 */
+    --input:                30 6% 90%;
+    --ring:                 16 44% 62%;           /* Rose gold focus ring */
     --radius:               0.5rem;
 
     /* Sidebar */
     --sidebar-background:   221 39% 11%;
     --sidebar-foreground:   210 40% 90%;
-    --sidebar-primary:      30 95% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary:      16 44% 62%;
+    --sidebar-primary-foreground: 0 0% 10%;
     --sidebar-accent:       221 35% 18%;
     --sidebar-accent-foreground:  210 40% 95%;
     --sidebar-border:       221 30% 20%;
-    --sidebar-ring:         30 95% 50%;
+    --sidebar-ring:         16 44% 62%;
   }
 
-  .dark {
-    --background:           221 39% 8%;
-    --foreground:           210 40% 95%;
-    --card:                 221 39% 11%;
-    --card-foreground:      210 40% 95%;
-    --popover:              221 39% 9%;
-    --popover-foreground:   210 40% 95%;
-    --primary:              30 95% 50%;
-    --primary-foreground:   0 0% 100%;
-    --secondary:            221 35% 18%;
-    --secondary-foreground: 210 40% 95%;
-    --muted:                221 35% 15%;
-    --muted-foreground:     220 9% 55%;
-    --accent:               210 65% 55%;
-    --accent-foreground:    0 0% 100%;
-    --destructive:          0 62% 40%;
-    --destructive-foreground: 0 0% 100%;
-    --border:               221 30% 18%;
-    --input:                221 30% 18%;
-    --ring:                 30 95% 50%;
-    --sidebar-background:   221 39% 6%;
-    --sidebar-foreground:   210 40% 85%;
-    --sidebar-primary:      30 95% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent:       221 35% 13%;
-    --sidebar-accent-foreground:  210 40% 90%;
-    --sidebar-border:       221 30% 14%;
-    --sidebar-ring:         30 95% 50%;
-  }
+}
+
+.dark {
+  --background:           11 11% 10%;
+  --foreground:           210 40% 95%;
+  --card:                 11 11% 13%;
+  --card-foreground:      210 40% 95%;
+  --popover:              11 11% 11%;
+  --popover-foreground:   210 40% 95%;
+  --primary:              16 44% 62%;
+  --primary-foreground:   0 0% 10%;
+  --secondary:            11 11% 20%;
+  --secondary-foreground: 210 40% 95%;
+  --muted:                11 11% 17%;
+  --muted-foreground:     220 9% 55%;
+  --accent:               210 65% 55%;
+  --accent-foreground:    0 0% 100%;
+  --destructive:          0 62% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border:               11 11% 20%;
+  --input:                11 11% 20%;
+  --ring:                 16 44% 62%;
+  --sidebar-background:   11 11% 8%;
+  --sidebar-foreground:   210 40% 85%;
+  --sidebar-primary:      16 44% 62%;
+  --sidebar-primary-foreground: 0 0% 10%;
+  --sidebar-accent:       11 11% 15%;
+  --sidebar-accent-foreground:  210 40% 90%;
+  --sidebar-border:       11 11% 16%;
+  --sidebar-ring:         16 44% 62%;
 }
 
 @layer base {
@@ -140,24 +143,25 @@ body {
 /* ── Component utilities ──────────────────────────────────────────── */
 @layer components {
   .container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1440px;
   }
 
-  /* Primary CTA — Orange */
+  /* Primary CTA — Rose Gold */
   .btn-primary {
-    background-color: #F38508;
-    color: #fff;
+    background-color: #C98B74;
+    color: #1F2937;
     @apply font-semibold text-sm transition-all duration-200;
   }
-  .btn-primary:hover { background-color: #D97706; }
+  .btn-primary:hover { background-color: #B9755D; }
 
   /* Dark secondary (Buy Now) */
   .btn-secondary {
-    background-color: #111827;
+    background-color: #1C1C1E;
     color: #fff;
     @apply font-semibold text-sm transition-all duration-200;
   }
-  .btn-secondary:hover { background-color: #1F2937; }
+  .btn-secondary:hover { background-color: #2D2D2D; }
 
   /* Accent / link blue */
   .btn-accent {
@@ -175,7 +179,7 @@ body {
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, #F38508 0%, #5AA1E3 100%);
+    background: linear-gradient(135deg, #C98B74 0%, #D4AF37 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -184,10 +188,10 @@ body {
   .skeleton  { @apply animate-pulse bg-gray-200 rounded; }
   .loading-spinner {
     @apply animate-spin rounded-full border-2 border-gray-300;
-    border-top-color: #F38508;
+    border-top-color: #C98B74;
   }
 
-  /* Section header with orange left-border accent */
+  /* Section header with gold left-border accent */
   .section-header {
     display: flex;
     align-items: center;
@@ -198,7 +202,7 @@ body {
     display: block;
     width: 4px;
     height: 1.5rem;
-    background-color: #F38508;
+    background-color: #C98B74;
     border-radius: 9999px;
     flex-shrink: 0;
   }
@@ -216,15 +220,23 @@ body {
   .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.10); }
 
   /* Brand color shortcuts */
-  .bg-brand          { background-color: #F38508; }
-  .bg-brand-hover    { background-color: #D97706; }
+  .bg-brand          { background-color: #C98B74; }
+  .bg-brand-hover    { background-color: #B9755D; }
   .bg-brand-accent   { background-color: #5AA1E3; }
-  .bg-brand-dark     { background-color: #111827; }
-  .bg-brand-surface  { background-color: #F8FAFC; }
-  .text-brand        { color: #F38508; }
+  .bg-brand-dark     { background-color: #1C1C1E; }
+  .bg-brand-surface  { background-color: #FAF8F6; }
+  .text-brand        { color: #C98B74; }
   .text-brand-accent { color: #5AA1E3; }
-  .text-brand-dark   { color: #111827; }
-  .border-brand      { border-color: #F38508; }
+  .text-brand-dark   { color: #1F2937; }
+  .border-brand      { border-color: #C98B74; }
+
+  /* Luxury shadow — subtle warm glow */
+  .shadow-luxury {
+    box-shadow: 0 4px 20px rgba(201,139,116,.08), 0 8px 40px rgba(0,0,0,.05);
+  }
+  .shadow-luxury-lg {
+    box-shadow: 0 8px 32px rgba(201,139,116,.12), 0 16px 64px rgba(0,0,0,.07);
+  }
 }
 
 /* ── Animations ───────────────────────────────────────────────────── */
@@ -263,11 +275,11 @@ body {
 /* ── Focus ring ───────────────────────────────────────────────────── */
 .focus-visible:focus {
   @apply outline-none ring-2 ring-offset-2;
-  --tw-ring-color: #F38508;
+  --tw-ring-color: #C98B74;
 }
 
 /* ── Custom scrollbar ─────────────────────────────────────────────── */
 .custom-scrollbar::-webkit-scrollbar { width: 5px; }
 .custom-scrollbar::-webkit-scrollbar-track { @apply bg-gray-100 rounded-full; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background-color: #F38508; border-radius: 9999px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #D97706; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: #C98B74; border-radius: 9999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #B9755D; }

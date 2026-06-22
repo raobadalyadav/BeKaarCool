@@ -144,7 +144,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   <Star
                     key={i}
                     className={`h-5 w-5 ${
-                      i < Math.floor(averageRating) ? "fill-[#F38508] text-[#F38508]" : "text-gray-300"
+                      i < Math.floor(averageRating) ? "fill-brand-500 text-brand-500" : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -158,7 +158,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                   <span className="text-sm w-8">{star}★</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-[#F38508] h-2 rounded-full transition-all duration-300"
+                      className="bg-brand-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -183,7 +183,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                     <button key={star} type="button" onClick={() => setRating(star)} className="p-1">
                       <Star
                         className={`h-6 w-6 transition-colors ${
-                          star <= rating ? "fill-[#F38508] text-[#F38508]" : "text-gray-300 hover:text-[#F38508]"
+                          star <= rating ? "fill-brand-500 text-brand-500" : "text-gray-300 hover:text-brand-500"
                         }`}
                       />
                     </button>
@@ -294,7 +294,7 @@ export function ReviewSection({ productId, reviews }: ReviewSectionProps) {
                           <Star
                             key={i}
                             className={`h-4 w-4 ${
-                              i < review.rating ? "fill-[#F38508] text-[#F38508]" : "text-gray-300"
+                              i < review.rating ? "fill-brand-500 text-brand-500" : "text-gray-300"
                             }`}
                           />
                         ))}

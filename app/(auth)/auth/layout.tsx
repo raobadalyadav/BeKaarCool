@@ -9,9 +9,9 @@ export default function CheckoutLayout({
     return (
         <div className="min-h-screen bg-gray-50">
             <header className="bg-white border-b sticky top-0 z-50">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                <div className="container h-16 flex items-center justify-between">
                     <Link href="/" className="flex-shrink-0">
-                        <span className="font-bold text-2xl tracking-tight text-[#F38508]">
+                        <span className="font-bold text-2xl tracking-tight text-brand-500">
                             Baefikra
                         </span>
                     </Link>

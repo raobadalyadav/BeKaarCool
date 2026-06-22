@@ -118,7 +118,7 @@ export default function ShippingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
@@ -291,7 +291,7 @@ export default function ShippingPage() {
         </div>
 
         {/* Important Notes */}
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-orange-200 bg-brand-50">
           <CardContent className="p-6">
             <div className="flex items-start space-x-3">
               <AlertCircle className="h-6 w-6 text-orange-600 flex-shrink-0 mt-0.5" />

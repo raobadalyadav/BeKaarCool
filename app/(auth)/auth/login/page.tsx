@@ -110,10 +110,10 @@ function LoginForm() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-[#F38508] items-center justify-center p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-brand-500 items-center justify-center p-12">
         <div className="max-w-md text-center">
           <div className="w-24 h-24 bg-black rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <span className="text-[#F38508] font-bold text-4xl">B</span>
+            <span className="text-brand-500 font-bold text-4xl">B</span>
           </div>
           <h1 className="text-4xl font-bold text-black mb-4">Baefikra</h1>
           <p className="text-xl text-black/80 mb-8">
@@ -145,7 +145,7 @@ function LoginForm() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-[#F38508] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-500 rounded-xl flex items-center justify-center mx-auto mb-4">
               <span className="text-black font-bold text-2xl">B</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Baefikra</h1>
@@ -178,7 +178,7 @@ function LoginForm() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("email")}
                 />
               </div>
@@ -193,7 +193,7 @@ function LoginForm() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-[#F38508] focus:ring-[#F38508]"
+                  className="pl-11 pr-11 h-12 border-gray-300 focus:border-brand-500 focus:ring-brand-500"
                   {...register("password")}
                 />
                 <button
@@ -208,14 +208,14 @@ function LoginForm() {
             </div>
 
             <div className="flex justify-end">
-              <Link href="/auth/forgot-password" className="text-sm text-[#F38508] hover:text-[#D97706] font-medium">
+              <Link href="/auth/forgot-password" className="text-sm text-brand-500 hover:text-brand-600 font-medium">
                 Forgot password?
               </Link>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold text-base"
+              className="w-full h-12 bg-brand-500 hover:bg-brand-600 text-black font-bold text-base"
               disabled={loading || googleLoading}
             >
               {loading ? (
@@ -254,7 +254,7 @@ function LoginForm() {
 
             <p className="text-center text-gray-600 mt-6">
               Don&apos;t have an account?{" "}
-              <Link href="/auth/register" className="text-[#F38508] hover:text-[#D97706] font-semibold">
+              <Link href="/auth/register" className="text-brand-500 hover:text-brand-600 font-semibold">
                 Sign up
               </Link>
             </p>
@@ -269,7 +269,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#F38508]" />
+        <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
       </div>
     }>
       <LoginForm />

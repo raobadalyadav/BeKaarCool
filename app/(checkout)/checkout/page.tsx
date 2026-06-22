@@ -252,11 +252,11 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && !loading) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
+      <div className="container py-16 text-center">
         <h2 className="text-2xl font-bold mb-4">Your Bag is Empty</h2>
         <Button
           onClick={() => router.push("/products")}
-          className="bg-[#F38508] text-black hover:bg-[#D97706]"
+          className="bg-brand-500 text-black hover:bg-brand-600"
         >
           Continue Shopping
         </Button>
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
         onLoad={() => setRazorpayLoaded(true)}
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container py-8 max-w-6xl">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1 space-y-6">
             {/* Step 1: Address */}
@@ -283,7 +283,7 @@ export default function CheckoutPage() {
                 <h3 className="font-bold text-gray-800 flex items-center gap-2">
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "ADDRESS"
-                        ? "bg-[#F38508] text-black"
+                        ? "bg-brand-500 text-black"
                         : "bg-green-500 text-white"
                       }`}
                   >
@@ -296,7 +296,7 @@ export default function CheckoutPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setStep("ADDRESS")}
-                    className="text-[#F38508] font-bold h-8"
+                    className="text-brand-500 font-bold h-8"
                   >
                     CHANGE
                   </Button>
@@ -315,7 +315,7 @@ export default function CheckoutPage() {
                         <label
                           key={a.id}
                           className={`flex gap-3 items-start border p-4 rounded cursor-pointer ${selectedAddressId === a.id
-                              ? "border-[#F38508] bg-orange-50"
+                              ? "border-brand-500 bg-brand-50"
                               : "hover:border-gray-400"
                             }`}
                         >
@@ -469,7 +469,7 @@ export default function CheckoutPage() {
                   </details>
 
                   <Button
-                    className="w-full md:w-auto bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+                    className="w-full md:w-auto bg-brand-500 hover:bg-brand-600 text-black font-bold"
                     onClick={handleNextStep}
                     disabled={!selectedAddressId || loading}
                   >
@@ -515,7 +515,7 @@ export default function CheckoutPage() {
                 <h3 className="font-bold text-gray-800 flex items-center gap-2">
                   <span
                     className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "PAYMENT"
-                        ? "bg-[#F38508] text-black"
+                        ? "bg-brand-500 text-black"
                         : "bg-gray-400 text-white"
                       }`}
                   >
@@ -534,7 +534,7 @@ export default function CheckoutPage() {
                   >
                     <label
                       className={`flex items-center space-x-3 border p-4 rounded cursor-pointer ${paymentMethod === "razorpay"
-                          ? "border-[#F38508] bg-orange-50"
+                          ? "border-brand-500 bg-brand-50"
                           : "hover:border-gray-400"
                         }`}
                     >
@@ -554,7 +554,7 @@ export default function CheckoutPage() {
 
                     <label
                       className={`flex items-center space-x-3 border p-4 rounded cursor-pointer ${paymentMethod === "cod"
-                          ? "border-[#F38508] bg-orange-50"
+                          ? "border-brand-500 bg-brand-50"
                           : "hover:border-gray-400"
                         }`}
                     >
@@ -577,7 +577,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <Button
-                    className="w-full bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-12 mt-6"
+                    className="w-full bg-brand-500 hover:bg-brand-600 text-black font-bold h-12 mt-6"
                     onClick={handlePlaceOrder}
                     disabled={
                       loading ||

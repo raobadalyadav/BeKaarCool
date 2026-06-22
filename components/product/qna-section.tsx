@@ -100,7 +100,7 @@ export function QnaSection({ productId, questions: initial }: QnaSectionProps) {
             <Button
               onClick={submit}
               disabled={loading || !draft.trim()}
-              className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+              className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />

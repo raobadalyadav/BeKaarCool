@@ -185,7 +185,7 @@ export default function CartPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container">
           <Skeleton className="h-8 w-48 mb-8" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
@@ -217,8 +217,8 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gray-50 py-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <ShoppingBag className="h-12 w-12 text-[#F38508]" />
+          <div className="w-24 h-24 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="h-12 w-12 text-brand-500" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-3">
             Your cart is empty
@@ -228,7 +228,7 @@ export default function CartPage() {
             arrivals and deals.
           </p>
           <Link href="/products">
-            <Button size="lg" className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
+            <Button size="lg" className="bg-brand-500 hover:bg-brand-600 text-black font-bold">
               <ShoppingCart className="mr-2 h-5 w-5" />
               Browse Products
             </Button>
@@ -240,7 +240,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container">
         <div className="flex items-center mb-6">
           <Button
             variant="ghost"
@@ -293,7 +293,7 @@ export default function CartPage() {
                       <div className="flex-1 min-w-0 flex flex-col">
                         <Link
                           href={`/products/${item.productSlug}`}
-                          className="font-semibold text-gray-900 hover:text-[#F38508] line-clamp-2"
+                          className="font-semibold text-gray-900 hover:text-brand-500 line-clamp-2"
                         >
                           {item.productTitle}
                         </Link>
@@ -406,7 +406,7 @@ export default function CartPage() {
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/products/${item.productSlug}`}
-                            className="font-medium text-sm line-clamp-2 hover:text-[#F38508]"
+                            className="font-medium text-sm line-clamp-2 hover:text-brand-500"
                           >
                             {item.productTitle}
                           </Link>
@@ -422,7 +422,7 @@ export default function CartPage() {
                             size="sm"
                             onClick={() => handleMoveToCart(item.id)}
                             disabled={updating === item.id}
-                            className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-8 text-xs"
+                            className="bg-brand-500 hover:bg-brand-600 text-black font-bold h-8 text-xs"
                           >
                             <ArrowUp className="h-3 w-3 mr-1" />
                             Move to cart
@@ -479,7 +479,7 @@ export default function CartPage() {
                 </div>
 
                 <Link href="/checkout">
-                  <Button className="w-full bg-[#F38508] hover:bg-[#D97706] text-black font-bold" size="lg">
+                  <Button className="w-full bg-brand-500 hover:bg-brand-600 text-black font-bold" size="lg">
                     Proceed to Checkout
                   </Button>
                 </Link>
@@ -551,7 +551,7 @@ export default function CartPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-700 flex items-center gap-1">
-                    <Gift className="w-3 h-3 text-[#F38508]" /> Gift Message
+                    <Gift className="w-3 h-3 text-brand-500" /> Gift Message
                   </label>
                   <Textarea 
                     placeholder="Adding a gift? Write a message here..." 

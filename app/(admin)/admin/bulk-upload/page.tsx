@@ -76,7 +76,7 @@ export default function AdminBulkUploadPage() {
             <div className="space-y-2">
               {FIELDS.map((f) => (
                 <div key={f.name} className="text-xs">
-                  <span className="font-mono text-[#F38508]">{f.name}</span>
+                  <span className="font-mono text-brand-500">{f.name}</span>
                   {f.required && <span className="text-red-500 ml-1">*</span>}
                   <span className="text-gray-500 ml-1">— {f.desc}</span>
                 </div>
@@ -88,7 +88,7 @@ export default function AdminBulkUploadPage() {
               </p>
               <button
                 onClick={downloadTemplate}
-                className="flex items-center gap-2 text-sm text-[#F38508] font-medium hover:underline"
+                className="flex items-center gap-2 text-sm text-brand-500 font-medium hover:underline"
               >
                 <Download className="w-4 h-4" /> Download Template
               </button>
@@ -110,8 +110,8 @@ export default function AdminBulkUploadPage() {
             <h2 className="font-semibold text-gray-900 mb-4">Upload CSV</h2>
 
             {/* File picker */}
-            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-8 cursor-pointer hover:border-[#F38508] transition-colors group">
-              <Upload className="w-8 h-8 text-gray-300 group-hover:text-[#F38508] mb-2 transition-colors" />
+            <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-8 cursor-pointer hover:border-brand-500 transition-colors group">
+              <Upload className="w-8 h-8 text-gray-300 group-hover:text-brand-500 mb-2 transition-colors" />
               <p className="text-sm text-gray-500 font-medium">Click to choose a CSV file</p>
               <p className="text-xs text-gray-400 mt-1">or paste CSV below</p>
               <input type="file" accept=".csv,text/csv" className="sr-only" onChange={handleFile} />
@@ -128,7 +128,7 @@ export default function AdminBulkUploadPage() {
               onChange={(e) => setCsv(e.target.value)}
               rows={10}
               placeholder="slug,title,description,brandSlug,categorySlug,sku,priceMinor,..."
-              className="w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508] resize-none text-gray-700 placeholder-gray-300"
+              className="w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none text-gray-700 placeholder-gray-300"
             />
 
             {error && (
@@ -141,7 +141,7 @@ export default function AdminBulkUploadPage() {
               <button
                 onClick={handleImport}
                 disabled={!csv.trim() || importing}
-                className="flex items-center gap-2 bg-[#F38508] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#d97507] disabled:opacity-60"
+                className="flex items-center gap-2 bg-brand-500 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#d97507] disabled:opacity-60"
               >
                 <Upload className="w-4 h-4" />
                 {importing ? "Importing..." : "Import Products"}

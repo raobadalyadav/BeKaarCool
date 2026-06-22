@@ -80,7 +80,7 @@ export default function AdminBrandsPage() {
         </div>
         <button
           onClick={openNew}
-          className="flex items-center gap-2 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold px-4 py-2 rounded-lg text-sm"
+          className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-black font-semibold px-4 py-2 rounded-lg text-sm"
         >
           <Plus className="w-4 h-4" /> Add Brand
         </button>
@@ -96,7 +96,7 @@ export default function AdminBrandsPage() {
                 <input
                   value={form.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g. Nike"
                 />
               </div>
@@ -105,7 +105,7 @@ export default function AdminBrandsPage() {
                 <input
                   value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="nike"
                 />
               </div>
@@ -114,7 +114,7 @@ export default function AdminBrandsPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
+                className="flex-1 bg-brand-500 hover:bg-brand-600 text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save"}
               </button>

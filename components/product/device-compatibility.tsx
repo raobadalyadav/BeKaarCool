@@ -23,7 +23,7 @@ export function DeviceCompatibility({ devices }: DeviceCompatibilityProps) {
           placeholder="Search your device..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F38508]/30 focus:border-[#F38508]"
+          className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
         />
       </div>
 

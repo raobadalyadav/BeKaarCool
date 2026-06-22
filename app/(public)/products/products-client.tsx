@@ -416,7 +416,7 @@ export default function ProductsPageClient() {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* ── Sticky toolbar ── */}
       <div className="bg-white border-b sticky top-16 md:top-20 z-30 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="container py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-[#111827]">
               {selectedCategories.length > 0 ? selectedCategories.join(", ") : "All Products"}
@@ -431,7 +431,7 @@ export default function ProductsPageClient() {
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-gray-400 hidden md:inline uppercase tracking-wide">Sort</span>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[160px] border-[#E5E7EB] text-sm font-semibold text-[#111827] focus:ring-[#F38508]">
+                <SelectTrigger className="w-[160px] border-[#E5E7EB] text-sm font-semibold text-[#111827] focus:ring-brand-500">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -452,7 +452,7 @@ export default function ProductsPageClient() {
                   <Filter className="h-4 w-4" />
                   Filters
                   {hasActiveFilters && (
-                    <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-[#F38508] text-white border-0">
+                    <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-brand-500 text-white border-0">
                       {activeFilterCount}
                     </Badge>
                   )}
@@ -472,7 +472,7 @@ export default function ProductsPageClient() {
                 </div>
                 <div className="sticky bottom-0 p-4 border-t bg-white">
                   <Button
-                    className="w-full bg-[#F38508] hover:bg-[#D97706] text-white font-bold"
+                    className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold"
                     onClick={() => setMobileFilterOpen(false)}
                   >
                     Show Results
@@ -484,7 +484,7 @@ export default function ProductsPageClient() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6 flex gap-6">
+      <div className="container py-6 flex gap-6">
         {/* ── Desktop Sidebar ── */}
         <div className="hidden lg:block w-60 flex-shrink-0">
           <div className="sticky top-40 max-h-[calc(100vh-170px)] overflow-y-auto pr-2 custom-scrollbar">
@@ -492,7 +492,7 @@ export default function ProductsPageClient() {
               <span className="font-bold text-[#111827] text-xs uppercase tracking-wider">Filters</span>
               {hasActiveFilters && (
                 <button
-                  className="text-xs text-[#F38508] font-semibold hover:underline"
+                  className="text-xs text-brand-500 font-semibold hover:underline"
                   onClick={clearAllFilters}
                 >
                   Clear All
@@ -511,7 +511,7 @@ export default function ProductsPageClient() {
               {selectedCategories.map(cat => (
                 <Badge
                   key={cat}
-                  className="px-3 py-1 bg-[#F38508]/10 text-[#F38508] border border-[#F38508]/30 font-medium text-xs cursor-pointer hover:bg-[#F38508]/20"
+                  className="px-3 py-1 bg-brand-500/10 text-brand-500 border border-brand-500/30 font-medium text-xs cursor-pointer hover:bg-brand-500/20"
                   onClick={() => setSelectedCategories(prev => prev.filter(c => c !== cat))}
                 >
                   {cat} <X className="ml-1.5 h-3 w-3 inline" />
@@ -561,7 +561,7 @@ export default function ProductsPageClient() {
               <AlertCircle className="h-12 w-12 text-red-400 mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
               <p className="text-gray-500 mb-6">{error}</p>
-              <Button className="bg-[#F38508] hover:bg-[#D97706] text-white" onClick={() => fetchProducts(cursorStack[currentPage])}>
+              <Button className="bg-brand-500 hover:bg-brand-600 text-white" onClick={() => fetchProducts(cursorStack[currentPage])}>
                 Try Again
               </Button>
             </div>
@@ -579,14 +579,14 @@ export default function ProductsPageClient() {
           {/* Empty state */}
           {!loading && !error && products.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-5">
-                <Search className="h-9 w-9 text-[#F38508]" />
+              <div className="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mb-5">
+                <Search className="h-9 w-9 text-brand-500" />
               </div>
               <h3 className="text-xl font-bold text-[#111827] mb-2">No Products Found</h3>
               <p className="text-gray-500 max-w-sm mb-6 text-sm">
                 We couldn&apos;t find any products matching your filters. Try adjusting or clearing them.
               </p>
-              <Button className="bg-[#F38508] hover:bg-[#D97706] text-white font-bold" onClick={clearAllFilters}>
+              <Button className="bg-brand-500 hover:bg-brand-600 text-white font-bold" onClick={clearAllFilters}>
                 Clear All Filters
               </Button>
             </div>
@@ -609,7 +609,7 @@ export default function ProductsPageClient() {
                 size="sm"
                 disabled={currentPage === 0}
                 onClick={goPrevPage}
-                className="gap-1 border-[#E5E7EB] text-[#111827] hover:border-[#F38508] hover:text-[#F38508]"
+                className="gap-1 border-[#E5E7EB] text-[#111827] hover:border-brand-500 hover:text-brand-500"
               >
                 <ChevronLeft className="h-4 w-4" /> Previous
               </Button>
@@ -619,7 +619,7 @@ export default function ProductsPageClient() {
                 size="sm"
                 disabled={!hasNextPage}
                 onClick={goNextPage}
-                className="gap-1 border-[#E5E7EB] text-[#111827] hover:border-[#F38508] hover:text-[#F38508]"
+                className="gap-1 border-[#E5E7EB] text-[#111827] hover:border-brand-500 hover:text-brand-500"
               >
                 Next <ChevronRight className="h-4 w-4" />
               </Button>

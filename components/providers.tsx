@@ -8,7 +8,6 @@ import { CurrencyProvider } from "@/contexts/currency-context";
 import { ChatProvider } from "@/contexts/chat-context";
 import { CartProvider } from "@/contexts/cart-context";
 import { WishlistProvider } from "@/contexts/wishlist-context";
-import { LiveChat } from "@/components/support/live-chat";
 import { ReferralCapture } from "@/components/referral-capture";
 
 export function Providers({ children, session }: { children: React.ReactNode; session: Session | null }) {
@@ -22,7 +21,6 @@ export function Providers({ children, session }: { children: React.ReactNode; se
               <ReferralCapture />
               <div className="min-h-screen flex flex-col">
                 <main className="flex-1">{children}</main>
-                <LiveChat />
               </div>
             </ChatProvider>
             </WishlistProvider>

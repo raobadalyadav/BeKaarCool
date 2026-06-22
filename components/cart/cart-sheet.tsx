@@ -48,7 +48,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
 
                 {/* Free Shipping Progress */}
                 {items.length > 0 && (
-                    <div className="px-6 py-3 bg-orange-50 border-b border-orange-100">
+                    <div className="px-6 py-3 bg-brand-50 border-b border-orange-100">
                         <div className="flex items-center gap-2 text-xs font-semibold text-gray-800 mb-2">
                             <Truck className="w-4 h-4" />
                             {amountToFreeShipping > 0
@@ -58,7 +58,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                         </div>
                         <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-[#F38508] transition-all duration-300 rounded-full"
+                                className="h-full bg-brand-500 transition-all duration-300 rounded-full"
                                 style={{ width: `${progressPercentage}%` }}
                             />
                         </div>
@@ -75,7 +75,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                             <p className="text-sm text-gray-500 max-w-[200px]">Looks like you haven't added anything to your bag yet.</p>
                             <Button
                                 onClick={() => setIsOpen(false)}
-                                className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold uppercase tracking-wide"
+                                className="mt-4 bg-brand-500 hover:bg-brand-600 text-black font-bold uppercase tracking-wide"
                             >
                                 Start Shopping
                             </Button>
@@ -110,7 +110,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                                                 <Link
                                                     href={`/products/${item.productSlug}`}
                                                     onClick={() => setIsOpen(false)}
-                                                    className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-[#F38508]"
+                                                    className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-brand-500"
                                                 >
                                                     {item.productTitle}
                                                 </Link>
@@ -175,7 +175,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
                         </div>
 
                         <Link href="/checkout" onClick={() => setIsOpen(false)}>
-                            <Button className="w-full h-12 bg-[#F38508] hover:bg-[#D97706] text-black font-bold uppercase tracking-wider text-sm shadow-sm">
+                            <Button className="w-full h-12 bg-brand-500 hover:bg-brand-600 text-black font-bold uppercase tracking-wider text-sm shadow-sm">
                                 Proceed to Checkout
                             </Button>
                         </Link>

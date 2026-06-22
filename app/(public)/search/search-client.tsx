@@ -55,7 +55,6 @@ export default function SearchClient() {
     // Fetch recent and popular searches on mount
     useEffect(() => {
         fetchRecentSearches()
-        fetchPopularSearches()
     }, [])
 
     // Fetch suggestions as user types
@@ -83,10 +82,6 @@ export default function SearchClient() {
                 /* ignore */
             }
         }
-    }
-
-    const fetchPopularSearches = async () => {
-        setPopularSearches(["T-Shirts", "Hoodies", "Mobile Covers", "Mugs"])
     }
 
     const fetchSuggestions = async (_q: string) => {
@@ -155,9 +150,9 @@ export default function SearchClient() {
         <div className="min-h-screen bg-gray-50">
             {/* Breadcrumbs */}
             <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-3">
+                <div className="container py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-[#F38508]">
+                        <Link href="/" className="hover:text-brand-500">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -172,7 +167,7 @@ export default function SearchClient() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container py-8">
                 {/* Search Box */}
                 <div className="max-w-2xl mx-auto mb-8">
                     <form onSubmit={handleSearch} className="relative">
@@ -186,7 +181,7 @@ export default function SearchClient() {
                                 setShowSuggestions(true)
                             }}
                             onFocus={() => setShowSuggestions(true)}
-                            className="pl-12 pr-12 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-[#F38508]"
+                            className="pl-12 pr-12 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-brand-500"
                         />
                         {query && (
                             <button
@@ -263,7 +258,7 @@ export default function SearchClient() {
                                                 <button
                                                     key={search}
                                                     onClick={() => handleRecentSearch(search)}
-                                                    className="px-3 py-1 bg-orange-50 text-[#D97706] rounded-full text-sm hover:bg-orange-100"
+                                                    className="px-3 py-1 bg-brand-50 text-brand-600 rounded-full text-sm hover:bg-orange-100"
                                                 >
                                                     {search}
                                                 </button>
@@ -296,7 +291,7 @@ export default function SearchClient() {
                             <h3 className="text-lg font-semibold text-gray-700">No products found</h3>
                             <p className="text-gray-500 mt-2">Try different keywords or browse categories</p>
                             <Link href="/products">
-                                <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
+                                <Button className="mt-4 bg-brand-500 hover:bg-brand-600 text-black font-bold">
                                     Browse All Products
                                 </Button>
                             </Link>
@@ -326,7 +321,7 @@ export default function SearchClient() {
                                             )}
                                         </div>
                                         <CardContent className="p-4">
-                                            <h3 className="font-semibold text-gray-900 line-clamp-2 hover:text-[#F38508]">
+                                            <h3 className="font-semibold text-gray-900 line-clamp-2 hover:text-brand-500">
                                                 {product.name}
                                             </h3>
                                             {product.category && (

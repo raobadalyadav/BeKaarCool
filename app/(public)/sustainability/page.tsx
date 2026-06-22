@@ -57,7 +57,7 @@ export default function SustainabilityPage() {
         <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
             {/* Breadcrumbs */}
             <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-3">
+                <div className="container py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
                         <Link href="/" className="hover:text-green-600">
                             <Home className="w-4 h-4" />
@@ -70,7 +70,7 @@ export default function SustainabilityPage() {
 
             {/* Hero */}
             <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-16">
-                <div className="container mx-auto px-4 text-center">
+                <div className="container text-center">
                     <Leaf className="w-16 h-16 mx-auto mb-4" />
                     <h1 className="text-4xl font-bold mb-4">Fashion for a Better Tomorrow</h1>
                     <p className="text-lg text-green-100 max-w-2xl mx-auto">
@@ -80,7 +80,7 @@ export default function SustainabilityPage() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
+            <div className="container py-12">
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
                     {stats.map((stat, idx) => (

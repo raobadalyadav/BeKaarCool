@@ -107,7 +107,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
@@ -118,10 +118,10 @@ export default function ContactPage() {
         </div>
 
         {session && (
-          <Alert className="mb-8 border-orange-200 bg-orange-50">
-            <MessageCircle className="h-4 w-4 text-[#F38508]" />
-            <AlertTitle className="text-[#D97706]">Have an account?</AlertTitle>
-            <AlertDescription className="text-[#F38508]">
+          <Alert className="mb-8 border-orange-200 bg-brand-50">
+            <MessageCircle className="h-4 w-4 text-brand-500" />
+            <AlertTitle className="text-brand-600">Have an account?</AlertTitle>
+            <AlertDescription className="text-brand-500">
               For better tracking of your inquiries, please use our{" "}
               <Link href="/account/support" className="font-bold underline hover:text-orange-800">
                 Support Ticket Portal

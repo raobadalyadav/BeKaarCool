@@ -40,7 +40,7 @@ export function EnhancedSearch({
   const [results, setResults] = useState<SearchResult[]>([])
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [recentSearches, setRecentSearches] = useState<string[]>([])
-  const [trendingSearches] = useState(["Custom T-shirts", "Hoodies", "Mugs", "Posters", "Phone Cases"])
+  const [trendingSearches] = useState(["shirts", "jewelry", "mobile cover", "t-shirts", "Phone Cases"])
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
@@ -332,7 +332,7 @@ export function EnhancedSearch({
                 <p className="text-sm text-muted-foreground">No results found for &ldquo;{query}&rdquo;</p>
                 <p className="text-xs text-muted-foreground mt-1">Try different keywords or browse categories</p>
                 <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                  {["T-shirts", "Hoodies", "Mugs", "Custom"].map((suggestion) => (
+                  {["T-shirts", "Jewelry", "Mobile Covers", "Custom"].map((suggestion) => (
                     <Badge
                       key={suggestion}
                       variant="outline"

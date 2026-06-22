@@ -89,14 +89,14 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
             />
             {/* Rating Overlay on Image Bottom Left - Typical Bewakoof Style */}
             <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded flex items-center gap-1 text-[10px] font-bold shadow-sm">
-              <Star className="w-3 h-3 fill-[#F38508] text-[#F38508]" />
+              <Star className="w-3 h-3 fill-brand-500 text-brand-500" />
               <span>{product.rating || "4.5"}</span>
             </div>
           </div>
 
           {/* Sale / Featured Badges */}
           {product.saleOffer && (
-            <div className="absolute top-0 left-0 bg-[#F38508] text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+            <div className="absolute top-0 left-0 bg-brand-500 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
               {product.saleOffer}
             </div>
           )}
@@ -134,7 +134,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
           </div>
 
           {/* Product Name */}
-          <h3 className="text-xs sm:text-sm text-[#111827] font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5em] group-hover:text-[#F38508] transition-colors">
+          <h3 className="text-xs sm:text-sm text-[#111827] font-semibold leading-tight mb-2 line-clamp-2 min-h-[2.5em] group-hover:text-brand-500 transition-colors">
             {product.name}
           </h3>
 
@@ -144,7 +144,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
             {product.originalPrice && product.originalPrice > product.price && (
               <>
                 <span className="text-xs text-gray-400 line-through">₹{product.originalPrice}</span>
-                <span className="text-xs font-bold text-[#F38508]">
+                <span className="text-xs font-bold text-brand-500">
                   {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
                 </span>
               </>
@@ -162,7 +162,7 @@ export function ProductCard({ product, viewMode = "grid", showSaleBadge = false,
             className={`mt-3 w-full font-bold h-9 text-xs tracking-wide transition-colors ${
               isOutOfStock
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100"
-                : "bg-[#F38508] hover:bg-[#D97706] text-white"
+                : "bg-brand-500 hover:bg-brand-600 text-white"
             }`}
             disabled={isOutOfStock || isLoading}
           >

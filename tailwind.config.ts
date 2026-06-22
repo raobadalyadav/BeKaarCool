@@ -13,10 +13,11 @@ const config = {
   theme: {
   	container: {
   		center: true,
-  		padding: '2rem',
-  		screens: {
-  			'2xl': '1400px'
-  		}
+  		padding: {
+  			DEFAULT: '1rem',
+  			sm: '1.5rem',
+  			lg: '2rem',
+  		},
   	},
   	extend: {
   		colors: {
@@ -53,17 +54,44 @@ const config = {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
   			},
-  			brand: {
-				'50':  '#FFF7ED',
-				'100': '#FFEDD5',
-				'200': '#FED7AA',
-				'300': '#FDBA74',
-				'400': '#FB923C',
-				'500': '#F38508',
-				'600': '#D97706',
-				'700': '#B45309',
-				'800': '#92400E',
-				'900': '#78350F',
+  			// Rose Gold — Main Brand (GIVA-style primary)
+			brand: {
+				'50':  '#FDF8F6',
+				'100': '#FAEDE8',
+				'200': '#F2C9BE',
+				'300': '#E8A993',
+				'400': '#DC9582',
+				'500': '#C98B74',
+				'600': '#B9755D',
+				'700': '#9A5E49',
+				'800': '#7A4A39',
+				'900': '#5A3629',
+			},
+			// Secondary Gold accent
+			gold: {
+				'50':  '#FFF9E6',
+				'100': '#FFF0C0',
+				'200': '#FFE280',
+				'300': '#FFD040',
+				'400': '#EFC03A',
+				'500': '#D4AF37',
+				'600': '#B8932D',
+				'700': '#997625',
+				'800': '#7A5E1D',
+				'900': '#5C4615',
+			},
+			// Silver — Neutral warm gray
+			silver: {
+				'50':  '#FAFAF9',
+				'100': '#F5F4F3',
+				'200': '#EAE9E8',
+				'300': '#D4D2D0',
+				'400': '#A8A6A4',
+				'500': '#737170',
+				'600': '#535150',
+				'700': '#3F3D3C',
+				'800': '#2A2928',
+				'900': '#1A1918',
 			},
 			// Blue accent
 			accentBlue: {
@@ -87,9 +115,10 @@ const config = {
 				'400': '#9CA3AF',
 				'500': '#6B7280',
 				'600': '#4B5563',
-				'700': '#374151',
-				'800': '#1F2937',
-				'900': '#111827',
+				'700': '#3D3D3D',
+				'800': '#2D2D2D',
+				'900': '#1C1C1E',
+				'950': '#141414',
 			},
   			success: {
   				'50': '#f0fdf4',

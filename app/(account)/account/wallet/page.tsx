@@ -90,7 +90,7 @@ export default function WalletPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">My Wallet</h1>
 
-      <Card className="bg-gradient-to-br from-[#F38508] to-[#D97706] text-white border-0">
+      <Card className="bg-gradient-to-br from-brand-500 to-brand-600 text-white border-0">
         <CardContent className="p-6 flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-black/10 flex items-center justify-center">
             <WalletIcon className="w-7 h-7" />
@@ -145,7 +145,7 @@ export default function WalletPage() {
               <Button
                 type="submit"
                 disabled={redeeming || !code.trim() || !pin.trim()}
-                className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+                className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
               >
                 {redeeming && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                 Redeem

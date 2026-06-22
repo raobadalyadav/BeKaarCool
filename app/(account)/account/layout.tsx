@@ -67,17 +67,17 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     if (status === "loading") {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F38508]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
             </div>
         )
     }
 
     if (!session) {
         return (
-            <div className="container mx-auto px-4 py-8">
+            <div className="container py-8">
                 <Alert>
                     <AlertDescription>
-                        Please <Link href="/auth/login" className="text-[#F38508] font-semibold underline">log in</Link> to view your account.
+                        Please <Link href="/auth/login" className="text-brand-500 font-semibold underline">log in</Link> to view your account.
                     </AlertDescription>
                 </Alert>
             </div>
@@ -89,7 +89,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 py-6">
+            <div className="container py-6">
                 {/* Breadcrumbs */}
                 <nav className="flex items-center gap-2 text-sm mb-6 text-gray-500">
                     {breadcrumbs.map((crumb, idx) => (
@@ -98,7 +98,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                             {idx === breadcrumbs.length - 1 ? (
                                 <span className="text-gray-900 font-medium">{crumb.label}</span>
                             ) : (
-                                <Link href={crumb.href} className="hover:text-[#F38508] transition-colors">
+                                <Link href={crumb.href} className="hover:text-brand-500 transition-colors">
                                     {idx === 0 ? <Home className="w-4 h-4" /> : crumb.label}
                                 </Link>
                             )}
@@ -114,7 +114,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                             <div className="flex items-center gap-3">
                                 <Avatar className="h-14 w-14 flex-shrink-0">
                                     <AvatarImage src={(user as { avatar?: string }).avatar ?? ""} />
-                                    <AvatarFallback className="bg-gradient-to-br from-[#F38508] to-[#D97706] text-black text-lg font-black">
+                                    <AvatarFallback className="bg-gradient-to-br from-brand-500 to-brand-600 text-black text-lg font-black">
                                         {(user.name ?? user.email ?? "?").split(" ").map((w: string) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                     </AvatarFallback>
                                 </Avatar>
@@ -135,7 +135,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="w-full mt-4 border-[#F38508] text-[#F38508] hover:bg-orange-50 text-xs"
+                                    className="w-full mt-4 border-brand-500 text-brand-500 hover:bg-brand-50 text-xs"
                                 >
                                     <Edit2 className="w-3.5 h-3.5 mr-1.5" /> Edit Profile
                                 </Button>
@@ -151,7 +151,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                                         key={item.id}
                                         href={item.href}
                                         className={`w-full flex items-center justify-between px-4 py-3 border-b last:border-b-0 transition-colors ${isActive
-                                            ? "bg-orange-50 text-[#D97706] border-l-4 border-l-[#F38508]"
+                                            ? "bg-brand-50 text-brand-600 border-l-4 border-l-brand-500"
                                             : "hover:bg-gray-50 text-gray-700"
                                             }`}
                                     >

@@ -87,7 +87,7 @@ export default function ReturnsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
@@ -279,7 +279,7 @@ export default function ReturnsPage() {
         </div>
 
         {/* Important Information */}
-        <Card className="border-orange-200 bg-orange-50">
+        <Card className="border-orange-200 bg-brand-50">
           <CardHeader>
             <CardTitle className="flex items-center text-orange-900">
               <AlertTriangle className="h-5 w-5 mr-2" />

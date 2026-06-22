@@ -123,28 +123,28 @@ export default function BlogDetailClient({ post, relatedPosts }: Props) {
         <div className="min-h-screen bg-white">
             {/* Breadcrumbs */}
             <div className="bg-gray-50 border-b">
-                <div className="container mx-auto px-4 py-3">
+                <div className="container py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-[#F38508]">
+                        <Link href="/" className="hover:text-brand-500">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
-                        <Link href="/blog" className="hover:text-[#F38508]">Blog</Link>
+                        <Link href="/blog" className="hover:text-brand-500">Blog</Link>
                         <ChevronRight className="w-4 h-4" />
                         <span className="text-gray-900 font-medium line-clamp-1">{post.title}</span>
                     </nav>
                 </div>
             </div>
 
-            <article className="container mx-auto px-4 py-8 max-w-4xl">
+            <article className="container py-8 max-w-4xl">
                 {/* Back Link */}
-                <Link href="/blog" className="inline-flex items-center text-gray-500 hover:text-[#F38508] mb-6">
+                <Link href="/blog" className="inline-flex items-center text-gray-500 hover:text-brand-500 mb-6">
                     <ArrowLeft className="w-4 h-4 mr-1" /> Back to Blog
                 </Link>
 
                 {/* Header */}
                 <header className="mb-8">
-                    <Badge className="bg-[#F38508] text-black mb-4">{post.category}</Badge>
+                    <Badge className="bg-brand-500 text-black mb-4">{post.category}</Badge>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
 
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
@@ -245,7 +245,7 @@ export default function BlogDetailClient({ post, relatedPosts }: Props) {
                                                 />
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold line-clamp-2 hover:text-[#F38508]">
+                                                <h3 className="font-semibold line-clamp-2 hover:text-brand-500">
                                                     {related.title}
                                                 </h3>
                                                 <p className="text-sm text-gray-500 mt-1">{related.readTime} min read</p>

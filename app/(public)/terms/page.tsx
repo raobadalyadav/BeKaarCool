@@ -163,7 +163,7 @@ export default function TermsPage() {
         </div>
 
         {/* Important Notice */}
-        <Card className="mb-8 border-orange-200 bg-orange-50">
+        <Card className="mb-8 border-orange-200 bg-brand-50">
           <CardContent className="p-6">
             <div className="flex items-start space-x-3">
               <AlertCircle className="h-6 w-6 text-orange-600 flex-shrink-0 mt-0.5" />

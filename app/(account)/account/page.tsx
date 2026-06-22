@@ -37,7 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
   shipped:         "bg-indigo-50 text-indigo-700 border-indigo-200",
   delivered:       "bg-green-50 text-green-700 border-green-200",
   cancelled:       "bg-red-50 text-red-700 border-red-200",
-  return_pending:  "bg-orange-50 text-orange-700 border-orange-200",
+  return_pending:  "bg-brand-50 text-orange-700 border-orange-200",
   return_approved: "bg-teal-50 text-teal-700 border-teal-200",
   returned:        "bg-gray-50 text-gray-600 border-gray-200",
   refunded:        "bg-gray-50 text-gray-500 border-gray-200",
@@ -46,8 +46,8 @@ const STATUS_COLORS: Record<string, string> = {
 /* ── Quick action card ──────────────────────────────────────────── */
 function ActionCard({ icon: Icon, title, description, href }: { icon: React.ElementType; title: string; description: string; href: string }) {
   return (
-    <Link href={href} className="bg-white p-5 rounded-xl border hover:shadow-md hover:border-[#F38508]/40 transition-all group block">
-      <Icon className="w-7 h-7 text-[#F38508] mb-2.5 group-hover:scale-110 transition-transform" />
+    <Link href={href} className="bg-white p-5 rounded-xl border hover:shadow-md hover:border-brand-500/40 transition-all group block">
+      <Icon className="w-7 h-7 text-brand-500 mb-2.5 group-hover:scale-110 transition-transform" />
       <h3 className="font-semibold text-gray-900 text-sm">{title}</h3>
       <p className="text-xs text-gray-500 mt-0.5">{description}</p>
     </Link>
@@ -79,7 +79,7 @@ export default function AccountOverviewPage() {
   return (
     <div className="space-y-8">
       {/* Welcome banner */}
-      <div className="bg-gradient-to-r from-[#F38508] to-[#D97706] rounded-2xl p-6 text-black">
+      <div className="bg-gradient-to-r from-brand-500 to-brand-600 rounded-2xl p-6 text-black">
         <h1 className="text-2xl font-black">
           Hello, {user?.name?.split(" ")[0] ?? "there"} 👋
         </h1>
@@ -112,7 +112,7 @@ export default function AccountOverviewPage() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-gray-900">Recent Orders</h2>
-          <Link href="/account/orders" className="text-sm text-[#F38508] hover:underline flex items-center gap-1">
+          <Link href="/account/orders" className="text-sm text-brand-500 hover:underline flex items-center gap-1">
             View all <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -126,7 +126,7 @@ export default function AccountOverviewPage() {
             <CardContent className="py-10 text-center">
               <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-3" />
               <p className="text-gray-500 text-sm">No orders yet</p>
-              <Link href="/products" className="text-[#F38508] text-sm hover:underline mt-1 block">Start shopping →</Link>
+              <Link href="/products" className="text-brand-500 text-sm hover:underline mt-1 block">Start shopping →</Link>
             </CardContent>
           </Card>
         ) : (
@@ -157,7 +157,7 @@ export default function AccountOverviewPage() {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-black text-sm text-[#F38508]">₹{minorToRupees(order.totalMinor).toLocaleString("en-IN")}</p>
+                        <p className="font-black text-sm text-brand-500">₹{minorToRupees(order.totalMinor).toLocaleString("en-IN")}</p>
                         <Badge
                           variant="outline"
                           className={`mt-1 text-[10px] ${STATUS_COLORS[order.status] ?? "bg-gray-50 text-gray-600"}`}

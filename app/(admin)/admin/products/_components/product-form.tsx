@@ -225,7 +225,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g. Premium Cotton T-Shirt"
                 />
               </div>
@@ -234,7 +234,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="premium-cotton-t-shirt"
                 />
               </div>
@@ -243,7 +243,7 @@ export function ProductForm({ product }: Props) {
                 <input
                   value={shortDescription}
                   onChange={(e) => setShortDescription(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="One-line summary shown below the product title"
                 />
               </div>
@@ -253,7 +253,7 @@ export function ProductForm({ product }: Props) {
                   value={descriptionHtml}
                   onChange={(e) => setDescriptionHtml(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="<p>Full product description...</p>"
                 />
               </div>
@@ -317,7 +317,7 @@ export function ProductForm({ product }: Props) {
                   value={highlightsText}
                   onChange={(e) => setHighlightsText(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder={"100% Pure Cotton\nMachine Washable\nOversized Fit"}
                 />
               </div>
@@ -328,7 +328,7 @@ export function ProductForm({ product }: Props) {
                   value={specificationsText}
                   onChange={(e) => setSpecificationsText(e.target.value)}
                   rows={5}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder={"Material: 100% Cotton\nFit: Regular\nSleeve: Half Sleeve\nPattern: Solid"}
                 />
               </div>
@@ -338,7 +338,7 @@ export function ProductForm({ product }: Props) {
               <input
                 value={tagsText}
                 onChange={(e) => setTagsText(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder="cotton, summer, casual, t-shirt (comma separated)"
               />
             </div>
@@ -372,7 +372,7 @@ export function ProductForm({ product }: Props) {
                       <input
                         value={v.sku}
                         onChange={(e) => updateVariant(i, "sku", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="TSHIRT-BLK-M"
                       />
                     </div>
@@ -382,7 +382,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.priceMinor}
                         onChange={(e) => updateVariant(i, "priceMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="999"
                       />
                     </div>
@@ -392,7 +392,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.compareAtMinor}
                         onChange={(e) => updateVariant(i, "compareAtMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="1999"
                       />
                     </div>
@@ -402,7 +402,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.costMinor}
                         onChange={(e) => updateVariant(i, "costMinor", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="500"
                       />
                     </div>
@@ -412,7 +412,7 @@ export function ProductForm({ product }: Props) {
                         type="number"
                         value={v.weightGrams}
                         onChange={(e) => updateVariant(i, "weightGrams", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder="250"
                       />
                     </div>
@@ -421,7 +421,7 @@ export function ProductForm({ product }: Props) {
                       <input
                         value={v.optionsJson}
                         onChange={(e) => updateVariant(i, "optionsJson", e.target.value)}
-                        className="w-full border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                        className="w-full border rounded px-2 py-1.5 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-brand-500"
                         placeholder='{"size":"M","color":"Black"}'
                       />
                     </div>
@@ -442,7 +442,7 @@ export function ProductForm({ product }: Props) {
                   <input
                     value={fashionFabric}
                     onChange={(e) => setFashionFabric(e.target.value)}
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                     placeholder="e.g. 100% Cotton, 925 Sterling Silver"
                   />
                 </div>
@@ -451,7 +451,7 @@ export function ProductForm({ product }: Props) {
                   <select
                     value={fashionFitType}
                     onChange={(e) => setFashionFitType(e.target.value)}
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="">— Select Fit —</option>
                     <option>Regular Fit</option>
@@ -470,7 +470,7 @@ export function ProductForm({ product }: Props) {
                   value={fashionCareText}
                   onChange={(e) => setFashionCareText(e.target.value)}
                   rows={3}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder={"Machine wash cold\nDo not bleach\nTumble dry low"}
                 />
               </div>
@@ -481,7 +481,7 @@ export function ProductForm({ product }: Props) {
                   value={fashionFitGuideJson}
                   onChange={(e) => setFashionFitGuideJson(e.target.value)}
                   rows={4}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder='{"columns":["Size","Chest (in)","Waist (in)"],"rows":[{"Size":"S","Chest (in)":"36","Waist (in)":"30"}]}'
                 />
               </div>
@@ -491,7 +491,7 @@ export function ProductForm({ product }: Props) {
                   id="ringSizeGuide"
                   checked={fashionRingSizeGuide}
                   onChange={(e) => setFashionRingSizeGuide(e.target.checked)}
-                  className="w-4 h-4 accent-[#F38508]"
+                  className="w-4 h-4 accent-brand-500"
                 />
                 <label htmlFor="ringSizeGuide" className="text-sm font-medium text-gray-700">
                   Show Ring Size Guide on product page (Jewellery)
@@ -504,7 +504,7 @@ export function ProductForm({ product }: Props) {
                   value={fashionCompatibilityText}
                   onChange={(e) => setFashionCompatibilityText(e.target.value)}
                   rows={4}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder={"iPhone 15 Pro Max\niPhone 15 Pro\nSamsung Galaxy S24 Ultra\nOnePlus 12"}
                 />
               </div>
@@ -520,7 +520,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="draft">Draft</option>
               <option value="published">Published</option>
@@ -529,7 +529,7 @@ export function ProductForm({ product }: Props) {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="w-full mt-4 bg-[#F38508] hover:bg-[#D97706] disabled:opacity-50 text-black font-semibold py-2.5 rounded-lg text-sm transition-colors"
+              className="w-full mt-4 bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-black font-semibold py-2.5 rounded-lg text-sm transition-colors"
             >
               {saving ? "Saving..." : product ? "Update Product" : "Create Product"}
             </button>
@@ -541,7 +541,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">— Select Category —</option>
               {topCats.map((c) => (
@@ -566,7 +566,7 @@ export function ProductForm({ product }: Props) {
             <select
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">— Select Brand —</option>
               {brands.map((b) => (

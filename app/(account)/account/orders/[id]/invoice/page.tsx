@@ -42,11 +42,11 @@ export default function InvoicePage() {
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 max-w-xl text-center">
+      <div className="container py-16 max-w-xl text-center">
         <p className="text-red-600">{error}</p>
         <Link
           href={`/account/orders/${orderNumber}`}
-          className="text-[#F38508] underline mt-4 inline-block"
+          className="text-brand-500 underline mt-4 inline-block"
         >
           ← Back to order
         </Link>
@@ -56,7 +56,7 @@ export default function InvoicePage() {
 
   if (!doc) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-3xl space-y-4">
+      <div className="container py-8 max-w-3xl space-y-4">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-64 w-full" />
       </div>
@@ -64,7 +64,7 @@ export default function InvoicePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
+    <div className="container py-8 max-w-3xl">
       <div className="flex items-center justify-between mb-6 print:hidden">
         <Link
           href={`/account/orders/${orderNumber}`}

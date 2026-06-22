@@ -11,7 +11,7 @@ const TYPE_COLORS: Record<string, string> = {
   manual: "bg-blue-100 text-blue-700",
   rule_based: "bg-purple-100 text-purple-700",
   ip_licensed: "bg-orange-100 text-orange-700",
-  tribe_exclusive: "bg-orange-100 text-[#D97706]",
+  tribe_exclusive: "bg-orange-100 text-brand-600",
 }
 
 export default function AdminCollectionsPage() {
@@ -96,7 +96,7 @@ export default function AdminCollectionsPage() {
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold px-4 py-2 rounded-lg text-sm"
+          className="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-black font-semibold px-4 py-2 rounded-lg text-sm"
         >
           <Plus className="w-4 h-4" /> New Collection
         </button>
@@ -113,7 +113,7 @@ export default function AdminCollectionsPage() {
                 <input
                   value={form.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g. Summer Essentials"
                 />
               </div>
@@ -122,7 +122,7 @@ export default function AdminCollectionsPage() {
                 <input
                   value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="summer-essentials"
                 />
               </div>
@@ -131,7 +131,7 @@ export default function AdminCollectionsPage() {
                 <select
                   value={form.type}
                   onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   <option value="manual">Manual</option>
                   <option value="rule_based">Rule-based</option>
@@ -144,7 +144,7 @@ export default function AdminCollectionsPage() {
               <button
                 onClick={handleCreate}
                 disabled={saving}
-                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
+                className="flex-1 bg-brand-500 hover:bg-brand-600 text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
               >
                 {saving ? "Creating..." : "Create"}
               </button>
@@ -176,7 +176,7 @@ export default function AdminCollectionsPage() {
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     placeholder="Search..."
-                    className="w-full pl-8 pr-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#F38508]"
+                    className="w-full pl-8 pr-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
                   />
                 </div>
                 <div className="overflow-y-auto flex-1 space-y-1">
@@ -184,7 +184,7 @@ export default function AdminCollectionsPage() {
                     <button
                       key={p.id}
                       onClick={() => handleAddProduct(p)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 text-left rounded hover:bg-orange-50 text-sm"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 text-left rounded hover:bg-brand-50 text-sm"
                     >
                       {p.images[0] ? (
                         <img src={p.images[0]} alt="" className="w-7 h-7 rounded object-cover flex-shrink-0" />

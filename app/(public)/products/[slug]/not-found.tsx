@@ -5,7 +5,7 @@ import { Package, ArrowLeft } from "lucide-react"
 
 export default function ProductNotFound() {
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container py-16">
       <Card className="max-w-md mx-auto text-center">
         <CardContent className="p-8">
           <Package className="h-16 w-16 mx-auto mb-4 text-gray-400" />

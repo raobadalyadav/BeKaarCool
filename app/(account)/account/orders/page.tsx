@@ -34,7 +34,7 @@ const STATUS_META: Record<string, { label: string; icon: typeof Package; color: 
   shipped:         { label: "Shipped",           icon: Truck, color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   delivered:       { label: "Delivered",         icon: CheckCircle, color: "bg-green-50 text-green-700 border-green-200" },
   cancelled:       { label: "Cancelled",         icon: XCircle, color: "bg-red-50 text-red-700 border-red-200" },
-  return_pending:  { label: "Return Requested",  icon: RotateCcw, color: "bg-orange-50 text-orange-700 border-orange-200" },
+  return_pending:  { label: "Return Requested",  icon: RotateCcw, color: "bg-brand-50 text-orange-700 border-orange-200" },
   return_approved: { label: "Return Approved",   icon: RotateCcw, color: "bg-teal-50 text-teal-700 border-teal-200" },
   returned:        { label: "Returned",          icon: RotateCcw, color: "bg-gray-50 text-gray-700 border-gray-200" },
   refunded:        { label: "Refunded",          icon: CheckCircle, color: "bg-gray-50 text-gray-600 border-gray-200" },
@@ -123,7 +123,7 @@ function OrderCard({ order, onRefresh }: { order: OrderDto; onRefresh: () => voi
                     <Badge variant="secondary" className="text-[10px] h-4 px-1.5">Qty: {item.quantity}</Badge>
                   </div>
                   {item.productSlug && (
-                    <Link href={`/products/${item.productSlug}`} className="text-[11px] text-[#F38508] hover:underline mt-1 block">
+                    <Link href={`/products/${item.productSlug}`} className="text-[11px] text-brand-500 hover:underline mt-1 block">
                       View product →
                     </Link>
                   )}
@@ -142,7 +142,7 @@ function OrderCard({ order, onRefresh }: { order: OrderDto; onRefresh: () => voi
           <div className="flex items-center gap-6">
             <div>
               <p className="text-xs text-gray-400">Order Total</p>
-              <p className="text-lg font-black text-[#F38508]">₹{total.toLocaleString("en-IN")}</p>
+              <p className="text-lg font-black text-brand-500">₹{total.toLocaleString("en-IN")}</p>
             </div>
             {order.couponCode && (
               <div>
@@ -258,7 +258,7 @@ export default function MyOrdersPage() {
           <ShoppingBag className="w-14 h-14 text-gray-200 mx-auto mb-4" />
           <p className="text-gray-500 font-medium">{emptyMsg}</p>
           <Link href="/products">
-            <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold" size="sm">
+            <Button className="mt-4 bg-brand-500 hover:bg-brand-600 text-black font-bold" size="sm">
               Browse Products
             </Button>
           </Link>

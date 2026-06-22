@@ -100,8 +100,8 @@ export default function AdminReturnsPage() {
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
               statusFilter === s
-                ? "bg-[#F38508] text-white"
-                : "bg-white border text-gray-600 hover:border-[#F38508] hover:text-[#F38508]"
+                ? "bg-brand-500 text-white"
+                : "bg-white border text-gray-600 hover:border-brand-500 hover:text-brand-500"
             }`}
           >
             {s.replace(/_/g, " ")}
@@ -223,7 +223,7 @@ export default function AdminReturnsPage() {
                   value={refundAmount}
                   onChange={(e) => setRefundAmount(e.target.value)}
                   placeholder="e.g. 499.00"
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               {actionError && <p className="text-red-600 text-sm">{actionError}</p>}

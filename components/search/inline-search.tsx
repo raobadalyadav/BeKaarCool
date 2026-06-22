@@ -144,7 +144,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
   return (
     <div ref={dropRef} className={`relative w-full ${className}`}>
       {/* Search input */}
-      <div className={`flex items-center w-full bg-white border-2 transition-colors rounded-sm overflow-hidden ${focused ? "border-[#F38508]" : "border-gray-200"}`}>
+      <div className={`flex items-center w-full bg-white border-2 transition-colors rounded-sm overflow-hidden ${focused ? "border-brand-500" : "border-gray-200"}`}>
         <Search className="flex-shrink-0 ml-3 h-4 w-4 text-gray-400" />
         <input
           ref={inputRef}
@@ -168,7 +168,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
         )}
         <button
           onClick={() => query.trim() && navigate(query.trim())}
-          className="flex-shrink-0 h-10 px-5 bg-[#F38508] hover:bg-[#D97706] text-gray-900 font-semibold text-sm transition-colors"
+          className="flex-shrink-0 h-10 px-5 bg-brand-500 hover:bg-brand-600 text-gray-900 font-semibold text-sm transition-colors"
         >
           Search
         </button>
@@ -181,7 +181,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
           {/* Loading */}
           {loading && (
             <div className="flex items-center gap-2 px-4 py-3 text-sm text-gray-500">
-              <span className="h-4 w-4 border-2 border-[#F38508] border-t-transparent rounded-full animate-spin" />
+              <span className="h-4 w-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
               Searching…
             </div>
           )}
@@ -228,7 +228,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
                             <span className="text-sm font-bold text-gray-900">₹{price.toLocaleString("en-IN")}</span>
                             {hit.ratingAvg && Number(hit.ratingAvg) > 0 && (
                               <span className="text-[11px] text-gray-500 flex items-center gap-0.5">
-                                <span className="text-[#F38508]">★</span>{Number(hit.ratingAvg).toFixed(1)}
+                                <span className="text-brand-500">★</span>{Number(hit.ratingAvg).toFixed(1)}
                               </span>
                             )}
                           </div>
@@ -240,7 +240,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
                   <button
                     data-item
                     onClick={() => navigate(query.trim())}
-                    className="w-full px-4 py-2.5 text-sm text-[#F38508] font-semibold text-center hover:bg-orange-50 border-t border-gray-100"
+                    className="w-full px-4 py-2.5 text-sm text-brand-500 font-semibold text-center hover:bg-brand-50 border-t border-gray-100"
                   >
                     See all results for "{query.trim()}" →
                   </button>
@@ -265,7 +265,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Recent Searches</p>
                     <button
                       onClick={() => { localStorage.removeItem(RECENT_KEY); setRecent([]) }}
-                      className="text-[10px] text-[#F38508] hover:underline font-medium"
+                      className="text-[10px] text-brand-500 hover:underline font-medium"
                     >
                       Clear all
                     </button>
@@ -298,7 +298,7 @@ export function InlineSearch({ className = "", placeholder = "Search for product
                     <button
                       key={t}
                       onClick={() => navigate(t)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-orange-50 hover:text-[#D97706] border border-gray-200 hover:border-[#F38508]/40 rounded-full text-xs text-gray-600 font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-brand-50 hover:text-brand-600 border border-gray-200 hover:border-brand-500/40 rounded-full text-xs text-gray-600 font-medium transition-colors"
                     >
                       <TrendingUp className="h-3 w-3" />
                       {t}

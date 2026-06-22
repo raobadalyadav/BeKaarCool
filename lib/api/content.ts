@@ -19,6 +19,13 @@ export async function banners(): Promise<ContentItemDto[]> {
   return data.banners;
 }
 
+export async function newsletterSubscribe(email: string): Promise<void> {
+  await gql<{ newsletterSubscribe: boolean }>({
+    query: `mutation Newsletter($email: String!) { newsletterSubscribe(email: $email) }`,
+    variables: { email },
+  });
+}
+
 export async function staticPage(
   slug: string
 ): Promise<ContentItemDto | null> {

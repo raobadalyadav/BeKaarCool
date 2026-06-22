@@ -43,8 +43,8 @@ function fmt(minor: string | number) {
 function StatCard({ icon: Icon, label, value, sub }: { icon: React.ElementType; label: string; value: string | number; sub?: string }) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
-      <div className="p-2.5 bg-[#F38508]/10 rounded-lg flex-shrink-0">
-        <Icon className="w-5 h-5 text-[#F38508]" />
+      <div className="p-2.5 bg-brand-500/10 rounded-lg flex-shrink-0">
+        <Icon className="w-5 h-5 text-brand-500" />
       </div>
       <div>
         <p className="text-sm text-gray-500">{label}</p>
@@ -154,7 +154,7 @@ export default function AdminAnalyticsPage() {
             onClick={() => setTab(id)}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg border transition-colors ${
               tab === id
-                ? "bg-white border-b-white text-[#F38508] border-[#F38508] border-b-2"
+                ? "bg-white border-b-white text-brand-500 border-brand-500 border-b-2"
                 : "bg-gray-50 border-transparent text-gray-600 hover:text-gray-900 hover:bg-white"
             }`}
           >
@@ -174,7 +174,7 @@ export default function AdminAnalyticsPage() {
                 onClick={() => setDays(d)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
                   days === d
-                    ? "bg-[#F38508] text-black border-[#F38508]"
+                    ? "bg-brand-500 text-black border-brand-500"
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
                 }`}
               >
@@ -204,7 +204,7 @@ export default function AdminAnalyticsPage() {
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6b7280" }} />
                   <YAxis tick={{ fontSize: 11, fill: "#6b7280" }} tickFormatter={(v) => `₹${v}`} />
                   <Tooltip formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]} />
-                  <Bar dataKey="revenue" fill="#F38508" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#C98B74" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -346,7 +346,7 @@ export default function AdminAnalyticsPage() {
                     label: "New customers (this month)",
                     value: customerData.newThisMonth,
                     total: customerData.totalCustomers,
-                    color: "bg-[#F38508]",
+                    color: "bg-brand-500",
                   },
                   {
                     label: "Returning customers",

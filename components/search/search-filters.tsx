@@ -146,7 +146,7 @@ export function SearchFilters({
       <span className="font-semibold text-[#111827] text-sm flex items-center gap-2">
         {label}
         {count !== undefined && count > 0 && (
-          <span className="text-[10px] font-bold bg-[#F38508]/10 text-[#F38508] rounded-full px-1.5 py-0.5">
+          <span className="text-[10px] font-bold bg-brand-500/10 text-brand-500 rounded-full px-1.5 py-0.5">
             {count}
           </span>
         )}
@@ -165,7 +165,7 @@ export function SearchFilters({
         {hasActive && (
           <button
             onClick={clearAll}
-            className="text-[11px] font-bold text-[#F38508] hover:text-[#D97706] uppercase tracking-wide transition-colors"
+            className="text-[11px] font-bold text-brand-500 hover:text-brand-600 uppercase tracking-wide transition-colors"
           >
             Clear All
           </button>
@@ -189,7 +189,7 @@ export function SearchFilters({
                     onCheckedChange={() =>
                       toggleItem(selectedCategories, cat.name, setSelectedCategories)
                     }
-                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-[#F38508] data-[state=checked]:border-[#F38508]"
+                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-brand-500 data-[state=checked]:border-brand-500"
                   />
                   <span className="text-sm text-gray-600 group-hover:text-[#111827] flex-1 transition-colors">
                     {cat.name}
@@ -215,7 +215,7 @@ export function SearchFilters({
                   id="in-stock-only"
                   checked={inStockOnly}
                   onCheckedChange={(checked) => setInStockOnly(!!checked)}
-                  className="border-gray-300 rounded-[2px] data-[state=checked]:bg-[#F38508] data-[state=checked]:border-[#F38508]"
+                  className="border-gray-300 rounded-[2px] data-[state=checked]:bg-brand-500 data-[state=checked]:border-brand-500"
                 />
                 <span className="text-sm text-gray-600 group-hover:text-[#111827] flex items-center gap-1.5 transition-colors">
                   <Package className="h-3.5 w-3.5 text-green-500" />
@@ -271,7 +271,7 @@ export function SearchFilters({
                       className={`min-w-[40px] h-9 px-2.5 flex items-center justify-center text-xs font-semibold border rounded-sm transition-all duration-150 ${
                         isSelected
                           ? "bg-[#111827] text-white border-[#111827] shadow-sm"
-                          : "border-[#E5E7EB] text-gray-600 hover:border-[#F38508] hover:text-[#F38508]"
+                          : "border-[#E5E7EB] text-gray-600 hover:border-brand-500 hover:text-brand-500"
                       }`}
                     >
                       {size}
@@ -304,7 +304,7 @@ export function SearchFilters({
                       onClick={() => toggleItem(selectedColors, color, setSelectedColors)}
                       className={`relative w-7 h-7 rounded-full border-2 transition-all duration-150 hover:scale-110 focus:outline-none ${
                         isSelected
-                          ? "border-[#F38508] scale-110 shadow-md"
+                          ? "border-brand-500 scale-110 shadow-md"
                           : isLight
                           ? "border-gray-300"
                           : "border-transparent hover:border-gray-300"
@@ -328,7 +328,7 @@ export function SearchFilters({
               {selectedColors.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {selectedColors.map(c => (
-                    <span key={c} className="text-[11px] text-[#F38508] font-medium">
+                    <span key={c} className="text-[11px] text-brand-500 font-medium">
                       {getColorInfo(c).label}
                       {selectedColors.indexOf(c) < selectedColors.length - 1 ? ", " : ""}
                     </span>
@@ -352,7 +352,7 @@ export function SearchFilters({
                     id={`brand-${brand}`}
                     checked={selectedBrands.includes(brand)}
                     onCheckedChange={() => toggleItem(selectedBrands, brand, setSelectedBrands)}
-                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-[#F38508] data-[state=checked]:border-[#F38508]"
+                    className="border-gray-300 rounded-[2px] data-[state=checked]:bg-brand-500 data-[state=checked]:border-brand-500"
                   />
                   <span className="text-sm text-gray-600 group-hover:text-[#111827] flex-1 transition-colors">
                     {brand}
@@ -376,7 +376,7 @@ export function SearchFilters({
                   onClick={() => setSelectedRating(selectedRating === rating ? 0 : rating)}
                   className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors ${
                     selectedRating === rating
-                      ? "bg-[#F38508]/10 border border-[#F38508]/30"
+                      ? "bg-brand-500/10 border border-brand-500/30"
                       : "hover:bg-gray-50"
                   }`}
                 >
@@ -386,7 +386,7 @@ export function SearchFilters({
                         key={i}
                         className={`h-3.5 w-3.5 ${
                           i < rating
-                            ? "fill-[#F38508] text-[#F38508]"
+                            ? "fill-brand-500 text-brand-500"
                             : "text-gray-200 fill-gray-200"
                         }`}
                       />

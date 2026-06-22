@@ -90,14 +90,14 @@ export default function AdminDashboard() {
           title="Revenue"
           value={`₹${minorToRupees(stats?.totalRevenueMinor ?? "0").toLocaleString("en-IN")}`}
           icon={TrendingUp}
-          color="bg-[#D97706]"
+          color="bg-brand-600"
           sub="From delivered orders"
         />
         <StatCard
           title="Pending Orders"
           value={stats?.pendingOrders ?? 0}
           icon={Clock}
-          color="bg-orange-500"
+          color="bg-brand-500"
           sub="Awaiting action"
         />
         <StatCard
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
             { label: "Add Product", href: "/admin/products/new", color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
             { label: "Manage Orders", href: "/admin/orders", color: "bg-green-50 text-green-700 hover:bg-green-100" },
             { label: "Add Category", href: "/admin/categories", color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
-            { label: "View Inventory", href: "/admin/inventory", color: "bg-orange-50 text-orange-700 hover:bg-orange-100" },
+            { label: "View Inventory", href: "/admin/inventory", color: "bg-brand-50 text-orange-700 hover:bg-orange-100" },
           ].map((a) => (
             <a
               key={a.href}

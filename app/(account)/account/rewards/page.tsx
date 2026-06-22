@@ -126,7 +126,7 @@ export default function RewardsPage() {
       title: "Redeem Gift Cards",
       description: "Have a gift card? Add it to your wallet and use it anytime",
       action: { label: "Redeem Now", href: "/account/wallet" },
-      color: "bg-orange-50 text-[#F38508]",
+      color: "bg-brand-50 text-brand-500",
     },
   ];
 
@@ -204,7 +204,7 @@ export default function RewardsPage() {
               <Wallet className="w-5 h-5" /> Wallet
             </CardTitle>
             <Link href="/account/wallet">
-              <Button variant="ghost" size="sm" className="text-[#F38508] gap-1">
+              <Button variant="ghost" size="sm" className="text-brand-500 gap-1">
                 View all <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -250,7 +250,7 @@ export default function RewardsPage() {
       {/* Ways to earn */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Star className="w-5 h-5 text-[#F38508]" /> Ways to Earn
+          <Star className="w-5 h-5 text-brand-500" /> Ways to Earn
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {earnWays.map((way) => (
@@ -291,7 +291,7 @@ function SummaryCard({
   accent: "yellow" | "purple" | "green";
 }) {
   const colors = {
-    yellow: "bg-orange-50 text-[#F38508]",
+    yellow: "bg-brand-50 text-brand-500",
     purple: "bg-purple-50 text-purple-600",
     green: "bg-green-50 text-green-600",
   };

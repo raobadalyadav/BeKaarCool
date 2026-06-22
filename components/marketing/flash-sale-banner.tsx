@@ -58,7 +58,7 @@ export function FlashSaleBanner() {
   if (timeString === "Expired") return null;
 
   return (
-    <div className="bg-[#F38508] text-white py-2 px-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-sm md:text-base">
+    <div className="bg-brand-500 text-white py-2 px-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-sm md:text-base">
       <div className="flex items-center gap-2 font-bold">
         <span>⚡ {activeCampaign.name}</span>
         {activeCampaign.description && <span className="hidden md:inline text-white/90 font-normal"> - {activeCampaign.description}</span>}

@@ -8,7 +8,7 @@ import type { StaffDto } from "@/lib/api/admin"
 const ROLE_COLORS: Record<string, string> = {
   admin: "bg-red-100 text-red-700",
   manager: "bg-purple-100 text-purple-700",
-  support: "bg-orange-100 text-[#D97706]",
+  support: "bg-orange-100 text-brand-600",
   finance: "bg-green-100 text-green-700",
   content: "bg-indigo-100 text-indigo-700",
 }
@@ -99,7 +99,7 @@ export default function AdminStaffPage() {
           </button>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 bg-[#F38508] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#d97507]"
+            className="flex items-center gap-2 bg-brand-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#d97507]"
           >
             <Plus className="w-4 h-4" /> Add Staff
           </button>
@@ -143,7 +143,7 @@ export default function AdminStaffPage() {
                   <input
                     value={form.firstName}
                     onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <div>
@@ -151,7 +151,7 @@ export default function AdminStaffPage() {
                   <input
                     value={form.lastName}
                     onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
@@ -162,7 +162,7 @@ export default function AdminStaffPage() {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -173,7 +173,7 @@ export default function AdminStaffPage() {
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   placeholder="Min 8 characters"
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <div>
@@ -181,7 +181,7 @@ export default function AdminStaffPage() {
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {ROLES.map((r) => (
                     <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
@@ -200,7 +200,7 @@ export default function AdminStaffPage() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="flex-1 bg-[#F38508] text-white rounded-lg py-2 text-sm font-medium hover:bg-[#d97507] disabled:opacity-60"
+                  className="flex-1 bg-brand-500 text-white rounded-lg py-2 text-sm font-medium hover:bg-[#d97507] disabled:opacity-60"
                 >
                   {creating ? "Creating..." : "Create Staff"}
                 </button>
@@ -300,7 +300,7 @@ export default function AdminStaffPage() {
                           <button
                             onClick={() => handleUpdate(s.id)}
                             disabled={saving}
-                            className="text-xs bg-[#F38508] text-white px-2 py-1 rounded disabled:opacity-60"
+                            className="text-xs bg-brand-500 text-white px-2 py-1 rounded disabled:opacity-60"
                           >
                             {saving ? "..." : "Save"}
                           </button>
@@ -308,7 +308,7 @@ export default function AdminStaffPage() {
                       ) : (
                         <button
                           onClick={() => startEdit(s)}
-                          className="text-xs text-[#F38508] hover:underline"
+                          className="text-xs text-brand-500 hover:underline"
                         >
                           Edit
                         </button>

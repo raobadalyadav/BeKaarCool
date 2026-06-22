@@ -141,7 +141,7 @@ export function DeliveryChecker({ onSlotSelect, cartTotal = 0 }: DeliveryChecker
                                     {deliveryInfo.delivery?.expressDays && (
                                         <div className="flex items-center justify-between pt-2 border-t">
                                             <div className="flex items-center gap-2">
-                                                <Package className="w-5 h-5 text-[#F38508]" />
+                                                <Package className="w-5 h-5 text-brand-500" />
                                                 <div>
                                                     <p className="font-medium text-sm">Express Delivery</p>
                                                     <p className="text-xs text-gray-500">
@@ -182,7 +182,7 @@ export function DeliveryChecker({ onSlotSelect, cartTotal = 0 }: DeliveryChecker
                                                 key={idx}
                                                 onClick={() => handleSlotSelect(slot)}
                                                 className={`p-3 border rounded-lg text-left transition-colors ${selectedSlot === slot
-                                                        ? "border-[#F38508] bg-orange-50"
+                                                        ? "border-brand-500 bg-brand-50"
                                                         : "border-gray-200 hover:border-gray-300"
                                                     }`}
                                             >

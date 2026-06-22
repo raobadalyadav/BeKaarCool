@@ -63,7 +63,7 @@ function statusBadge(status?: string) {
       );
     case "pending":
       return (
-        <Badge className="bg-orange-100 text-[#D97706] border-orange-200 gap-1">
+        <Badge className="bg-orange-100 text-brand-600 border-orange-200 gap-1">
           <Clock className="w-3 h-3" /> Pending
         </Badge>
       );
@@ -131,8 +131,8 @@ export default function PaymentsPage() {
         <Link href="/account/wallet">
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-                <Wallet className="w-5 h-5 text-[#F38508]" />
+              <div className="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+                <Wallet className="w-5 h-5 text-brand-500" />
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-sm">Baefikra Wallet</p>

@@ -78,7 +78,7 @@ export default function CorporateClient() {
 
   if (submitted) {
     return (
-      <div className="container mx-auto px-4 py-16 max-w-xl">
+      <div className="container py-16 max-w-xl">
         <Card>
           <CardContent className="p-10 text-center space-y-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -102,7 +102,7 @@ export default function CorporateClient() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-5xl">
+    <div className="container py-10 max-w-5xl">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 order-2 lg:order-1">
           <Card>
@@ -202,7 +202,7 @@ export default function CorporateClient() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+                  className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
                   size="lg"
                 >
                   {submitting && (
@@ -216,7 +216,7 @@ export default function CorporateClient() {
         </div>
 
         <div className="lg:col-span-1 order-1 lg:order-2 space-y-4">
-          <Card className="bg-orange-50 border-orange-200">
+          <Card className="bg-brand-50 border-orange-200">
             <CardContent className="p-5 space-y-3">
               <Feature
                 icon={Sparkles}
@@ -253,7 +253,7 @@ function Feature({
   return (
     <div className="flex gap-3">
       <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-        <Icon className="w-4 h-4 text-[#F38508]" />
+        <Icon className="w-4 h-4 text-brand-500" />
       </div>
       <div>
         <p className="text-sm font-bold">{title}</p>

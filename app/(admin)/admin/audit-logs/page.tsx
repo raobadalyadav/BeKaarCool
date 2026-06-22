@@ -12,7 +12,7 @@ const ACTION_COLORS: Record<string, string> = {
   update: "bg-blue-100 text-blue-700",
   delete: "bg-red-100 text-red-700",
   approve: "bg-teal-100 text-teal-700",
-  reject: "bg-orange-100 text-[#D97706]",
+  reject: "bg-orange-100 text-brand-600",
   refund: "bg-purple-100 text-purple-700",
 }
 
@@ -89,7 +89,7 @@ export default function AdminAuditLogsPage() {
           <select
             value={entityType}
             onChange={(e) => setEntityType(e.target.value)}
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">All Types</option>
             {ENTITY_TYPES.filter(Boolean).map((t) => (
@@ -105,7 +105,7 @@ export default function AdminAuditLogsPage() {
               value={actorSearch}
               onChange={(e) => setActorSearch(e.target.value)}
               placeholder="Email or actor ID..."
-              className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+              className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
         </div>

@@ -78,7 +78,7 @@ export default function CategoriesPageClient() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#F38508] via-orange-500 to-[#D97706] text-white py-16 md:py-24">
+      <section className="bg-gradient-to-br from-brand-500 via-orange-500 to-brand-600 text-white py-16 md:py-24">
         <div className="container px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             Shop by Category
@@ -115,9 +115,9 @@ export default function CategoriesPageClient() {
         {!error && featuredCategories.length > 0 && (
           <section className="mb-12">
             <div className="flex items-center mb-6">
-              <TrendingUp className="h-6 w-6 text-[#F38508] mr-2" />
+              <TrendingUp className="h-6 w-6 text-brand-500 mr-2" />
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Featured Categories</h2>
-              <Badge className="ml-3 bg-orange-100 text-[#D97706]">Trending</Badge>
+              <Badge className="ml-3 bg-orange-100 text-brand-600">Trending</Badge>
             </div>
 
             {loading ? (
@@ -130,7 +130,7 @@ export default function CategoriesPageClient() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {featuredCategories.map((category) => (
                   <Link key={category._id} href={`/products?category=${encodeURIComponent(category.name)}`}>
-                    <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-[#F38508] bg-gradient-to-br from-orange-50 to-orange-50 overflow-hidden">
+                    <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-brand-500 bg-gradient-to-br from-orange-50 to-orange-50 overflow-hidden">
                       <CardContent className="p-0">
                         {category.image && (
                           <div className="relative h-40 w-full">
@@ -194,7 +194,7 @@ export default function CategoriesPageClient() {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
                 {(regularCategories.length > 0 ? regularCategories : filteredCategories).map((category) => (
                   <Link key={category._id} href={`/products?category=${encodeURIComponent(category.name)}`}>
-                    <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-[#F38508] h-full overflow-hidden">
+                    <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-brand-500 h-full overflow-hidden">
                       <CardContent className="p-0">
                         {category.image ? (
                           <div className="relative h-32 w-full">
@@ -236,7 +236,7 @@ export default function CategoriesPageClient() {
               Browse all products or use our search to find exactly what you need
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold" asChild>
+              <Button size="lg" className="bg-brand-500 hover:bg-brand-600 text-black font-bold" asChild>
                 <Link href="/products">
                   Browse All Products
                   <ArrowRight className="ml-2 h-5 w-5" />

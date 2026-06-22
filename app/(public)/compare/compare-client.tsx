@@ -40,11 +40,11 @@ export default function CompareClient() {
 
     if (items.length === 0) {
         return (
-            <div className="container mx-auto px-4 py-24 text-center">
+            <div className="container py-24 text-center">
                 <h1 className="text-3xl font-bold mb-4">Compare Products</h1>
                 <p className="text-gray-500 mb-8">You haven't added any products to compare.</p>
                 <Link href="/products">
-                    <Button className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
+                    <Button className="bg-brand-500 hover:bg-brand-600 text-black font-bold">
                         Browse Products
                     </Button>
                 </Link>
@@ -53,7 +53,7 @@ export default function CompareClient() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-12 max-w-7xl">
+        <div className="container py-12">
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Compare Products</h1>
@@ -99,7 +99,7 @@ export default function CompareClient() {
             </div>
             
             <div className="mt-8 pt-8 border-t border-gray-200">
-                 <Link href="/products" className="inline-flex items-center text-[#F38508] font-bold hover:underline">
+                 <Link href="/products" className="inline-flex items-center text-brand-500 font-bold hover:underline">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Shopping
                 </Link>

@@ -213,13 +213,13 @@ export default function AdminInventoryPage() {
             onClick={() => setTab(id)}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg border transition-colors ${
               tab === id
-                ? "bg-white border-b-white text-[#F38508] border-[#F38508] border-b-2"
+                ? "bg-white border-b-white text-brand-500 border-brand-500 border-b-2"
                 : "bg-gray-50 border-transparent text-gray-600 hover:text-gray-900 hover:bg-white"
             }`}
           >
             {label}
             {badge !== undefined && badge > 0 && (
-              <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-semibold ${tab === id ? "bg-[#F38508]/10 text-[#F38508]" : "bg-gray-200 text-gray-600"}`}>
+              <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full font-semibold ${tab === id ? "bg-brand-500/10 text-brand-500" : "bg-gray-200 text-gray-600"}`}>
                 {badge}
               </span>
             )}
@@ -240,7 +240,7 @@ export default function AdminInventoryPage() {
                   type="number"
                   value={adjDelta}
                   onChange={(e) => setAdjDelta(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g. 10 or -5"
                 />
               </div>
@@ -249,7 +249,7 @@ export default function AdminInventoryPage() {
                 <input
                   value={adjReason}
                   onChange={(e) => setAdjReason(e.target.value)}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g. New stock received"
                 />
               </div>
@@ -258,7 +258,7 @@ export default function AdminInventoryPage() {
               <button
                 onClick={handleAdjust}
                 disabled={adjSaving}
-                className="flex-1 bg-[#F38508] hover:bg-[#D97706] text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
+                className="flex-1 bg-brand-500 hover:bg-brand-600 text-black font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
               >
                 {adjSaving ? "Saving..." : "Apply"}
               </button>
@@ -281,7 +281,7 @@ export default function AdminInventoryPage() {
                 placeholder="Search by product or SKU..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
@@ -305,7 +305,7 @@ export default function AdminInventoryPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {filtered.map((e) => (
-                      <tr key={e.variantId} className={`hover:bg-gray-50 ${e.available < 5 ? "bg-red-50" : e.available < 10 ? "bg-orange-50" : ""}`}>
+                      <tr key={e.variantId} className={`hover:bg-gray-50 ${e.available < 5 ? "bg-red-50" : e.available < 10 ? "bg-brand-50" : ""}`}>
                         <td className="px-4 py-3">
                           <p className="font-medium text-gray-900 line-clamp-1">{e.productTitle}</p>
                           <p className="text-xs text-gray-500 font-mono">
@@ -315,7 +315,7 @@ export default function AdminInventoryPage() {
                         <td className="px-4 py-3 text-center text-gray-700">{e.onHand}</td>
                         <td className="px-4 py-3 text-center text-gray-500">{e.reserved}</td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`font-semibold ${e.available < 5 ? "text-red-600" : e.available < 10 ? "text-[#F38508]" : "text-green-600"}`}>
+                          <span className={`font-semibold ${e.available < 5 ? "text-red-600" : e.available < 10 ? "text-brand-500" : "text-green-600"}`}>
                             {e.available}
                           </span>
                         </td>
@@ -373,7 +373,7 @@ export default function AdminInventoryPage() {
                       <td className="px-4 py-3 text-center text-gray-700">{e.onHand}</td>
                       <td className="px-4 py-3 text-center text-gray-500">{e.reserved}</td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`font-semibold ${e.available < 5 ? "text-red-600" : "text-[#F38508]"}`}>
+                        <span className={`font-semibold ${e.available < 5 ? "text-red-600" : "text-brand-500"}`}>
                           {e.available}
                         </span>
                       </td>
@@ -383,7 +383,7 @@ export default function AdminInventoryPage() {
                             ? "bg-red-100 text-red-700"
                             : e.available < 5
                             ? "bg-red-50 text-red-600"
-                            : "bg-orange-50 text-[#D97706]"
+                            : "bg-brand-50 text-brand-600"
                         }`}>
                           {e.available <= 0 ? "Out of Stock" : e.available < 5 ? "Critical" : "Low Stock"}
                         </span>
@@ -410,12 +410,12 @@ export default function AdminInventoryPage() {
                   value={skuInput}
                   onChange={(e) => setSkuInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleSkuSearch() }}
-                  className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+                  className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               </div>
               <button
                 onClick={handleSkuSearch}
-                className="px-4 py-2 bg-[#F38508] text-black font-medium rounded-lg text-sm hover:bg-[#D97706]"
+                className="px-4 py-2 bg-brand-500 text-black font-medium rounded-lg text-sm hover:bg-brand-600"
               >
                 Search
               </button>

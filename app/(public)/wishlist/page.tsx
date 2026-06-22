@@ -72,7 +72,7 @@ export default function WishlistPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container py-8 max-w-6xl">
         <Skeleton className="h-8 w-48 mb-6" />
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -91,7 +91,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container py-8 max-w-6xl">
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="w-5 h-5" />
@@ -114,7 +114,7 @@ export default function WishlistPage() {
             for easy access later.
           </p>
           <Link href="/products">
-            <Button className="mt-4 bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
+            <Button className="mt-4 bg-brand-500 hover:bg-brand-600 text-black font-bold">
               Start Shopping
             </Button>
           </Link>
@@ -169,13 +169,13 @@ export default function WishlistPage() {
                 <div className="p-3 flex-1 flex flex-col gap-1.5">
                   <Link
                     href={`/products/${slug}`}
-                    className="text-sm font-medium line-clamp-2 hover:text-[#F38508]"
+                    className="text-sm font-medium line-clamp-2 hover:text-brand-500"
                   >
                     {title}
                   </Link>
                   {(item.ratingCount ?? 0) > 0 && (
                     <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Star className="h-3 w-3 fill-[#F38508] text-[#F38508]" />
+                      <Star className="h-3 w-3 fill-brand-500 text-brand-500" />
                       {(item.ratingAvg ?? 0).toFixed(1)} ({item.ratingCount})
                     </div>
                   )}
@@ -201,7 +201,7 @@ export default function WishlistPage() {
                         item.inStock === false ||
                         !item.defaultVariantId
                       }
-                      className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold h-9 text-xs"
+                      className="bg-brand-500 hover:bg-brand-600 text-black font-bold h-9 text-xs"
                     >
                       {movingId === item.productId ? (
                         <Loader2 className="w-3 h-3 animate-spin" />

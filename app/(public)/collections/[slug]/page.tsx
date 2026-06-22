@@ -60,7 +60,7 @@ export default async function CollectionPage({ params }: { params: { slug: strin
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container py-8">
       {/* Breadcrumb */}
       <nav className="text-xs text-gray-400 mb-6 flex items-center gap-1.5">
         <Link href="/" className="hover:text-gray-600">Home</Link>
@@ -94,7 +94,7 @@ export default async function CollectionPage({ params }: { params: { slug: strin
       {products.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <p className="text-lg">No products in this collection yet.</p>
-          <Link href="/products" className="text-[#F38508] font-semibold mt-2 inline-block hover:underline">
+          <Link href="/products" className="text-brand-500 font-semibold mt-2 inline-block hover:underline">
             Browse all products →
           </Link>
         </div>

@@ -67,18 +67,18 @@ function AddrCard({
   }
 
   return (
-    <Card className={`relative overflow-hidden transition-shadow hover:shadow-md ${addr.isDefault ? "border-[#F38508] border-2" : ""}`}>
+    <Card className={`relative overflow-hidden transition-shadow hover:shadow-md ${addr.isDefault ? "border-brand-500 border-2" : ""}`}>
       {addr.isDefault && (
         <div className="absolute top-3 right-3">
-          <Badge className="bg-orange-100 text-[#D97706] border-orange-200 gap-1 text-[10px]">
+          <Badge className="bg-orange-100 text-brand-600 border-orange-200 gap-1 text-[10px]">
             <Star className="w-2.5 h-2.5 fill-current" /> Default
           </Badge>
         </div>
       )}
       <CardContent className="p-5 pt-4">
         <div className="flex items-start gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Home className="w-4 h-4 text-[#F38508]" />
+          <div className="w-9 h-9 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <Home className="w-4 h-4 text-brand-500" />
           </div>
           <div className="min-w-0 pr-16">
             <p className="font-bold text-gray-900">{addr.name}</p>
@@ -261,7 +261,7 @@ export default function AddressesPage() {
         {!showForm && (
           <Button
             onClick={() => { resetForm(); setShowForm(true); setTimeout(() => document.getElementById("addr-name")?.focus(), 50) }}
-            className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+            className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
           >
             <Plus className="w-4 h-4 mr-2" /> Add New Address
           </Button>
@@ -273,7 +273,7 @@ export default function AddressesPage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <MapPin className="w-4 h-4 text-[#F38508]" />
+              <MapPin className="w-4 h-4 text-brand-500" />
               {editingId ? "Edit Address" : "Add New Address"}
             </CardTitle>
           </CardHeader>
@@ -374,7 +374,7 @@ export default function AddressesPage() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+                  className="bg-brand-500 hover:bg-brand-600 text-black font-bold"
                 >
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   {submitting ? "Saving…" : editingId ? "Update Address" : "Save Address"}
@@ -400,7 +400,7 @@ export default function AddressesPage() {
             <h3 className="text-lg font-semibold text-gray-700">No saved addresses</h3>
             <p className="text-gray-400 text-sm mt-1">Add an address for faster checkout</p>
             <Button
-              className="mt-5 bg-[#F38508] hover:bg-[#D97706] text-black font-bold"
+              className="mt-5 bg-brand-500 hover:bg-brand-600 text-black font-bold"
               onClick={() => { resetForm(); setShowForm(true) }}
             >
               <Plus className="w-4 h-4 mr-2" /> Add Address

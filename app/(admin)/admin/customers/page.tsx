@@ -18,7 +18,7 @@ const ROLE_COLORS: Record<string, string> = {
   customer: "bg-blue-100 text-blue-700",
   admin: "bg-red-100 text-red-700",
   manager: "bg-purple-100 text-purple-700",
-  support: "bg-orange-100 text-[#D97706]",
+  support: "bg-orange-100 text-brand-600",
   finance: "bg-green-100 text-green-700",
   content: "bg-indigo-100 text-indigo-700",
 }
@@ -26,7 +26,7 @@ const ROLE_COLORS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-green-100 text-green-700",
   suspended: "bg-red-100 text-red-700",
-  pending: "bg-orange-100 text-[#D97706]",
+  pending: "bg-orange-100 text-brand-600",
 }
 
 export default function AdminCustomersPage() {
@@ -100,13 +100,13 @@ export default function AdminCustomersPage() {
             placeholder="Search by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+            className="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F38508]"
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="all">All Roles</option>
           {Object.keys(ROLE_COLORS).map((r) => (
@@ -159,7 +159,7 @@ export default function AdminCustomersPage() {
                         <div className="flex-1 space-y-1 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
                             <Mail className="w-4 h-4 text-gray-400" />
-                            <a href={`mailto:${customer.email}`} className="hover:text-[#F38508]">{customer.email}</a>
+                            <a href={`mailto:${customer.email}`} className="hover:text-brand-500">{customer.email}</a>
                           </div>
                           <p className="text-xs text-gray-400">ID: <span className="font-mono">{customer.id}</span></p>
                           <p className="text-xs text-gray-400">Joined: {formatDate(customer.createdAt)}</p>

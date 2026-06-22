@@ -50,7 +50,7 @@ function channelColor(channel: string) {
     case "email":     return "bg-blue-50 text-blue-600";
     case "whatsapp":  return "bg-green-50 text-green-600";
     case "push":      return "bg-purple-50 text-purple-600";
-    case "sms":       return "bg-orange-50 text-orange-600";
+    case "sms":       return "bg-brand-50 text-orange-600";
     default:          return "bg-gray-100 text-gray-500";
   }
 }
@@ -82,8 +82,8 @@ function PrefRow({
   return (
     <div className="flex items-center justify-between gap-4 py-4">
       <div className="flex items-start gap-3 min-w-0">
-        <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-          <Icon className="w-4 h-4 text-[#F38508]" />
+        <div className="w-9 h-9 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+          <Icon className="w-4 h-4 text-brand-500" />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium text-gray-900">{item.label}</p>
@@ -94,7 +94,7 @@ function PrefRow({
         checked={granted}
         disabled={saving}
         onCheckedChange={(v) => onToggle(item.purpose, v)}
-        className="flex-shrink-0 data-[state=checked]:bg-[#F38508]"
+        className="flex-shrink-0 data-[state=checked]:bg-brand-500"
       />
     </div>
   );

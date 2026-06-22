@@ -21,6 +21,7 @@ const toUiProduct = (
   brandName?: string
 ) => {
   const v = p.variants?.[0];
+  const inStock = p.variants?.some((vv) => vv.inStock) ?? false;
   return {
     _id: p.id,
     id: p.id,
@@ -28,9 +29,12 @@ const toUiProduct = (
     title: p.title,
     slug: p.slug,
     description: p.descriptionHtml ?? "",
+    descriptionHtml: p.descriptionHtml ?? "",
     price: v ? minorToRupees(v.priceMinor) : 0,
     originalPrice: v?.compareAtMinor ? minorToRupees(v.compareAtMinor) : undefined,
     images: p.images ?? [],
+    videos: p.videos ?? [],
+    view360Images: p.view360Images ?? [],
     category: p.categoryId ?? "",
     categoryName: categoryName ?? "",
     brand: p.brandId ?? "",
@@ -38,9 +42,14 @@ const toUiProduct = (
     rating: p.ratingAvg ?? 0,
     reviewCount: p.ratingCount ?? 0,
     variants: p.variants ?? [],
+    productRelations: p.productRelations ?? [],
     defaultVariantId: v?.id,
-    stock: v?.inStock ? 100 : 0,
-    tags: [],
+    stock: inStock ? 100 : 0,
+    highlights: p.highlights ?? [],
+    tags: p.tags ?? [],
+    specificationsJson: p.specificationsJson ?? undefined,
+    attributesJson: p.attributesJson ?? undefined,
+    shortDescription: p.shortDescription ?? undefined,
   };
 };
 
@@ -124,10 +133,11 @@ export default async function ProductPage({ params }: Props) {
     productsApi.listBrands().catch(() => [] as { id: string; name: string; slug: string }[]),
   ]);
 
-  const [relatedProducts, reviewsRaw, questionsRaw] = await Promise.all([
+  const [relatedProducts, reviewsRaw, questionsRaw, coupons] = await Promise.all([
     getRelatedProducts(product.category, product._id, categoriesForRelated, brandsForRelated),
     productsApi.productReviews(product._id).catch(() => []),
     productsApi.productQuestions(product._id).catch(() => []),
+    productsApi.publicCoupons(8).catch(() => []),
   ]);
 
   const reviews = reviewsRaw.map((r) => ({
@@ -165,6 +175,7 @@ export default async function ProductPage({ params }: Props) {
         product={{ ...product, reviews }}
         relatedProducts={relatedProducts}
         questions={questions}
+        coupons={coupons}
       />
 
       <Script

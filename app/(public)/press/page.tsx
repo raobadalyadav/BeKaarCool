@@ -51,9 +51,9 @@ export default function PressPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Breadcrumbs */}
             <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-3">
+                <div className="container py-3">
                     <nav className="flex items-center gap-2 text-sm text-gray-500">
-                        <Link href="/" className="hover:text-[#F38508]">
+                        <Link href="/" className="hover:text-brand-500">
                             <Home className="w-4 h-4" />
                         </Link>
                         <ChevronRight className="w-4 h-4" />
@@ -62,7 +62,7 @@ export default function PressPage() {
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-12">
+            <div className="container py-12">
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Press & Media</h1>
@@ -106,7 +106,7 @@ export default function PressPage() {
                                 <div className="space-y-3">
                                     {mediaItems.map(item => (
                                         <div key={item.title} className="border-b pb-3 last:border-0">
-                                            <p className="text-sm text-[#F38508] font-semibold">{item.outlet}</p>
+                                            <p className="text-sm text-brand-500 font-semibold">{item.outlet}</p>
                                             <p className="text-gray-800">{item.title}</p>
                                             <p className="text-xs text-gray-500">{item.date}</p>
                                         </div>
@@ -122,7 +122,7 @@ export default function PressPage() {
                                 <p className="text-sm text-gray-600 mb-4">
                                     Download official logos, brand guidelines, and media kit.
                                 </p>
-                                <Button className="w-full bg-[#F38508] hover:bg-[#D97706] text-black font-bold">
+                                <Button className="w-full bg-brand-500 hover:bg-brand-600 text-black font-bold">
                                     <Download className="w-4 h-4 mr-2" /> Download Media Kit
                                 </Button>
                             </CardContent>
@@ -137,7 +137,7 @@ export default function PressPage() {
                                 </p>
                                 <a
                                     href="mailto:press@Baefikra.com"
-                                    className="flex items-center gap-2 text-[#F38508] hover:underline"
+                                    className="flex items-center gap-2 text-brand-500 hover:underline"
                                 >
                                     <Mail className="w-4 h-4" /> press@Baefikra.com
                                 </a>

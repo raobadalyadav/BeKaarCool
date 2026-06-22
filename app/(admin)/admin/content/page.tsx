@@ -43,13 +43,13 @@ export default function AdminContentPage() {
       <div className="flex gap-1 mb-6">
         <button
           onClick={() => setTab("blog")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "blog" ? "bg-[#F38508] text-black" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "blog" ? "bg-brand-500 text-black" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
         >
           <FileText className="w-4 h-4" /> Blog Posts ({blogPosts.length})
         </button>
         <button
           onClick={() => setTab("banners")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "banners" ? "bg-[#F38508] text-black" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === "banners" ? "bg-brand-500 text-black" : "bg-white border text-gray-600 hover:bg-gray-50"}`}
         >
           <Image className="w-4 h-4" /> Banners ({banners.length})
         </button>
@@ -92,9 +92,9 @@ export default function AdminContentPage() {
         )}
       </div>
 
-      <div className="mt-6 bg-orange-50 border border-orange-200 rounded-xl p-4">
+      <div className="mt-6 bg-brand-50 border border-orange-200 rounded-xl p-4">
         <p className="text-sm font-semibold text-orange-800 mb-1">Rich Text Editor Coming Soon</p>
-        <p className="text-xs text-[#D97706]">
+        <p className="text-xs text-brand-600">
           Full TipTap-powered blog post and banner editing (Phase 2). Currently content can be created via the API.
           Use the backend GraphQL playground to create or update content items.
         </p>

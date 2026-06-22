@@ -136,7 +136,7 @@ export function CommandSearch({ open, onOpenChange }: CommandSearchProps) {
                   <p className="font-medium truncate text-sm">{product.title}</p>
                   {product.ratingAvg != null && product.ratingAvg > 0 && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <span className="text-[#F38508]">★</span>
+                      <span className="text-brand-500">★</span>
                       <span>{Number(product.ratingAvg).toFixed(1)}</span>
                     </div>
                   )}
