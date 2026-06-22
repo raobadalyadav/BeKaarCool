@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
@@ -16,212 +15,201 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart/cart-sheet"
-import { Search, User, Menu } from "lucide-react"
+import { Search, User, Menu, Heart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useCart } from "@/contexts/cart-context"
 import { InlineSearch } from "@/components/search/inline-search"
 import { Logo } from "@/components/layout/logo"
+
+const MARQUEE_TEXT =
+  "🚚 Free Delivery on orders above ₹499  |  Use code FIRST10 for 10% off  |  ⚡ 7-Day Easy Returns  |  ✅ 100% Genuine Products  |  🎁 Gift Wrapping Available  |  🔒 Secure Checkout      "
+
+const NAV_STRIP = [
+  { label: "All", href: "/products" },
+  { label: "Men", href: "/products?category=Men" },
+  { label: "Women", href: "/products?category=Women" },
+  { label: "Mobile Covers", href: "/products?category=Mobile%20Covers" },
+  { label: "Accessories", href: "/products?category=Accessories" },
+  { label: "Footwear", href: "/products?category=Footwear" },
+  { label: "Hoodies", href: "/products?category=Hoodies" },
+  { label: "Sale 🔥", href: "/products?sale=true", highlight: true },
+]
+
+const SEARCH_CATEGORIES = ["All", "Men", "Women", "Mobile Covers", "Accessories", "Footwear"]
 
 export function Header() {
   const { data: session } = useSession()
   const router = useRouter()
   const { toast } = useToast()
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
-
+  const [searchCategory, setSearchCategory] = useState("All")
   const { itemCount: cartCount } = useCart()
-
-
 
   const handleSignOut = async () => {
     try {
       await signOut({ redirect: false })
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      })
+      toast({ title: "Signed out", description: "You have been successfully signed out." })
       router.push("/")
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      })
+    } catch {
+      toast({ title: "Error", description: "Failed to sign out. Please try again.", variant: "destructive" })
     }
   }
 
   return (
     <>
       <div className="flex flex-col w-full">
-        {/* Top Bar — Navy background like Robu.in */}
-        <div className="bg-[#111827] py-1.5 text-[11px] text-white/80">
-          <div className="container mx-auto px-4 flex justify-between items-center font-medium">
-            <div className="flex items-center space-x-4 md:space-x-6">
-              <Link suppressHydrationWarning href="/offers" className="hover:text-[#F38508] transition-colors">Offers</Link>
-              <Link suppressHydrationWarning href="/fanbook" className="hidden md:inline hover:text-[#F38508] transition-colors">Fanbook</Link>
-              <Link suppressHydrationWarning href="/apps" className="flex items-center hover:text-[#F38508] transition-colors">
-                <span className="hidden md:inline mr-1">Download App</span>
-                <span className="md:hidden">App</span>
-              </Link>
-              <Link suppressHydrationWarning href="/stores" className="hidden md:inline hover:text-[#F38508] transition-colors">Find a store near me</Link>
-            </div>
-            <div className="flex items-center space-x-4 md:space-x-6">
-              <Link suppressHydrationWarning href="/contact" className="hover:text-[#F38508] transition-colors">Contact Us</Link>
-              <Link suppressHydrationWarning href="/track-order" className="hover:text-[#F38508] transition-colors">Track Order</Link>
-            </div>
+
+        {/* ── Announcement marquee bar ───────────────────────────── */}
+        <div className="bg-[#F38508] h-7 flex items-center overflow-hidden">
+          <div className="animate-marquee text-white text-[11px] font-semibold tracking-wide">
+            {/* duplicated for seamless loop */}
+            {MARQUEE_TEXT}{MARQUEE_TEXT}
           </div>
         </div>
 
-        {/* Main Header — white with navy text */}
+        {/* ── Main header ───────────────────────────────────────── */}
         <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
-          <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between gap-4">
-            {/* Left: Logo & Menu */}
-            <div className="flex items-center gap-6 lg:gap-8">
-              {/* Mobile Menu Trigger */}
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="lg:hidden -ml-2">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[300px]">
-                  <div className="flex flex-col space-y-6 mt-8">
-                    <div className="px-2">
-                      <Logo width={130} height={32} textColor="#111111" />
-                    </div>
-                    <nav className="flex flex-col space-y-2">
-                      <Link href="/products?category=Men" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Men</Link>
-                      <Link href="/products?category=Women" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Women</Link>
-                      <Link href="/products?category=Mobile%20Covers" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-lg">Mobile Covers</Link>
-                      <hr className="my-2" />
-                      <Link href="/account" className="px-4 py-3 hover:bg-muted rounded-md font-medium">My Account</Link>
-                      <Link href="/contact" className="px-4 py-3 hover:bg-muted rounded-md font-medium">Contact Us</Link>
-                      {session ? (
-                        <div onClick={handleSignOut} className="px-4 py-3 hover:bg-muted rounded-md font-medium cursor-pointer text-red-500">Sign Out</div>
-                      ) : (
-                        <Link href="/auth/login" className="px-4 py-3 hover:bg-muted rounded-md font-medium text-primary">Login</Link>
-                      )}
-                    </nav>
-                  </div>
-                </SheetContent>
-              </Sheet>
+          <div className="container mx-auto px-4 h-16 md:h-[68px] flex items-center gap-3 md:gap-4">
 
-              {/* Logo */}
-              <Link href="/" className="flex-shrink-0 flex items-center">
-                <Logo width={140} height={36} textColor="#111111" />
-              </Link>
-
-              {/* Desktop Navigation — Navy underline on hover */}
-              <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold tracking-wide uppercase">
-                <Link suppressHydrationWarning href="/products?category=Men" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
-                  Men
-                </Link>
-                <Link suppressHydrationWarning href="/products?category=Women" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
-                  Women
-                </Link>
-                <Link suppressHydrationWarning href="/products?category=Mobile%20Covers" className="text-[#111827] hover:text-[#F38508] border-b-2 border-transparent hover:border-[#F38508] py-7 transition-all">
-                  Mobile Covers
-                </Link>
-              </nav>
-            </div>
-
-            {/* Right: Search & Actions */}
-            <div className="flex items-center flex-1 justify-end gap-2 md:gap-4">
-
-              {/* Search Bar (Desktop) */}
-              <div className="hidden md:block flex-1 max-w-xl mx-2">
-                <InlineSearch />
-              </div>
-
-              <div className="flex items-center gap-1 md:gap-3 text-muted-foreground">
-                {/* Mobile Search Icon */}
-                <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileSearchOpen(true)}>
-                  <Search className="h-5 w-5" />
+            {/* Mobile hamburger */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden -ml-2 flex-shrink-0">
+                  <Menu className="h-5 w-5" />
                 </Button>
-
-                <div className="hidden md:flex items-center h-8 w-[1px] bg-border mx-1"></div>
-
-                {/* Login / User */}
-                {session ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="hidden md:flex flex-col gap-0.5 h-auto px-2 py-1 items-center hover:bg-transparent hover:text-foreground">
-                        <User className="h-5 w-5" />
-                        {/* <span className="text-[10px] font-medium">Profile</span> */}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 mt-2">
-                      <DropdownMenuItem asChild>
-                        <Link suppressHydrationWarning href="/account/profile">Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link suppressHydrationWarning href="/account/orders">Orders</Link>
-                      </DropdownMenuItem>
-
-                      {session.user?.role === "admin" && (
-                        <DropdownMenuItem asChild>
-                          <Link suppressHydrationWarning href="/admin">Admin Dashboard</Link>
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleSignOut}>Sign Out</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Link suppressHydrationWarning href="/auth/login" className="hidden md:block text-xs font-bold hover:underline px-2">
-                    Login
-                  </Link>
-                )}
-
-                {/* Heart / Wishlist */}
-                <Link href="/wishlist">
-                  <Button variant="ghost" size="icon" className="hidden md:flex h-9 w-9 text-muted-foreground hover:text-foreground">
-                    <span className="sr-only">Wishlist</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-                    </svg>
-                  </Button>
-                </Link>
-
-                {/* Cart */}
-                <CartSheet>
-                  <Button variant="ghost" size="icon" className="relative h-9 w-9 text-[#111827] hover:text-[#F38508]">
-                    <ShoppingBagIcon className="h-5 w-5" />
-                    {cartCount > 0 && (
-                      <span className="absolute top-0 right-0 h-4 w-4 bg-[#F38508] text-white text-[10px] font-bold flex items-center justify-center rounded-full">
-                        {cartCount}
-                      </span>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[280px] p-0">
+                <div className="flex flex-col h-full">
+                  <div className="px-5 py-4 border-b">
+                    <Logo width={120} height={30} textColor="#111111" />
+                  </div>
+                  <nav className="flex-1 overflow-y-auto py-3">
+                    {NAV_STRIP.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center px-5 py-3 text-sm font-medium border-b border-gray-50 ${item.highlight ? "text-[#F38508]" : "text-gray-800 hover:text-[#F38508]"}`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                    <div className="h-px bg-gray-100 my-2" />
+                    <Link href="/account" className="flex items-center px-5 py-3 text-sm font-medium text-gray-700 hover:text-[#F38508]">My Account</Link>
+                    <Link href="/track-order" className="flex items-center px-5 py-3 text-sm font-medium text-gray-700 hover:text-[#F38508]">Track Order</Link>
+                    <Link href="/contact" className="flex items-center px-5 py-3 text-sm font-medium text-gray-700 hover:text-[#F38508]">Contact Us</Link>
+                    {session ? (
+                      <button onClick={handleSignOut} className="w-full text-left flex items-center px-5 py-3 text-sm font-medium text-red-500">Sign Out</button>
+                    ) : (
+                      <Link href="/auth/login" className="flex items-center px-5 py-3 text-sm font-medium text-[#F38508]">Login / Register</Link>
                     )}
-                  </Button>
-                </CartSheet>
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
 
-                {/* Flag / Region (Optional - mimicking Bewakoof's possible region selector or just placeholder) */}
-                <div className="hidden lg:flex items-center justify-center h-8 w-8">
-                  <span className="text-lg">🇮🇳</span>
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <Logo width={130} height={34} textColor="#111111" />
+            </Link>
+
+            {/* Search bar — center, with category prefix on desktop */}
+            <div className="flex-1 hidden md:flex items-center min-w-0">
+              <div className="flex items-center w-full max-w-2xl border border-gray-300 rounded-full overflow-hidden bg-white hover:border-[#F38508] transition-colors focus-within:border-[#F38508] focus-within:ring-1 focus-within:ring-[#F38508]/20">
+                <select
+                  value={searchCategory}
+                  onChange={(e) => setSearchCategory(e.target.value)}
+                  className="text-xs bg-gray-50 border-r border-gray-200 px-3 py-2.5 text-gray-600 focus:outline-none cursor-pointer flex-shrink-0 rounded-l-full"
+                >
+                  {SEARCH_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <div className="flex-1 min-w-0 [&_input]:border-0 [&_input]:rounded-none [&_input]:shadow-none [&_input]:focus:ring-0 [&_input]:bg-transparent">
+                  <InlineSearch />
                 </div>
               </div>
             </div>
+
+            {/* Right icons */}
+            <div className="flex items-center gap-0.5 md:gap-1 ml-auto md:ml-0 flex-shrink-0">
+
+              {/* Mobile search */}
+              <Button variant="ghost" size="icon" className="md:hidden h-9 w-9" onClick={() => setMobileSearchOpen(true)}>
+                <Search className="h-5 w-5 text-gray-700" />
+              </Button>
+
+              {/* Login / Account */}
+              {session ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 hidden md:flex">
+                      <User className="h-5 w-5 text-gray-700" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52 mt-2">
+                    <div className="px-3 py-2 text-xs text-gray-500 border-b">{(session.user as any)?.email}</div>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/profile">My Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/orders">My Orders</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/wishlist">Wishlist</Link>
+                    </DropdownMenuItem>
+                    {(session.user as any)?.role !== "customer" && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin/dashboard">Admin Dashboard</Link>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-red-600">Sign Out</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/auth/login" className="hidden md:flex items-center gap-1 text-xs font-semibold text-gray-700 hover:text-[#F38508] px-2 py-1.5 rounded-lg hover:bg-orange-50 transition-colors">
+                  <User className="h-4 w-4" />
+                  <span>Login</span>
+                </Link>
+              )}
+
+              {/* Wishlist */}
+              <Link href="/wishlist" className="hidden md:flex">
+                <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-700 hover:text-[#F38508]">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
+
+              {/* Cart */}
+              <CartSheet>
+                <Button variant="ghost" size="icon" className="relative h-9 w-9 text-gray-700 hover:text-[#F38508]">
+                  <ShoppingBagIcon className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-[#F38508] text-white text-[9px] font-bold flex items-center justify-center rounded-full">
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </span>
+                  )}
+                </Button>
+              </CartSheet>
+
+            </div>
           </div>
 
-          {/* Sub-Header strip — Robu.in style with navy border */}
-          <div className="w-full border-t border-gray-100 hidden md:block bg-gray-50">
+          {/* ── Category strip ──────────────────────────────────── */}
+          <div className="hidden md:block border-t border-gray-100 bg-white">
             <div className="container mx-auto px-4">
-              <div className="flex items-center space-x-6 h-9 text-xs font-semibold text-[#111827] overflow-x-auto scrollbar-hide uppercase tracking-wider">
-                <Link suppressHydrationWarning href="/products?sort=trending" className="whitespace-nowrap hover:text-[#F38508] transition-colors">🔴 LIVE NOW</Link>
-                <Link suppressHydrationWarning href="/products?category=Men" className="whitespace-nowrap hover:text-[#F38508] transition-colors">MEN</Link>
-                <Link suppressHydrationWarning href="/products?category=Women" className="whitespace-nowrap hover:text-[#F38508] transition-colors">WOMEN</Link>
-                <Link suppressHydrationWarning href="/products?category=Accessories" className="whitespace-nowrap hover:text-[#F38508] transition-colors">ACCESSORIES</Link>
-                <Link suppressHydrationWarning href="/products?sale=true" className="whitespace-nowrap text-[#F38508] hover:text-[#D97706] transition-colors font-bold">SALE</Link>
-                <Link suppressHydrationWarning href="/products?category=Plus%20Size" className="whitespace-nowrap hover:text-[#F38508] transition-colors">PLUS SIZE</Link>
+              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+                {NAV_STRIP.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`whitespace-nowrap px-4 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-b-2 border-transparent hover:border-[#F38508] hover:text-[#F38508] ${
+                      item.highlight ? "text-[#F38508] font-bold" : "text-gray-600"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
@@ -231,12 +219,32 @@ export function Header() {
       {/* Mobile full-screen search overlay */}
       {mobileSearchOpen && (
         <div className="fixed inset-0 z-[300] bg-white flex flex-col md:hidden">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 bg-white">
-            <button onClick={() => setMobileSearchOpen(false)} className="p-2 rounded hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200">
+            <button
+              onClick={() => setMobileSearchOpen(false)}
+              className="p-2 rounded-lg hover:bg-gray-100 flex-shrink-0"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
             </button>
             <div className="flex-1">
               <InlineSearch onFocusChange={(f) => { if (!f) setMobileSearchOpen(false) }} />
+            </div>
+          </div>
+          <div className="px-4 pt-4">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-3">Quick Links</p>
+            <div className="flex flex-wrap gap-2">
+              {NAV_STRIP.slice(1).map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileSearchOpen(false)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${item.highlight ? "border-[#F38508] text-[#F38508]" : "border-gray-200 text-gray-600"}`}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -247,18 +255,7 @@ export function Header() {
 
 function ShoppingBagIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
       <path d="M3 6h18" />
       <path d="M16 10a4 4 0 0 1-8 0" />

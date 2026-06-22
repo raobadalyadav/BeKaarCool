@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -15,11 +14,6 @@ import {
   Phone,
   MapPin,
   Send,
-  Heart,
-  Shield,
-  Truck,
-  Award,
-  CreditCard,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Logo, VisaIcon, MastercardIcon, UpiIcon, RazorpayIcon, CodIcon } from "@/components/layout/logo"
@@ -57,189 +51,209 @@ export function Footer() {
     }
   }
 
-  const features = [
-    { icon: CreditCard, text: "Secure Payments" },
-    { icon: Truck, text: "Fast Delivery" },
-    { icon: Shield, text: "100% Genuine" },
-    { icon: Award, text: "Best Quality" },
-  ]
-
   return (
     <footer className="bg-gray-900 text-white">
-      {/* Features Bar */}
-      <div className="bg-[#F38508] py-4">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-center justify-center space-x-2 text-black">
-                <feature.icon className="h-5 w-5" />
-                <span className="font-semibold text-sm">{feature.text}</span>
-              </div>
+
+      {/* ── Newsletter strip ───────────────────────────────────── */}
+      <div className="bg-gray-800 border-b border-gray-700">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <p className="font-bold text-white text-lg">Subscribe & get 10% off your first order</p>
+              <p className="text-gray-400 text-sm mt-0.5">No spam. Unsubscribe any time.</p>
+            </div>
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2 w-full md:w-auto md:min-w-[360px]">
+              <Input
+                type="email"
+                placeholder="Your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 flex-1"
+              />
+              <Button
+                type="submit"
+                disabled={subscribing}
+                className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold px-5 flex-shrink-0"
+              >
+                {subscribing ? "..." : <><Send className="h-4 w-4 mr-1" /> Subscribe</>}
+              </Button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main footer grid ───────────────────────────────────── */}
+      <div className="container mx-auto px-4 py-10">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+
+          {/* Col 1 — Brand */}
+          <div className="col-span-2 md:col-span-1 space-y-4">
+            <Logo width={140} height={35} textColor="#FFFFFF" />
+            <p className="text-gray-400 text-sm leading-relaxed">
+              India's favourite online fashion store. Trendy t-shirts, hoodies, accessories &amp; more at amazing prices.
+            </p>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Mail className="h-4 w-4 text-[#F38508] flex-shrink-0" />
+              <span>support@baefikra.com</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Phone className="h-4 w-4 text-[#F38508] flex-shrink-0" />
+              <span>+91 98765 43210</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <MapPin className="h-4 w-4 text-[#F38508] flex-shrink-0" />
+              <span>Mumbai, Maharashtra, India</span>
+            </div>
+            {/* Socials */}
+            <div className="flex gap-2 pt-1">
+              {[
+                { href: "https://facebook.com", Icon: Facebook },
+                { href: "https://twitter.com", Icon: Twitter },
+                { href: "https://instagram.com", Icon: Instagram },
+                { href: "https://youtube.com", Icon: Youtube },
+              ].map(({ href, Icon }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  suppressHydrationWarning
+                  className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Col 2 — Shop */}
+          <div className="space-y-4">
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">Shop</h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: "Men's Fashion", href: "/products?category=Men" },
+                { label: "Women's Fashion", href: "/products?category=Women" },
+                { label: "Accessories", href: "/products?category=Accessories" },
+                { label: "Footwear", href: "/products?category=Footwear" },
+                { label: "Mobile Covers", href: "/products?category=Mobile%20Covers" },
+                { label: "Trending Now", href: "/products?sort=trending" },
+                { label: "New Arrivals", href: "/products?sort=newest" },
+                { label: "Sale", href: "/products?sale=true" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link suppressHydrationWarning href={href} className="text-gray-400 text-sm hover:text-[#F38508] transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 3 — Company */}
+          <div className="space-y-4">
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">Company</h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: "About Us", href: "/about" },
+                { label: "Blog", href: "/blog" },
+                { label: "Careers", href: "/careers" },
+                { label: "Press", href: "/press" },
+                { label: "Collections", href: "/collections" },
+                { label: "Affiliate Program", href: "/affiliate" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link suppressHydrationWarning href={href} className="text-gray-400 text-sm hover:text-[#F38508] transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4 — Support */}
+          <div className="space-y-4">
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">Support</h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: "Track Your Order", href: "/track-order" },
+                { label: "Returns & Exchanges", href: "/returns" },
+                { label: "Shipping Info", href: "/shipping" },
+                { label: "Size Guide", href: "/size-guide" },
+                { label: "FAQs", href: "/faq" },
+                { label: "Contact Us", href: "/contact" },
+                { label: "Bulk & Corporate", href: "/corporate" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link suppressHydrationWarning href={href} className="text-gray-400 text-sm hover:text-[#F38508] transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 5 — Get the App */}
+          <div className="space-y-4">
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">Get the App</h3>
+            <p className="text-gray-400 text-sm">Shop on the go — exclusive app-only deals every day.</p>
+            <div className="space-y-2">
+              <Link
+                suppressHydrationWarning
+                href="/apps"
+                className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 rounded-xl px-4 py-3 transition-colors"
+              >
+                <span className="text-2xl">🍎</span>
+                <div>
+                  <p className="text-[10px] text-gray-400">Download on the</p>
+                  <p className="text-sm font-bold text-white">App Store</p>
+                </div>
+              </Link>
+              <Link
+                suppressHydrationWarning
+                href="/apps"
+                className="flex items-center gap-3 bg-gray-800 hover:bg-gray-700 rounded-xl px-4 py-3 transition-colors"
+              >
+                <span className="text-2xl">🤖</span>
+                <div>
+                  <p className="text-[10px] text-gray-400">Get it on</p>
+                  <p className="text-sm font-bold text-white">Google Play</p>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Legal strip ────────────────────────────────────────── */}
+      <div className="border-t border-gray-800">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
+            {[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Sitemap", href: "/sitemap" },
+              { label: "Cookie Policy", href: "/cookies" },
+            ].map(({ label, href }) => (
+              <Link key={href} suppressHydrationWarning href={href} className="hover:text-[#F38508] transition-colors">
+                {label}
+              </Link>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Main Footer */}
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="space-y-6">
-            <div>
-              <Logo width={148} height={37} textColor="#FFFFFF" />
-            </div>
-            <p className="text-gray-400 leading-relaxed">
-              India's favourite online fashion store. Explore trendy t-shirts, hoodies, accessories and more at amazing prices. Shop the coolest styles with confidence!
+      {/* ── Bottom bar ─────────────────────────────────────────── */}
+      <div className="border-t border-gray-800 bg-black/40">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+            <p className="text-gray-500 text-xs">
+              © {new Date().getFullYear()} Baefikra. All rights reserved. Made with ❤️ in India.
             </p>
-
-            {/* Social Links */}
-            <div className="flex space-x-3">
-              <a suppressHydrationWarning href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a suppressHydrationWarning href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a suppressHydrationWarning href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a suppressHydrationWarning href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#F38508] hover:text-black transition-colors">
-                <Youtube className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
-
-          {/* Shop */}
-          <div className="space-y-6">
-            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Shop</h3>
-            <div className="space-y-3">
-              <Link suppressHydrationWarning href="/products?category=Men" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Men&apos;s Fashion
-              </Link>
-              <Link suppressHydrationWarning href="/products?category=Women" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Women&apos;s Fashion
-              </Link>
-              <Link suppressHydrationWarning href="/products?category=Accessories" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Accessories
-              </Link>
-              <Link suppressHydrationWarning href="/products?category=Footwear" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Footwear
-              </Link>
-              <Link suppressHydrationWarning href="/products?featured=true" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Featured Products
-              </Link>
-              <Link suppressHydrationWarning href="/products?sort=trending" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Trending Now
-              </Link>
-            </div>
-          </div>
-
-          {/* Help */}
-          <div className="space-y-6">
-            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Help</h3>
-            <div className="space-y-3">
-              <Link suppressHydrationWarning href="/track-order" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Track Your Order
-              </Link>
-              <Link suppressHydrationWarning href="/shipping" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Shipping Information
-              </Link>
-              <Link suppressHydrationWarning href="/returns" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Returns & Exchanges
-              </Link>
-              <Link suppressHydrationWarning href="/size-guide" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Size Guide
-              </Link>
-              <Link suppressHydrationWarning href="/faq" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                FAQs
-              </Link>
-              <Link suppressHydrationWarning href="/contact" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Contact Us
-              </Link>
-              <Link suppressHydrationWarning href="/corporate" className="block text-gray-400 hover:text-[#F38508] transition-colors">
-                Bulk & Corporate
-              </Link>
-            </div>
-          </div>
-
-          {/* Contact & Newsletter */}
-          <div className="space-y-6">
-            <h3 className="font-bold text-lg text-white uppercase tracking-wide">Contact</h3>
-
-            {/* Contact Info */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 text-gray-400">
-                <Mail className="h-5 w-5 text-[#F38508]" />
-                <span className="text-sm">support@baefikra.com</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-400">
-                <Phone className="h-5 w-5 text-[#F38508]" />
-                <span className="text-sm">+91 98765 43210</span>
-              </div>
-              <div className="flex items-center space-x-3 text-gray-400">
-                <MapPin className="h-5 w-5 text-[#F38508]" />
-                <span className="text-sm">Mumbai, Maharashtra, India</span>
-              </div>
-            </div>
-
-            {/* Newsletter */}
-            <div className="space-y-3">
-              <p className="font-semibold text-white">Newsletter</p>
-              <p className="text-sm text-gray-400">Get 10% off on your first order!</p>
-              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 flex-1"
-                  required
-                />
-                <Button
-                  type="submit"
-                  className="bg-[#F38508] hover:bg-[#D97706] text-black font-bold px-4"
-                  disabled={subscribing}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Legal Links */}
-      <div className="border-t border-gray-800">
-        <div className="container py-4">
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-            <Link suppressHydrationWarning href="/about" className="hover:text-[#F38508] transition-colors">About Us</Link>
-            <span>•</span>
-            <Link suppressHydrationWarning href="/privacy" className="hover:text-[#F38508] transition-colors">Privacy Policy</Link>
-            <span>•</span>
-            <Link suppressHydrationWarning href="/terms" className="hover:text-[#F38508] transition-colors">Terms of Service</Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="border-t border-gray-800 bg-black/30">
-        <div className="container py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            {/* Copyright */}
-            <div className="flex items-center space-x-2 text-gray-500 text-sm">
-              <p>© 2024 Baefikra. All rights reserved.</p>
-              <span className="hidden md:inline">|</span>
-              <div className="hidden md:flex items-center space-x-1">
-                <span>Made with</span>
-                <Heart className="h-4 w-4 text-red-500 fill-current" />
-                <span>in India</span>
-              </div>
-            </div>
-
-            {/* Payment Methods */}
-            <div className="flex items-center gap-3 flex-wrap justify-center md:justify-end">
-              <span className="text-gray-500 text-xs">We accept:</span>
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              <span className="text-gray-600 text-xs">We accept:</span>
+              <div className="flex items-center gap-1.5">
                 <VisaIcon />
                 <MastercardIcon />
                 <UpiIcon />
@@ -250,6 +264,7 @@ export function Footer() {
           </div>
         </div>
       </div>
+
     </footer>
   )
 }
